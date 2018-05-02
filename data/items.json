@@ -1,0 +1,164 @@
+{
+
+	"knife1": {
+		"id": 1,
+		"name": "Knife",
+		"type":"Weapon",
+		"files":["knife1.gif","knife1Highlight.gif"]
+	},
+
+	"baseballBat":{
+		"id":2,
+		"name":"Bat",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"crowbar":{
+		"id":3,
+		"name":"Crowbar",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"pistol1":{
+		"id": 4,
+		"name": "M9",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"pistol2":{
+		"id": 5,
+		"name": "Glock 17",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"automaticRifle1":{
+		"id":6,
+		"name":"M16",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"automaticRifle2":{
+		"id":7,
+		"name":"AK-47",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"cannedFood1":{
+		"id":8,
+		"name":"Canned Beans",
+		"type":"Food",
+		"files":[]
+	},
+
+	"cannedFood2":{
+		"id":9,
+		"name":"Canned Meat",
+		"type":"Food",
+		"files":[]
+	},
+
+	"rawMeat":{
+		"id":10,
+		"name":"Raw Meat",
+		"type":"Food",
+		"files":[]
+	},
+
+	"cookedMeat":{
+		"id":11,
+		"name":"Cooked Meat",
+		"type":"Food",
+		"files":[]
+	},
+
+	"fruit1":{
+		"id":12,
+		"name":"Apple",
+		"type":"Food",
+		"files":[]
+	},
+
+	"wood1":{
+		"id":13,
+		"name":"Wood Log",
+		"type":"Resource",
+		"files":[]
+	},
+
+	"wood2":{
+		"id":14,
+		"name":"Stick",
+		"type":"Resource",
+		"files":[]
+	},
+
+	"stone1":{
+		"id":15,
+		"name":"Rock",
+		"type":"Resource",
+		"files":[]
+	},
+
+	"shotgun1":{
+		"id":16,
+		"name":"Mossberg 500",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"shotgun2":{
+		"id":17,
+		"name":"M4",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"sniper1":{
+		"id":18,
+		"name":"M24",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"sniper2":{
+		"id":19,
+		"name":"Mosin Nagant",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"revolver":{
+		"id":20,
+		"name":"M1877",
+		"type":"Weapon",
+		"files":[]
+	},
+
+	"flashlight":{
+		"id":21,
+		"name":"Flashlight",
+		"type":"Tool",
+		"files":[]
+	},
+
+	"compass":{
+		"id":22,
+		"name":"Compass",
+		"type":"Tool",
+		"files":[]
+	},
+
+	"waterBottle":{
+		"id":23,
+		"name":"Water Bottle",
+		"type":"Tool",
+		"files":[]
+	}
+
+}
