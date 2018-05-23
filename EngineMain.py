@@ -4,6 +4,7 @@ from MainScene import *
 from SettingsScene import *
 from time import sleep
 from Scene import Scene
+from GameObject import *
 
 TESTING = False
 
@@ -21,7 +22,7 @@ def saveSettings():
     updatedSettings = []
     for item in settingsS.settingText:
         itemText = s.canv.itemcget(item, 'text').split()
-        print(itemText[-1])
+        if TESTING: print(itemText[-1])
         if itemText[0:2] == ['Screen', 'Size']:
             updatedSettings.append(itemText[3])
             updatedSettings.append(itemText[5])
@@ -58,7 +59,7 @@ def saveSettings():
         sWidth = s.canv.winfo_screenwidth()
         sHeight = s.canv.winfo_screenheight()
         
-        s.root.geometry("{}x{}+{}+{}".format(width, height, 0, 0))
+        s.root.geometry("{}x{}+0+0".format(width, height))
         if TESTING:print(s.root.geometry())
         s.canv.config(width = width, height = height)
         s.root.attributes("-fullscreen", fullScr)
@@ -67,7 +68,7 @@ def saveSettings():
         sHeight = height
         
         s.root.attributes("-fullscreen", fullScr)
-        s.root.geometry("{}x{}+50+50".format(width, height))
+        s.root.geometry("{}x{}+20+20".format(width, height))
         if TESTING: print(s.root.geometry())
         s.canv.config(width = width, height = height)
 
@@ -100,7 +101,7 @@ def run():
             updatedSettings = [settings["window"]["width"],settings["window"]["height"],settings["window"]["fullscreen"],settings["sound"]]
             
             global applyButton
-            applyButton = s.canv.create_text(sWidth // 2, sHeight - 50, text = "Save and Apply", fill = 'black', activefill = 'yellow', font = ('Helvetica', 16))
+            applyButton = s.canv.create_text(sWidth // 2, sHeight - 100, text = "Save and Apply", fill = 'black', activefill = 'yellow', font = ('Helvetica', 16))
             s.canv.tag_bind(applyButton, '<Button-1>', saveSettingsEvent)
             
             firstTime = False
@@ -111,12 +112,13 @@ def run():
 def main():
     global sWidth, sHeight,mainS, settingsS, s, firstTime, updatePosition
     if settings["window"]["width"] == None:
-        s = makeScreen(1024, 768, settings["window"]["fullscreen"])
+        s = makeScreen(1024, 768, settings["window"]["fullscreen"], "GameWindow")
         settings["window"]["width"] = s.canv.winfo_screenwidth()
         settings["window"]["height"] = s.canv.winfo_screenheight()
         
     else:
         s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Game Window")
+
     
     if settings["window"]["fullscreen"] == True:
         sWidth = s.root.winfo_screenwidth()
@@ -127,7 +129,7 @@ def main():
         sWidth = int(s.canv.cget('width'))
         sHeight = int(s.canv.cget('height'))
     mainS = MainScene("Zombie Game")
-    settingsS = SettingsScene()
+    settingsS = SettingsScene(s)
     
     
     firstTime = True
@@ -139,6 +141,8 @@ def main():
         sleep(0.001)
 
 if __name__ == '__main__':
+    
+    # GO = GameObject()
     global settings
     settings = loadSettings()
     

@@ -5,11 +5,19 @@ screenOptions = [(1920,1200),(1920,1080),(1680,1050),(1600,900),(1440,900),(1360
 
 
 class SettingsScene(Scene):
-    def __init__(self):
+    def __init__(self, screen):
         super().__init__("scene_settings",["scene_main", "scene_menu"])
         self.settings = ["Screen Size", "Fullscreen","Sound"]
         self.settingText = []
         self.title = 0
+
+        maxWidth = screen.canv.winfo_screenwidth()
+        maxHeight = screen.canv.winfo_screenheight()
+
+        global screenOptions
+        for i in range(len(screenOptions)-1, -1, -1):
+            if screenOptions[i][0] > maxWidth or screenOptions[i][1] > maxHeight:
+                screenOptions.pop(i)
     
     def changeSetting(self, Event, screen):
         item = screen.canv.find_closest(Event.x, Event.y)
@@ -45,9 +53,10 @@ class SettingsScene(Scene):
     
     def displaySettings(self, screen, x, y, width, height, fullscreen, sound):
         self.deleteSettings(screen)
-        if fullscreen == True:
-            x = screen.root.winfo_screenwidth() // 2
-            y = screen.root.winfo_screenheight() // 2
+##        print(type(fullscreen))
+##        if eval(fullscreen) == True:
+##            x = screen.root.winfo_screenwidth() // 2
+##            y = screen.root.winfo_screenheight() // 2
         if TESTING: print(x,y, fullscreen == True)
         self.title = screen.canv.create_text(x, y*0.5, text = "Settings", font = ('Helvetica', '24'))
         options = [fullscreen , sound]
