@@ -1,16 +1,37 @@
-from Screen import *
+#Standard Library
 import json as js
+import os
+from time import sleep
+from random import choice
+import atexit
+
+#Parent Classes
+from Screen import *
+from Scene import Scene
+
+#Scenes
 from MainScene import *
 from SettingsScene import *
-from time import sleep
-from Scene import Scene
+from GameScene import *
+
+#Game Scene Stuff
 from GameObject import *
+from Tile import *
+from Camera import Camera
+
+#Miscellaneous
+from keyHandler import KeyHandler
 
 TESTING = False
 
 
-def loadSettings():
-    with open("data/configs.json") as jsonFile:
+def exitProcedure():
+    pass
+
+atexit.register(exit)
+
+def loadSettings(sFile = "data/configs.json"):
+    with open(sFile) as jsonFile:
         data = js.load(jsonFile)
     return data
 
@@ -50,7 +71,7 @@ def saveSettings():
     s.canv.delete(applyButton)
     applyButton = None
     
-    settingsS.deleteSettings(s)
+    settingsS.deleteSettings()
     global firstTime
     firstTime = True
     settingsS.change_scene("scene_main")
@@ -76,10 +97,14 @@ def saveSettings():
 def run():
     global firstTime
     
+    KH.scene = Scene.current_scene
+    # print(Cam.x, Cam.y)
+    # print(KH.scene)
+
     if Scene.current_scene == "scene_main":
-        mainS.displayOptions(s, sWidth//2, sHeight//2)
+        mainS.displayOptions(sWidth//2, sHeight//2)
         
-    if Scene.current_scene == "scene_settings":
+    elif Scene.current_scene == "scene_settings":
         if not firstTime:
             updatedSettings = []
             for item in settingsS.settingText:
@@ -94,9 +119,7 @@ def run():
                     updatedSettings = [settings["window"]["width"],settings["window"]["height"],settings["window"]["fullscreen"],settings["sound"]]
                     saveSettings()
                     break
-                
-            
-            
+                        
         else:
             updatedSettings = [settings["window"]["width"],settings["window"]["height"],settings["window"]["fullscreen"],settings["sound"]]
             
@@ -105,12 +128,22 @@ def run():
             s.canv.tag_bind(applyButton, '<Button-1>', saveSettingsEvent)
             
             firstTime = False
-        settingsS.displaySettings(s, sWidth//2, sHeight//2, *updatedSettings)
+        settingsS.displaySettings(sWidth//2, sHeight//2, *updatedSettings)
+    
+    elif Scene.current_scene == "scene_game":
+        Cam.move()
+        Cam.Velx *= 0.9
+        Cam.Vely *= 0.9
+        gameS.showTiles(tileGrid)
+        s.canv.update()
 
 
 
 def main():
-    global sWidth, sHeight,mainS, settingsS, s, firstTime, updatePosition
+    global sWidth, sHeight
+    global mainS, settingsS, gameS, Cam, KH
+    global s, firstTime, updatePosition, tileGrid
+
     if settings["window"]["width"] == None:
         s = makeScreen(1024, 768, settings["window"]["fullscreen"], "GameWindow")
         settings["window"]["width"] = s.canv.winfo_screenwidth()
@@ -120,6 +153,14 @@ def main():
         s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Game Window")
 
     
+    Cam = Camera(s)
+    KH = KeyHandler(s,Cam)
+    s.root.bind_all("<Up>", KH.handlerHandlerP)
+    s.root.bind_all("<Down>", KH.handlerHandlerP)
+    s.root.bind_all("<Left>", KH.handlerHandlerP)
+    s.root.bind_all("<Right>", KH.handlerHandlerP)
+    s.root.bind("<KeyRelease>", KH.handlerHandlerR)
+
     if settings["window"]["fullscreen"] == True:
         sWidth = s.root.winfo_screenwidth()
         sHeight = s.root.winfo_screenheight()
@@ -128,10 +169,18 @@ def main():
     else:
         sWidth = int(s.canv.cget('width'))
         sHeight = int(s.canv.cget('height'))
-    mainS = MainScene("Zombie Game")
-    settingsS = SettingsScene(s)
+    mainS = MainScene("Zombie Game", s, KH)
+    settingsS = SettingsScene(s,KH)
+    gameS = GameScene(s,KH)
+
     
     
+    tileGrid = []
+    for i in range(tileGridHeight):
+        tileGrid.append([])
+        for j in range(tileGridWidth):
+            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,choice(["red",'blue','yellow','green','orange','purple']), s, Cam))
+        
     firstTime = True
     if TESTING: print(sWidth, sHeight)
     run()
@@ -139,6 +188,9 @@ def main():
         run()
         s.canv.update()
         sleep(0.001)
+
+
+
 
 if __name__ == '__main__':
     

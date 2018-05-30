@@ -22,7 +22,8 @@ class GameObject:
     def display(self, camera, screen):
         screen.canv.delete(self.screenObj)
         if self.isOnScreen(camera, screen):
-            if self.type == img:
+            if self.type == "img":
                 self.screenObj = screen.canv.create_image(self.x - camera.x, self.y - camera.y, image = self.sprite)
+
         
 
