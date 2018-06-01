@@ -4,161 +4,199 @@
 		"id": 1,
 		"name": "Knife",
 		"type":"Weapon",
-		"files":["knife1.gif","knife1Highlight.gif"]
+		"subtype":"Melee",
+		"files":["images/Weapons/Knife/knife1.gif","images/Weapons/Knife/knife1Highlight.gif"],
+		"ammo":"Melee",
+		"damage":17
 	},
 
 	"baseballBat":{
 		"id":2,
 		"name":"Bat",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Melee",
+		"files":["images/Weapons/Bat/baseballBat.gif","images/Weapons/Bat/baseballBatHighlight.gif"],
+		"ammo":"Melee",
+		"damage":20
 	},
 
 	"crowbar":{
 		"id":3,
 		"name":"Crowbar",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Melee",
+		"files":["images/Weapons/Crowbar/crowbar.gif","images/Weapons/Crowbar/crowbarHighlight.gif"],
+		"ammo":"Melee",
+		"damage":25
 	},
 
 	"pistol1":{
 		"id": 4,
-		"name": "M9",
+		"name": "M1911",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Pistol",
+		"files":["images/Weapons/M1911/M1911.gif","images/Weapons/M1911/M1911Highlight.gif"],
+		"ammo":7,
+		"damage":25
 	},
 
 	"pistol2":{
 		"id": 5,
 		"name": "Glock 17",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Pistol",
+		"files":["images/Weapons/Glock/glock.gif","images/Weapons/Glock/glockHighlight.gif"],
+		"ammo":17,
+		"damage":15
 	},
 
 	"automaticRifle1":{
 		"id":6,
 		"name":"M16",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Automatic Rifle",
+		"files":[],
+		"ammo":30,
+		"damage":20
 	},
 
 	"automaticRifle2":{
 		"id":7,
 		"name":"AK-47",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Automatic Rifle",
+		"files":["images/Weapons/Ak-47/ak47.gif","images/Weapons/Ak-47/ak47Highlight.gif"],
+		"ammo":30,
+		"damage":34
 	},
 
 	"cannedFood1":{
 		"id":8,
 		"name":"Canned Beans",
 		"type":"Food",
-		"files":[]
+		"files":["images/Food/Canned Beans/cannedBeans.gif","images/Food/Canned Beans/cannedBeansHighlight.gif"]
 	},
 
 	"cannedFood2":{
 		"id":9,
 		"name":"Canned Meat",
 		"type":"Food",
-		"files":[]
+		"files":["images/Food/Canned Meat/cannedMeat.gif","images/Food/Canned Meat/cannedMeatHighlight.gif"]
 	},
 
 	"rawMeat":{
 		"id":10,
 		"name":"Raw Meat",
 		"type":"Food",
-		"files":[]
+		"files":["images/Food/Raw Meat/rawMeat.gif","images/Food/Raw Meat/rawMeatHighlight.gif"]
 	},
 
 	"cookedMeat":{
 		"id":11,
 		"name":"Cooked Meat",
 		"type":"Food",
-		"files":[]
+		"files":["images/Food/Cooked Meat/cookedMeat.gif","images/Food/Cooked Meat/cookedMeatHighlight.gif"]
 	},
 
 	"fruit1":{
 		"id":12,
 		"name":"Apple",
 		"type":"Food",
-		"files":[]
+		"files":["images/Food/Apple/apple.gif","images/Food/Apple/appleHighlight.gif"]
 	},
 
 	"wood1":{
 		"id":13,
 		"name":"Wood Log",
 		"type":"Resource",
-		"files":[]
+		"files":["images/Resources/Wood Log/woodLog.gif","images/Resources/Wood Log/woodLogHighlight.gif"]
 	},
 
 	"wood2":{
 		"id":14,
 		"name":"Stick",
 		"type":"Resource",
-		"files":[]
+		"files":["images/Resources/Stick/stick.gif","images/Resources/Stick/stickHighlight.gif"]
 	},
 
 	"stone1":{
 		"id":15,
 		"name":"Rock",
 		"type":"Resource",
-		"files":[]
+		"files":["images/Resources/Rock/rock.gif","images/Resources/Rock/rockHighlight.gif"]
 	},
 
 	"shotgun1":{
 		"id":16,
 		"name":"Mossberg 500",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Shotgun",
+		"files":[],
+		"ammo":6,
+		"damage":12,
+		"shots":10
 	},
 
 	"shotgun2":{
 		"id":17,
 		"name":"M4",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Shotgun",
+		"files":[],
+		"ammo":8,
+		"damage":17,
+		"shots":8
 	},
 
 	"sniper1":{
 		"id":18,
 		"name":"M24",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Sniper",
+		"files":[],
+		"ammo":5,
+		"damage":120
 	},
 
 	"sniper2":{
 		"id":19,
 		"name":"Mosin Nagant",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Sniper",
+		"files":[],
+		"ammo":5,
+		"damage":90
 	},
 
 	"revolver":{
 		"id":20,
-		"name":"M1877",
+		"name":"M1877 Revolver",
 		"type":"Weapon",
-		"files":[]
+		"subtype":"Pistol",
+		"files":[],
+		"ammo":6,
+		"damage":50
 	},
 
 	"flashlight":{
 		"id":21,
 		"name":"Flashlight",
 		"type":"Tool",
-		"files":[]
+		"files":["images/Tools/Flashlight/flashlight.gif","images/Tools/Flashlight/flashlightHighlight.gif"]
 	},
 
 	"compass":{
 		"id":22,
 		"name":"Compass",
 		"type":"Tool",
-		"files":[]
+		"files":["images/Tools/Compass/compass.gif","images/Tools/Compass/compassHighlight.gif"]
 	},
 
 	"waterBottle":{
 		"id":23,
 		"name":"Water Bottle",
 		"type":"Tool",
-		"files":[]
+		"files":["images/Tools/Water Bottle/waterBottle.gif","images/Tools/Water Bottle/waterBottleHighlight.gif"]
 	}
 
 }

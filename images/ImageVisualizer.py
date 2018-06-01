@@ -13,28 +13,6 @@ toggle = 0
 prevToggle = 0
 
 
-
-#def Hover(Event):
-    #c.delete(i)
-    
-    #item = c.find_closest(Event.x, Event.y)
-    
-    
-    #global img, i
-    #img = PhotoImage(file = options[1])
-    #i = c.create_image(Event.x, Event.y, image = img)
-    
-    #c.tag_bind(i, "<Leave>", leaveHover)
-
-#def leaveHover(Event):
-    #c.delete(i)
-    
-    #global img, i
-    #img = PhotoImage(file = options[0])
-    #i = c.create_image(Event.x, Event.y, image = img)
-    
-    #c.tag_bind(i, "<Enter>", Hover)
-
 def Pickup(Event):
     item = c.find_closest(Event.x, Event.y)
     print("Clicked on {}".format(c.itemcget(item, "image")))
