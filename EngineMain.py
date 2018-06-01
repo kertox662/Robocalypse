@@ -4,6 +4,7 @@ import os
 from time import sleep
 from random import choice
 import atexit
+import sys
 
 #Parent Classes
 from Screen import *
@@ -21,6 +22,13 @@ from Camera import Camera
 
 #Miscellaneous
 from keyHandler import KeyHandler
+
+dependencyPath = __file__.split('EngineMain.py')[0] + "Dependencies"
+sys.path.append(dependencyPath)
+import InstallPip
+
+
+# print(sys.path)
 
 TESTING = False
 
@@ -131,11 +139,35 @@ def run():
         settingsS.displaySettings(sWidth//2, sHeight//2, *updatedSettings)
     
     elif Scene.current_scene == "scene_game":
-        Cam.move()
-        Cam.Velx *= 0.9
-        Cam.Vely *= 0.9
         gameS.showTiles(tileGrid)
-        s.canv.update()
+
+        if KH.aToggle:
+            Cam.Velx += -0.1
+        if KH.dToggle:
+            Cam.Velx += 0.1
+        if KH.wToggle:
+            Cam.Vely -= 0.1
+        if KH.sToggle:
+            Cam.Vely += 0.1
+        
+        if Cam.Velx > 1:
+            Cam.Velx = 1
+        elif Cam.Velx < -1:
+            Cam.Velx = -1
+        
+        if Cam.Vely > 1:
+            Cam.Vely = 1
+        elif Cam.Vely < -1:
+            Cam.Vely = -1
+
+        Cam.move()
+
+        # print(Cam.Velx, Cam.Vely)
+
+        Cam.Velx *= 0.95
+        Cam.Vely *= 0.95
+
+        
 
 
 
@@ -155,11 +187,11 @@ def main():
     
     Cam = Camera(s)
     KH = KeyHandler(s,Cam)
-    s.root.bind_all("<Up>", KH.handlerHandlerP)
-    s.root.bind_all("<Down>", KH.handlerHandlerP)
-    s.root.bind_all("<Left>", KH.handlerHandlerP)
-    s.root.bind_all("<Right>", KH.handlerHandlerP)
-    s.root.bind("<KeyRelease>", KH.handlerHandlerR)
+    # s.root.bind_all("<Up>", KH.handlerHandlerP)
+    # s.root.bind_all("<Down>", KH.handlerHandlerP)
+    # s.root.bind_all("<Left>", KH.handlerHandlerP)
+    # s.root.bind_all("<Right>", KH.handlerHandlerP)
+    # s.root.bind("<KeyRelease>", KH.handlerHandlerR)
 
     if settings["window"]["fullscreen"] == True:
         sWidth = s.root.winfo_screenwidth()
@@ -193,7 +225,7 @@ def main():
 
 
 if __name__ == '__main__':
-    
+    InstallPip.checkDependencies()
     # GO = GameObject()
     global settings
     settings = loadSettings()

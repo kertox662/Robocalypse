@@ -1,72 +1,60 @@
 from Camera import Camera
+from pynput import keyboard
+from threading import Thread
+
+def keyboardThread(self):
+    with keyboard.Listener(on_press=self.onPress, on_release=self.onRelease) as l:
+            l.join()
+
 
 class KeyHandler:
     def __init__(self, screen, camera):
         self.screen = screen
         self.camera = camera
         self.scene = "scene_main"
+        self.wToggle = False
+        self.aToggle = False
+        self.sToggle = False
+        self.dToggle = False
+
+        t = Thread(target=keyboardThread, args=(self,))
+        t.daemon = True
+        t.start()
+        
     
             
-    def handlerHandlerP(self, Event):
-        # print(Event)
-        keycode = Event.keysym
-        keysym = Event.keysym
-        self.pressHandler(keycode, keysym, self.scene)
+    def onPress(self, key):
+        # print(arg2)
+        try:
+            ch = key.char
 
-    def handlerHandlerR(self, Event):
-        # print(Event)
-        keycode = Event.keycode
-        keysym = Event.keysym
-        self.releaseHandler(keycode, keysym, self.scene)
-
-    def pressHandler(self, keycode, keysym, scene):
-        if scene == "scene_game":
-            if keysym == "Up":
-                if self.camera.Vely > -1:
-                    self.camera.Vely += -0.1
-                    if self.camera.Vely < -1:
-                        self.camera.Vely = -1
-                print("Up Press")
-                # print(self.camera.Movementx, self.camera.Movementy)
-            
-            elif keysym == "Down":
-                if self.camera.Vely < 1:
-                    self.camera.Vely += 0.1
-                    if self.camera.Vely > 1:
-                        self.camera.Vely = 1
-                print("Down Press")
-                # print(self.camera.Movementx, self.camera.Movementy)
-            
-            elif keysym == "Right":
-                if self.camera.Velx < 1:
-                    self.camera.Velx += 0.1
-                    if self.camera.Velx > 1:
-                        self.camera.Velx = 1
-                print("Right Press")
-                # print(self.camera.Movementx, self.camera.Movementy)
-            
-            elif keysym == "Left":
-                if self.camera.Velx > -1:
-                    self.camera.Velx -= 0.1
-                    if self.camera.Velx < -1:
-                        self.camera.Velx = -1
-                print("Left Press")
-                # print(self.camera.Movementx, self.camera.Movementy)
+        except AttributeError:
+            ch = ''
+        
+        if ch == 'w':
+            self.wToggle = True
+        elif ch == 'a':
+            self.aToggle = True
+        elif ch == 's':
+            self.sToggle = True
+        elif ch == 'd':
+            self.dToggle = True
     
-    def releaseHandler(self, keycode, keysym, scene):
-        if scene == "scene_game":
-            if keysym == "w":
-                self.w = False
-                print("Up Release")
-            
-            elif keysym == "s":
-                self.s = False
-                print("Down Release")
-            
-            elif keysym == "d":
-                self.d = False
-                print("Right Release")
-            
-            elif keysym == "a":
-                self.a = False
-                print("Left Release")
+        print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)
+    
+    def onRelease(self, key):
+        try:
+            ch = key.char
+            if ch == 'w':
+                self.wToggle = False
+            elif ch == 'a':
+                self.aToggle = False
+            elif ch == 's':
+                self.sToggle = False
+            elif ch == 'd':
+                self.dToggle = False
+        
+        except AttributeError:
+            pass
+        
+        print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)
