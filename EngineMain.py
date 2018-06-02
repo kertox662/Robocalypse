@@ -11,7 +11,7 @@ sys.path.append(dependencyPath)
 import InstallPip
 if __name__ == '__main__':
     InstallPip.checkDependencies()
-    input("Press enter once the packages have been installed. ()")
+    input("Press enter once the packages have been installed.")
 
 #Parent Classes
 from Screen import *
@@ -142,28 +142,10 @@ def runGame():
     elif Scene.current_scene == "scene_game":
 
         if gameS.checkRendered(renderedTiles) == False:
-            renderedTiles = gameS.setRenderGrid(tileGrid, renderedTiles)
+            renderedTiles = gameS.setRenderGrid(tileGrid)
         gameS.showTiles(renderedTiles)
 
-        if KH.aToggle:
-            Cam.Velx += -0.1
-        if KH.dToggle:
-            Cam.Velx += 0.1
-        if KH.wToggle:
-            Cam.Vely -= 0.1
-        if KH.sToggle:
-            Cam.Vely += 0.1
-        
-        if Cam.Velx > 1:
-            Cam.Velx = 1
-        elif Cam.Velx < -1:
-            Cam.Velx = -1
-        
-        if Cam.Vely > 1:
-            Cam.Vely = 1
-        elif Cam.Vely < -1:
-            Cam.Vely = -1
-
+        Cam.updateVelocity()
         Cam.move()
 
         Cam.Velx *= 0.95
@@ -195,9 +177,9 @@ def setInitialValues():
     else:
         s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Game Window")
 
+    KH = KeyHandler(s)
+    Cam = Camera(s, KH)
     
-    Cam = Camera(s)
-    KH = KeyHandler(s,Cam)
 
     if settings["window"]["fullscreen"] == True:
         sWidth = s.root.winfo_screenwidth()
@@ -209,7 +191,7 @@ def setInitialValues():
         sHeight = int(s.canv.cget('height'))
     mainS = MainScene("Zombie Game", s, KH)
     settingsS = SettingsScene(s,KH)
-    gameS = GameScene(s,KH)
+    gameS = GameScene(s,Cam, KH)
 
     
     
@@ -219,7 +201,7 @@ def setInitialValues():
         for j in range(tileGridWidth):
             tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,choice(["red",'blue','yellow','green','orange','purple']), s, Cam, i, j))
 
-    renderedTiles = gameS.setRenderGrid(tileGrid, None)
+    renderedTiles = gameS.setRenderGrid(tileGrid)
         
     firstTime = True
     if TESTING: print(sWidth, sHeight)

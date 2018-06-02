@@ -8,9 +8,8 @@ def keyboardThread(self):
 
 
 class KeyHandler:
-    def __init__(self, screen, camera):
+    def __init__(self, screen):
         self.screen = screen
-        self.camera = camera
         self.scene = "scene_main"
         self.wToggle = False
         self.aToggle = False
