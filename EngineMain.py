@@ -202,7 +202,7 @@ def setInitialValues():
 
     tileData = loadSettings("data/tiles.json")
     tileSprites = []
-    for i in range(1,29):
+    for i in range(1,37):
         imgTemp = Image.open(tileData[str(i)]["image"])
         tileSprites.append(ImageTk.PhotoImage(image=imgTemp))
 
@@ -231,8 +231,8 @@ def setInitialValues():
         # print(i)
         # print("="*20)
 
-    print(type(tileMap))
-    print(type(tileMap[0]))
+    # print(type(tileMap))
+    # print(type(tileMap[0]))
     
     tileGrid = []
     for i in range(tileGridHeight):
@@ -243,8 +243,9 @@ def setInitialValues():
             # else:
             #     tileC = 'green'
 
-            choiceID = randint(0,27)           
-
+            # choiceID = randint(0,27)           
+            # print(tileMap[i][j])
+            # print(tileSprites[0])
             tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight, tileSprites[int(tileMap[i][j])-1], s, Cam, i, j))
 
     renderedTiles = gameS.setRenderGrid(tileGrid)

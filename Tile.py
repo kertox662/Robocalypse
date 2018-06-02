@@ -1,8 +1,8 @@
 from GameObject import *
 from PIL import Image, ImageTk
 
-tileGridWidth = 20
-tileGridHeight = 20
+tileGridWidth = 50
+tileGridHeight = 50
 
 class Tile(GameObject):
     tileWidth = 400

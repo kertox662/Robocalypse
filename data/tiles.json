@@ -109,6 +109,38 @@
 
     "28":{
         "image":"Tileset/400x400/Road/RoadIntersection.png"
+    },
+    
+    "29":{
+        "image":"Tileset/400x400/Coast/CoastL1.png"
+    },
+
+    "30":{
+        "image":"Tileset/400x400/Coast/CoastL2.png"
+    },
+
+    "31":{
+        "image":"Tileset/400x400/Coast/CoastL3.png"
+    },
+
+    "32":{
+        "image":"Tileset/400x400/Coast/CoastL4.png"
+    },
+
+    "33":{
+        "image":"Tileset/400x400/Road/RoadL1.png"
+    },
+
+    "34":{
+        "image":"Tileset/400x400/Road/RoadL2.png"
+    },
+
+    "35":{
+        "image":"Tileset/400x400/Road/RoadL3.png"
+    },
+
+    "36":{
+        "image":"Tileset/400x400/Road/RoadL4.png"
     }
 }
 

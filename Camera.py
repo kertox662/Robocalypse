@@ -8,8 +8,8 @@ class Camera:
         self.Velx = 0
         self.Vely = 0
 
-        self.x = screen.width/2
-        self.y = screen.height/2
+        self.x = 2000
+        self.y = 2000
         self.screen = screen
         self.KH = KH
         
