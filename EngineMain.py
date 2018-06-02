@@ -2,9 +2,10 @@
 import json as js
 import os
 from time import sleep
-from random import choice
+from random import choice, randint
 import atexit
 import sys
+from threading import Thread
 
 dependencyPath = __file__.split('EngineMain.py')[0] + "Dependencies"
 sys.path.append(dependencyPath)
@@ -25,6 +26,10 @@ from GameScene import *
 from GameObject import *
 from Tile import *
 from Camera import Camera
+
+#Downloaded Modules
+from PIL import Image, ImageTk
+from pygame import mixer
 
 #Miscellaneous
 from keyHandler import KeyHandler
@@ -98,6 +103,32 @@ def saveSettings():
     s.updateDimensions()
 
 
+frame = 0
+
+def countFrameRate():
+    global frame
+    while True:
+        sleep(1)
+        print(frame)
+        frame = 0
+
+# def updateGraphics():
+#     global renderedTiles
+#     while True:
+#         if Scene.current_scene == "scene_game":
+
+            
+        
+
+
+frameThread = Thread(target=countFrameRate)
+frameThread.daemon = True
+frameThread.start()
+
+# graphicsThread = Thread(target = updateGraphics)
+# graphicsThread.daemon = True
+# graphicsThread.start()
+
 def runGame():
     global firstTime
     global renderedTiles
@@ -134,7 +165,6 @@ def runGame():
         settingsS.displaySettings(sWidth//2, sHeight//2, *updatedSettings)
     
     elif Scene.current_scene == "scene_game":
-
         if gameS.checkRendered(renderedTiles) == False:
             renderedTiles = gameS.setRenderGrid(tileGrid)
         gameS.showTiles(renderedTiles)
@@ -142,6 +172,8 @@ def runGame():
         Cam.updateVelocity()
         Cam.move()
         Cam.applyFriction()
+    
+    
 
 
 
@@ -150,18 +182,26 @@ def setInitialValues():
     global mainS, settingsS, gameS, Cam, KH
     global s, firstTime, updatePosition
     global settings , TESTING
-    global renderedTiles, tileGrid
+    global renderedTiles, tileGrid, tileData, tileSprites
+    global frame
 
     settings = loadSettings()
     TESTING = False
 
     if settings["window"]["width"] == None:
-        s = makeScreen(1024, 768, settings["window"]["fullscreen"], "GameWindow")
+        s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", "images/Robot.ico")
         settings["window"]["width"] = s.canv.winfo_screenwidth()
         settings["window"]["height"] = s.canv.winfo_screenheight()
         
     else:
-        s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Game Window")
+        s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Robocalypse Game", "images/Robot.ico")
+
+    tileData = loadSettings("data/tiles.json")
+    tileSprites = []
+    for i in range(1,29):
+        imgTemp = Image.open(tileData[str(i)]["image"])
+        tileSprites.append(ImageTk.PhotoImage(image=imgTemp))
+
 
     KH = KeyHandler(s)
     Cam = Camera(s, KH)
@@ -175,7 +215,7 @@ def setInitialValues():
     else:
         sWidth = int(s.canv.cget('width'))
         sHeight = int(s.canv.cget('height'))
-    mainS = MainScene("Zombie Game", s, KH)
+    mainS = MainScene("Robocalypse", s, KH)
     settingsS = SettingsScene(s,KH)
     gameS = GameScene(s,Cam, KH)
 
@@ -185,11 +225,14 @@ def setInitialValues():
     for i in range(tileGridHeight):
         tileGrid.append([])
         for j in range(tileGridWidth):
-            if i in [0, tileGridHeight - 1] or j in [0, tileGridWidth - 1]:
-                tileC = 'blue'
-            else:
-                tileC = 'green'
-            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight, tileC, s, Cam, i, j))
+            # if i in [0, tileGridHeight - 1] or j in [0, tileGridWidth - 1]:
+            #     tileC = 'blue'
+            # else:
+            #     tileC = 'green'
+
+            choiceID = randint(0,27)           
+
+            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight, tileSprites[choiceID], s, Cam, i, j))
 
     renderedTiles = gameS.setRenderGrid(tileGrid)
         
@@ -198,7 +241,8 @@ def setInitialValues():
     while True:
         runGame()
         s.canv.update()
-        sleep(0.001)
+        sleep(1/60)
+        frame += 1
 
 
 

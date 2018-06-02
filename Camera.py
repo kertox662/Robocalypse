@@ -2,7 +2,7 @@ from Tile import *
 
 class Camera:
     camSpeed = 10
-    camFriction = 0.95
+    camFriction = 0.9
 
     def __init__(self, screen, KH):
         self.Velx = 0
@@ -15,13 +15,13 @@ class Camera:
         
     def updateVelocity(self):
         if self.KH.aToggle:
-            self.Velx += -0.1
+            self.Velx += -0.12
         if self.KH.dToggle:
-            self.Velx += 0.1
+            self.Velx += 0.12
         if self.KH.wToggle:
-            self.Vely -= 0.1
+            self.Vely -= 0.12
         if self.KH.sToggle:
-            self.Vely += 0.1
+            self.Vely += 0.12
         
         if self.Velx > 1:
             self.Velx = 1
@@ -50,13 +50,16 @@ class Camera:
         if self.y < self.screen.height/2:
             self.y = self.screen.height/2
             self.Vely = 0
-        elif self.y > Tile.tileHeight * tileGridHeight - self.screen.height + Tile.tileHeight:
-            self.y = Tile.tileHeight * tileGridHeight - self.screen.height + Tile.tileHeight
+        elif self.y > Tile.tileHeight * (tileGridHeight-1) - self.screen.height/2:
+            self.y = Tile.tileHeight * (tileGridHeight-1) - self.screen.height/2
             self.Vely = 0
 
     def applyFriction(self):
-        self.Velx *= Camera.camFriction
-        self.Vely *= Camera.camFriction
+        if self.KH.aToggle == False and self.KH.dToggle == False:
+            self.Velx *= Camera.camFriction
+        
+        if self.KH.wToggle == False and self.KH.sToggle == False:
+            self.Vely *= Camera.camFriction
 
     def setCoords(self, newX, newY):
         self.x = newX
