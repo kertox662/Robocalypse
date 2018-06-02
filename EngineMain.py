@@ -6,6 +6,12 @@ from random import choice
 import atexit
 import sys
 
+dependencyPath = __file__.split('EngineMain.py')[0] + "Dependencies"
+sys.path.append(dependencyPath)
+import InstallPip
+if __name__ == '__main__':
+    InstallPip.checkDependencies()
+
 #Parent Classes
 from Screen import *
 from Scene import Scene
@@ -22,16 +28,6 @@ from Camera import Camera
 
 #Miscellaneous
 from keyHandler import KeyHandler
-
-dependencyPath = __file__.split('EngineMain.py')[0] + "Dependencies"
-sys.path.append(dependencyPath)
-import InstallPip
-
-
-# print(sys.path)
-
-TESTING = False
-
 
 def exitProcedure():
     pass
@@ -64,6 +60,7 @@ def saveSettings():
     fullScr = eval(updatedSettings[2])
     sound = eval(updatedSettings[3])
     
+    s.updateShownDimensions(width, height)
     
     settings['window']['width'] = width
     settings['window']['height'] = height
@@ -100,10 +97,13 @@ def saveSettings():
         s.root.geometry("{}x{}+20+20".format(width, height))
         if TESTING: print(s.root.geometry())
         s.canv.config(width = width, height = height)
+    
+    s.updateDimensions()
 
 
-def run():
+def runGame():
     global firstTime
+    global renderedTiles
     
     KH.scene = Scene.current_scene
     # print(Cam.x, Cam.y)
@@ -139,7 +139,10 @@ def run():
         settingsS.displaySettings(sWidth//2, sHeight//2, *updatedSettings)
     
     elif Scene.current_scene == "scene_game":
-        gameS.showTiles(tileGrid)
+
+        if gameS.checkRendered(renderedTiles) == False:
+            renderedTiles = gameS.setRenderGrid(tileGrid, renderedTiles)
+        gameS.showTiles(renderedTiles)
 
         if KH.aToggle:
             Cam.Velx += -0.1
@@ -162,19 +165,26 @@ def run():
 
         Cam.move()
 
-        # print(Cam.Velx, Cam.Vely)
-
         Cam.Velx *= 0.95
         Cam.Vely *= 0.95
 
+        # for i in renderedTiles:
+        #     for j in i:
+        #         print(j.x, j.y)
+        # print("===========")
         
 
 
 
-def main():
+def setInitialValues():
     global sWidth, sHeight
     global mainS, settingsS, gameS, Cam, KH
-    global s, firstTime, updatePosition, tileGrid
+    global s, firstTime, updatePosition
+    global settings , TESTING
+    global renderedTiles, tileGrid
+
+    settings = loadSettings()
+    TESTING = False
 
     if settings["window"]["width"] == None:
         s = makeScreen(1024, 768, settings["window"]["fullscreen"], "GameWindow")
@@ -187,11 +197,6 @@ def main():
     
     Cam = Camera(s)
     KH = KeyHandler(s,Cam)
-    # s.root.bind_all("<Up>", KH.handlerHandlerP)
-    # s.root.bind_all("<Down>", KH.handlerHandlerP)
-    # s.root.bind_all("<Left>", KH.handlerHandlerP)
-    # s.root.bind_all("<Right>", KH.handlerHandlerP)
-    # s.root.bind("<KeyRelease>", KH.handlerHandlerR)
 
     if settings["window"]["fullscreen"] == True:
         sWidth = s.root.winfo_screenwidth()
@@ -211,23 +216,19 @@ def main():
     for i in range(tileGridHeight):
         tileGrid.append([])
         for j in range(tileGridWidth):
-            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,choice(["red",'blue','yellow','green','orange','purple']), s, Cam))
+            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,choice(["red",'blue','yellow','green','orange','purple']), s, Cam, i, j))
+
+    renderedTiles = gameS.setRenderGrid(tileGrid, None)
         
     firstTime = True
     if TESTING: print(sWidth, sHeight)
-    run()
     while True:
-        run()
+        runGame()
         s.canv.update()
         sleep(0.001)
 
 
 
 
-if __name__ == '__main__':
-    InstallPip.checkDependencies()
-    # GO = GameObject()
-    global settings
-    settings = loadSettings()
-    
-    main()
+if __name__ == '__main__':    
+    setInitialValues()

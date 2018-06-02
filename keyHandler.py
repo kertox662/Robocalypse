@@ -40,7 +40,7 @@ class KeyHandler:
         elif ch == 'd':
             self.dToggle = True
     
-        print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)
+        # print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)
     
     def onRelease(self, key):
         try:
@@ -57,4 +57,4 @@ class KeyHandler:
         except AttributeError:
             pass
         
-        print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)
+        # print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)
