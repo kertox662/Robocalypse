@@ -38,10 +38,10 @@ class GameScene(Scene):
             firstIndexY = max(0, firstIndexY - 2)
 
             lastIndexX = renderArray[-1][-1].indexX
-            lastIndexX = max(0, lastIndexX - 2)
+            lastIndexX = min(0, lastIndexX + 2)
 
             lastIndexY = renderArray[-1][-1].indexY
-            lastIndexY = max(0, lastIndexY - 2)
+            lastIndexY = min(0, lastIndexY + 2)
 
             for i in renderArray:
                 for j in i:
