@@ -96,7 +96,7 @@ def checkDependencies():
                 return
 
             
-
+            input("Press enter once the packages have been installed.")
             print("Hopefully installed all dependecies")
         else: #If answers n in [y\n]
             print("Exiting out.\nHave a nice day!")

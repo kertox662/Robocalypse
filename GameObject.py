@@ -1,4 +1,5 @@
 from tkinter import *
+from getData import loadSettings
 
 class GameObject:
     def __init__(self, initx, inity, objType, id, sprite, screen, camera):

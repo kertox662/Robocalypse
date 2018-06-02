@@ -1,5 +1,4 @@
-from EngineMain import loadSettings
-import json as js
+from getData import loadSettings
 
 itemData = loadSettings("data/items.json")
 

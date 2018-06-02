@@ -25,10 +25,10 @@ class GameScene(Scene):
     
     def setRenderGrid(self,tileArray):
         minX = floor((self.camera.x - self.screen.width/2 - 100) / Tile.tileWidth)
-        maxX = ceil((self.camera.x + self.screen.width/2 + 300) / Tile.tileWidth)
+        maxX = ceil((self.camera.x + self.screen.width/2 + 500) / Tile.tileWidth)
         
         minY = floor((self.camera.y - self.screen.height/2 - 100) / Tile.tileHeight)
-        maxY = ceil((self.camera.y + self.screen.height/2 + 300) / Tile.tileHeight)
+        maxY = ceil((self.camera.y + self.screen.height/2 + 500) / Tile.tileHeight)
 
         minX = max(minX, 0)
         maxX = min(maxX, tileGridWidth)
@@ -42,6 +42,6 @@ class GameScene(Scene):
             for j in i[minX:maxX + 1]:
                 newRenderArray[-1].append(j)
 
-        print(len(newRenderArray[0]), len(newRenderArray))
+        # print(len(newRenderArray[0]), len(newRenderArray))
 
         return newRenderArray

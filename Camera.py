@@ -2,6 +2,7 @@ from Tile import *
 
 class Camera:
     camSpeed = 10
+    camFriction = 0.95
 
     def __init__(self, screen, KH):
         self.Velx = 0
@@ -42,16 +43,20 @@ class Camera:
         if self.x < self.screen.width/2:
             self.x = self.screen.width/2
             self.Velx = 0
-        elif self.x > Tile.tileWidth * tileGridWidth - self.screen.width:
-            self.x = Tile.tileWidth * tileGridWidth - self.screen.width
+        elif self.x > Tile.tileWidth * (tileGridWidth-1) - self.screen.width/2:
+            self.x = Tile.tileWidth * (tileGridWidth-1) - self.screen.width/2
             self.Velx = 0
 
         if self.y < self.screen.height/2:
             self.y = self.screen.height/2
             self.Vely = 0
-        elif self.y > Tile.tileHeight * tileGridHeight - self.screen.height:
-            self.y = Tile.tileHeight * tileGridHeight - self.screen.height
+        elif self.y > Tile.tileHeight * tileGridHeight - self.screen.height + Tile.tileHeight:
+            self.y = Tile.tileHeight * tileGridHeight - self.screen.height + Tile.tileHeight
             self.Vely = 0
+
+    def applyFriction(self):
+        self.Velx *= Camera.camFriction
+        self.Vely *= Camera.camFriction
 
     def setCoords(self, newX, newY):
         self.x = newX

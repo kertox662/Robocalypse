@@ -11,7 +11,6 @@ sys.path.append(dependencyPath)
 import InstallPip
 if __name__ == '__main__':
     InstallPip.checkDependencies()
-    input("Press enter once the packages have been installed.")
 
 #Parent Classes
 from Screen import *
@@ -29,16 +28,13 @@ from Camera import Camera
 
 #Miscellaneous
 from keyHandler import KeyHandler
+from getData import *
 
 def exitProcedure():
     pass
 
 atexit.register(exit)
 
-def loadSettings(sFile = "data/configs.json"):
-    with open(sFile) as jsonFile:
-        data = js.load(jsonFile)
-    return data
 
 def saveSettingsEvent(Event):
     saveSettings()
@@ -107,8 +103,6 @@ def runGame():
     global renderedTiles
     
     KH.scene = Scene.current_scene
-    # print(Cam.x, Cam.y)
-    # print(KH.scene)
 
     if Scene.current_scene == "scene_main":
         mainS.displayOptions(sWidth//2, sHeight//2)
@@ -147,15 +141,7 @@ def runGame():
 
         Cam.updateVelocity()
         Cam.move()
-
-        Cam.Velx *= 0.95
-        Cam.Vely *= 0.95
-
-        # for i in renderedTiles:
-        #     for j in i:
-        #         print(j.x, j.y)
-        # print("===========")
-        
+        Cam.applyFriction()
 
 
 
@@ -199,7 +185,11 @@ def setInitialValues():
     for i in range(tileGridHeight):
         tileGrid.append([])
         for j in range(tileGridWidth):
-            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,choice(["red",'blue','yellow','green','orange','purple']), s, Cam, i, j))
+            if i in [0, tileGridHeight - 1] or j in [0, tileGridWidth - 1]:
+                tileC = 'blue'
+            else:
+                tileC = 'green'
+            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight, tileC, s, Cam, i, j))
 
     renderedTiles = gameS.setRenderGrid(tileGrid)
         
