@@ -9,6 +9,10 @@ from threading import Thread
 
 dependencyPath = __file__.split('EngineMain.py')[0] + "Dependencies"
 sys.path.append(dependencyPath)
+
+#imagesPath = 
+#sys.path.append(imagesPath)
+
 import InstallPip
 if __name__ == '__main__':
     InstallPip.checkDependencies()
@@ -189,12 +193,12 @@ def setInitialValues():
     TESTING = False
 
     if settings["window"]["width"] == None:
-        s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", "images/Robot.ico")
+        s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
         settings["window"]["width"] = s.canv.winfo_screenwidth()
         settings["window"]["height"] = s.canv.winfo_screenheight()
         
     else:
-        s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Robocalypse Game", "images/Robot.ico")
+        s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Robocalypse Game", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
 
     tileData = loadSettings("data/tiles.json")
     tileSprites = []

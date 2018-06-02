@@ -1,8 +1,8 @@
 {
     "window": {
         "fullscreen": false,
-        "width": 1280,
-        "height": 720
+        "height": 1050,
+        "width": 1680
     },
     "sound": true
 }
