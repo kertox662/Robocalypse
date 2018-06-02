@@ -182,7 +182,7 @@ def setInitialValues():
     global mainS, settingsS, gameS, Cam, KH
     global s, firstTime, updatePosition
     global settings , TESTING
-    global renderedTiles, tileGrid, tileData, tileSprites
+    global renderedTiles, tileGrid, tileData, tileSprites, tileMap
     global frame
 
     settings = loadSettings()
@@ -219,7 +219,16 @@ def setInitialValues():
     settingsS = SettingsScene(s,KH)
     gameS = GameScene(s,Cam, KH)
 
+    with open('data/TileData.txt') as mapD:
+        tileMap = mapD.read().split('\n')
     
+    for i in range(len(tileMap)):
+        tileMap[i] = tileMap[i].split(',')
+        # print(i)
+        # print("="*20)
+
+    print(type(tileMap))
+    print(type(tileMap[0]))
     
     tileGrid = []
     for i in range(tileGridHeight):
@@ -232,7 +241,7 @@ def setInitialValues():
 
             choiceID = randint(0,27)           
 
-            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight, tileSprites[choiceID], s, Cam, i, j))
+            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight, tileSprites[int(tileMap[i][j])-1], s, Cam, i, j))
 
     renderedTiles = gameS.setRenderGrid(tileGrid)
         
