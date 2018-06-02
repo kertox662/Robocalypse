@@ -32,29 +32,16 @@ class GameScene(Scene):
         
         else:
             firstIndexX = renderArray[0][0].indexX
-            if firstIndexX > 0:
-                if firstIndexX > 1:
-                    firstIndexX -= 2
-                else:
-                    firstIndexX -= 1
+            firstIndexX = max(0, firstIndexX - 2)
+
             firstIndexY = renderArray[0][0].indexY
-            if firstIndexY > 0:
-                if firstIndexY > 1:
-                    firstIndexY -= 2
-                else:
-                    firstIndexY -= 1
+            firstIndexY = max(0, firstIndexY - 2)
+
             lastIndexX = renderArray[-1][-1].indexX
-            if lastIndexX < tileGridWidth:
-                if lastIndexX < tileGridWidth - 1:
-                    lastIndexX += 2
-                else:
-                    lastIndexX += 1
+            lastIndexX = max(0, lastIndexX - 2)
+
             lastIndexY = renderArray[-1][-1].indexY
-            if lastIndexY < tileGridHeight:
-                if lastIndexY < tileGridHeight - 2:
-                    lastIndexY += 2
-                else:
-                    lastIndexY += 1
+            lastIndexY = max(0, lastIndexY - 2)
 
             for i in renderArray:
                 for j in i:

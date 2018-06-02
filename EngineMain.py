@@ -11,6 +11,7 @@ sys.path.append(dependencyPath)
 import InstallPip
 if __name__ == '__main__':
     InstallPip.checkDependencies()
+    input("Press enter once the packages have been installed. ()")
 
 #Parent Classes
 from Screen import *
