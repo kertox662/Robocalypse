@@ -31,7 +31,7 @@ from GameObject import *
 from Tile import *
 from Camera import Camera
 from Player import Player
-from Entity import Entity
+from Entity import Entity, stationaryEntity, movingEntity
 
 #Downloaded Modules
 from PIL import Image, ImageTk
@@ -67,6 +67,7 @@ def saveSettings():
     height = int(updatedSettings[1])
     fullScr = eval(updatedSettings[2])
     sound = eval(updatedSettings[3])
+    showFps = eval(updatedSettings[4])
     
     s.updateShownDimensions(width, height)
     
@@ -74,6 +75,7 @@ def saveSettings():
     settings['window']['height'] = height
     settings['window']['fullscreen'] = fullScr
     settings['sound'] = sound
+    settings['displayFPS'] = showFps
     
     with open('data/configs.json', 'w') as jsonFile:
         js.dump(settings, jsonFile, indent = 4)
@@ -82,7 +84,7 @@ def saveSettings():
     
     global applyButton
     s.canv.delete(applyButton)
-    applyButton = None
+    applyButton = -1
     
     settingsS.deleteSettings()
     global firstTime
@@ -108,15 +110,19 @@ def saveSettings():
     
     s.updateDimensions()
 
-
-frame = 0
-
 def countFrameRate():
     global frame
+    global fps
     while True:
         sleep(1)
-        print(frame)
+        fps = frame
         frame = 0
+
+def displayFPS():
+    global fpsText
+    text = "{} fps".format(fps)
+    s.canv.delete(fpsText)
+    fpsText = s.canv.create_text(30, 10, text = text, fill = '#20FF20')
 
 def doGameCalculations():
     while True:
@@ -124,8 +130,6 @@ def doGameCalculations():
             player.applyFriction()            
             player.updateVelocity()
             player.move()
-
-            
         
         sleep(1/60)
 
@@ -138,26 +142,19 @@ def doGraphicCalcs():
 
         sleep(1/10)
 
-            
-        
-
-
 frameThread = Thread(target=countFrameRate)
 frameThread.daemon = True
-frameThread.start()
 
 calcThread = Thread(target = doGameCalculations)
 calcThread.daemon = True
-calcThread.start()
 
 graphCalcThread = Thread(target = doGraphicCalcs)
 graphCalcThread.daemon = True
-graphCalcThread.start()
-
 
 def runGame():
     global firstTime
     global renderedTiles
+    global applyButton
     
     KH.scene = Scene.current_scene
 
@@ -181,29 +178,25 @@ def runGame():
                     break
                         
         else:
-            updatedSettings = [settings["window"]["width"],settings["window"]["height"],settings["window"]["fullscreen"],settings["sound"]]
-            
-            global applyButton
-            applyButton = s.canv.create_text(sWidth // 2, sHeight - 100, text = "Save and Apply", fill = 'black', activefill = 'yellow', font = ('Helvetica', 16))
-            s.canv.tag_bind(applyButton, '<Button-1>', saveSettingsEvent)
-            
+            updatedSettings = [settings["window"]["width"],settings["window"]["height"],settings["window"]["fullscreen"],settings["sound"], settings["displayFPS"]]
             firstTime = False
+
         settingsS.displaySettings(sWidth//2, sHeight//2, *updatedSettings)
+        
+        s.canv.delete(applyButton)
+        applyButton = s.canv.create_text(sWidth // 2, sHeight - 100, text = "Save and Apply", fill = 'black', activefill = 'yellow', font = ('Helvetica', 16))
+        s.canv.tag_bind(applyButton, '<Button-1>', saveSettingsEvent)
     
     elif Scene.current_scene == "scene_game":
-        # if gameS.checkRendered(renderedTiles) == False:
-        #     renderedTiles = gameS.setRenderGrid(tileGrid)
         gameS.showTiles(renderedTiles)
-        
-        # player.updateVelocity()
-        # player.move()
 
         player.display()
 
         testEntity.drawCollision()
         testEntity.display()
-        
-        # player.applyFriction()
+
+        if settings["displayFPS"] == True:
+            displayFPS()
     
     
 
@@ -215,10 +208,14 @@ def setInitialValues():
     global s, firstTime, updatePosition
     global settings , TESTING, testEntity
     global renderedTiles, tileGrid, tileData, tileSprites, tileMap
-    global frame
+    global frame, fpsText
+    global applyButton
 
     settings = loadSettings()
     TESTING = False
+    frame = 0
+    fpsText = -1
+    applyButton = -1
 
     if settings["window"]["width"] == None:
         s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
@@ -259,24 +256,11 @@ def setInitialValues():
     
     for i in range(len(tileMap)):
         tileMap[i] = tileMap[i].split(',')
-        # print(i)
-        # print("="*20)
-
-    # print(type(tileMap))
-    # print(type(tileMap[0]))
     
     tileGrid = []
     for i in range(tileGridHeight):
         tileGrid.append([])
         for j in range(tileGridWidth):
-            # if i in [0, tileGridHeight - 1] or j in [0, tileGridWidth - 1]:
-            #     tileC = 'blue'
-            # else:
-            #     tileC = 'green'
-
-            # choiceID = randint(0,27)           
-            # print(tileMap[i][j])
-            # print(tileSprites[0])
             tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight, tileSprites[int(tileMap[i][j])-1], s, Cam, i, j))
 
     renderedTiles = gameS.setRenderGrid(tileGrid)
@@ -284,7 +268,12 @@ def setInitialValues():
     firstTime = True
     if TESTING: print(sWidth, sHeight)
 
-    testEntity = Entity(1200, 1200, "img", 0, "images/Tree1.png", s, Cam, ((-10, 80), (15, 80), (15, 106), (-10, 106)), True)
+    testEntity = stationaryEntity(1200, 1200, "img", 0, "images/Tree1.png", s, Cam, ((-10, 80), (15, 80), (15, 106), (-10, 106)), True)
+    
+    frameThread.start()
+    calcThread.start()
+    graphCalcThread.start()
+    sleep(0.5)
 
     while True:
         runGame()

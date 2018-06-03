@@ -69,11 +69,11 @@ class Player(GameObject):
         
     
     def applyFriction(self):
-        if self.KH.aToggle == False and self.KH.dToggle == False:
-            self.Velx *= Player.playerFriction
+        # if self.KH.aToggle == False and self.KH.dToggle == False:
+        self.Velx *= Player.playerFriction
         
-        if self.KH.wToggle == False and self.KH.sToggle == False:
-            self.Vely *= Player.playerFriction
+        # if self.KH.wToggle == False and self.KH.sToggle == False:
+        self.Vely *= Player.playerFriction
     
     def moveCam(self, directionRestrictions):
         self.camera.updateVelocity(self.Velx, self.Vely)

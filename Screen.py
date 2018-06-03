@@ -25,5 +25,5 @@ class Screen:
 def makeScreen(width, height, fullscreen, winName, winIcon):
     s = Screen(width, height, fullscreen, winName)
     # s.root.iconbitmap(winIcon)
-    s.root.bind("<Escape>", lambda e: s.canv.destroy())
+    s.root.bind("<q>", lambda e: s.canv.destroy())
     return s

@@ -9,6 +9,18 @@ class GameScene(Scene):
     def __init__(self, screen, camera, KHandler):
         super().__init__("scene_game", screen, KHandler, connections = ["scene_main", "scene_menu"])
         self.camera = camera
+        self.screen.root.bind("<Escape>", lambda e: self.change_scene("scene_main"))
+
+    
+    def change_scene(self, targetscene = None):
+        if targetscene == "scene_main":
+            if Scene.current_scene == 'scene_game':
+                Scene.current_scene = targetscene
+        
+        else:
+            if targetscene in self.connections:
+                Scene.current_scene = targetscene
+    
 
     def showTiles(self, tileArray):
         camX = self.camera.x
@@ -27,10 +39,10 @@ class GameScene(Scene):
     
     def setRenderGrid(self,tileArray):
         minX = floor((self.camera.x - self.screen.width/2 - 100) / Tile.tileWidth)
-        maxX = ceil((self.camera.x + self.screen.width/2 + 500) / Tile.tileWidth)
+        maxX = ceil((self.camera.x + self.screen.width/2 + 100) / Tile.tileWidth)
         
         minY = floor((self.camera.y - self.screen.height/2 - 100) / Tile.tileHeight)
-        maxY = ceil((self.camera.y + self.screen.height/2 + 500) / Tile.tileHeight)
+        maxY = ceil((self.camera.y + self.screen.height/2 + 100) / Tile.tileHeight)
 
         minX = max(minX, 0)
         maxX = min(maxX, tileGridWidth)

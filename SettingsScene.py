@@ -7,9 +7,12 @@ screenOptions = [(1920,1200),(1920,1080),(1680,1050),(1600,900),(1440,900),(1360
 class SettingsScene(Scene):
     def __init__(self, screen, KHandler):
         super().__init__("scene_settings", screen, KHandler,connections = ["scene_main", "scene_menu"])
-        self.settings = ["Screen Size", "Fullscreen","Sound"]
+        self.settings = ["Screen Size", "Fullscreen","Sound", "Show FPS"]
         self.settingText = []
         self.title = 0
+        # self.saveFunc = saveFunc
+
+        self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')
 
         maxWidth = screen.canv.winfo_screenwidth()
         maxHeight = screen.canv.winfo_screenheight()
@@ -19,6 +22,7 @@ class SettingsScene(Scene):
             if screenOptions[i][0] > maxWidth or screenOptions[i][1] > maxHeight:
                 screenOptions.pop(i)
     
+
     def changeSetting(self, Event):
         item = self.screen.canv.find_closest(Event.x, Event.y)
         text = self.screen.canv.itemcget(item, 'text')
@@ -31,14 +35,14 @@ class SettingsScene(Scene):
             index = (screenOptions.index((width, height)) + 1) % len(screenOptions)
             self.screen.canv.itemconfig(item , text = "Screen Size - {} x {}".format(screenOptions[index][0], screenOptions[index][1]))
             
-        elif selOption == 'Sound':
+        elif selOption in ['Sound', 'Fullscreen', 'Show']:
             newVal = not eval(text.split()[-1])
-            self.screen.canv.itemconfig(item , text = "Sound - {}".format(newVal))
+            self.screen.canv.itemconfig(item , text = "{} - {}".format(selOption,newVal))
         
         
-        elif selOption == 'Fullscreen':
+        else:
             newVal = not eval(text.split()[-1])
-            self.screen.canv.itemconfig(item , text = "Fullscreen - {}".format(newVal))
+            self.screen.canv.itemconfig(item , text = "error - {}".format(newVal))
         
         
         self.screen.canv.update()
@@ -50,13 +54,18 @@ class SettingsScene(Scene):
         for i in range(len(self.settingText)):
             self.screen.canv.delete(self.settingText[-1])
             self.settingText.pop(-1)
+        
+        self.screen.canv.delete(self.Background)
     
-    def displaySettings(self, x, y, width, height, fullscreen, sound):
+
+    def displaySettings(self, x, y, width, height, fullscreen, sound, fps):
         self.deleteSettings()
+        self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')
+
 
         if TESTING: print(x,y, fullscreen == True)
         self.title = self.screen.canv.create_text(x, y*0.5, text = "Settings", font = ('Helvetica', '24'))
-        options = [fullscreen , sound]
+        options = [fullscreen, sound, fps]
         
         for i in self.settings:
             if i == 'Screen Size':

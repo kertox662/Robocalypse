@@ -7,8 +7,9 @@ class MainScene(Scene):
         self.optionsText = []
         self.title = 0
         self.titleText = GameTitle
+        self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')   
     
-    
+
     def deleteOptions(self, option):
         if option == 'Title':
             if self.title != 0:
@@ -19,16 +20,20 @@ class MainScene(Scene):
             for i in range(len(self.optionsText)):
                 self.screen.canv.delete(self.optionsText[-1])
                 self.optionsText.pop(-1)
+            self.screen.canv.delete(self.Background)
         else:
             self.screen.canv.delete(option)
 
+
     def changeSceneHandler(self,target):
         self.deleteOptions("All")
-
         self.change_scene(target)
 
+
     def displayOptions(self,xC, yC):
-        
+        self.screen.canv.delete(self.Background)
+        self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')
+
         self.deleteOptions('Title')
         self.title = self.screen.canv.create_text(xC, yC *0.5, text = self.titleText, font = ('Helvetica', 24))
         

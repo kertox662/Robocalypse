@@ -4,5 +4,6 @@
         "height": 800,
         "width": 1280
     },
-    "sound": true
+    "sound": true,
+    "displayFPS": true
 }

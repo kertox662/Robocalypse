@@ -24,3 +24,13 @@ class Entity(GameObject):
             self.rawBox.append(self.y + self.collisionBox[i][1] - self.camera.y + self.screen.height/2)
 
         self.drawnCollision = self.screen.canv.create_polygon(*self.rawBox, fill = 'red')
+
+
+class stationaryEntity(Entity):
+    def __init__(self, x, y, entityType, id, sprite, screen, camera, collisionBox, doCollision, xOff = 0, yOff = 0):
+        super().__init__(x, y, entityType, id, sprite, screen, camera, collisionBox, doCollision, xOff, yOff)
+
+
+class movingEntity(Entity):
+    def __init__(self, x, y, entityType, id, sprite, screen, camera, collisionBox, doCollision, xOff = 0, yOff = 0):
+        super().__init__(x, y, entityType, id, sprite, screen, camera, collisionBox, doCollision, xOff, yOff)
