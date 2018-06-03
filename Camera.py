@@ -1,42 +1,32 @@
 from Tile import *
 
 class Camera:
-    camSpeed = 10
-    camFriction = 0.9
-
-    def __init__(self, screen, KH):
+    def __init__(self, x, y, screen, KH):
         self.Velx = 0
         self.Vely = 0
 
-        self.x = 2000
-        self.y = 2000
+        self.x = x
+        self.y = y
         self.screen = screen
         self.KH = KH
         
-    def updateVelocity(self):
-        if self.KH.aToggle:
-            self.Velx += -0.12
-        if self.KH.dToggle:
-            self.Velx += 0.12
-        if self.KH.wToggle:
-            self.Vely -= 0.12
-        if self.KH.sToggle:
-            self.Vely += 0.12
-        
-        if self.Velx > 1:
-            self.Velx = 1
-        elif self.Velx < -1:
-            self.Velx = -1
-        
-        if self.Vely > 1:
-            self.Vely = 1
-        elif self.Vely < -1:
-            self.Vely = -1
+    def updateVelocity(self, velx, vely):
+        self.Velx = velx
+        self.Vely = vely
 
+    def move(self, dR, speed):
+        if dR[0] == False and self.Vely < 0:
+            self.Vely = 0
+        elif dR[1] == False and self.Vely > 0:
+            self.Vely = 0
+        
+        if dR[2] == False and self.Velx < 0:
+            self.Velx = 0
+        elif dR[3] == False and self.Velx > 0:
+            self.Velx = 0
 
-    def move(self):
-        self.x += self.Velx * Camera.camSpeed
-        self.y += self.Vely * Camera.camSpeed
+        self.x += self.Velx * speed
+        self.y += self.Vely * speed
 
         # print(self.screen.width, self.screen.height)
 

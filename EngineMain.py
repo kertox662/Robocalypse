@@ -30,6 +30,8 @@ from GameScene import *
 from GameObject import *
 from Tile import *
 from Camera import Camera
+from Player import Player
+from Entity import Entity
 
 #Downloaded Modules
 from PIL import Image, ImageTk
@@ -116,10 +118,25 @@ def countFrameRate():
         print(frame)
         frame = 0
 
-# def updateGraphics():
-#     global renderedTiles
-#     while True:
-#         if Scene.current_scene == "scene_game":
+def doGameCalculations():
+    while True:
+        if Scene.current_scene == "scene_game":
+            player.applyFriction()            
+            player.updateVelocity()
+            player.move()
+
+            
+        
+        sleep(1/60)
+
+def doGraphicCalcs():
+    global renderedTiles
+    while True:
+        if Scene.current_scene == "scene_game":
+            if gameS.checkRendered(renderedTiles) == False:
+                renderedTiles = gameS.setRenderGrid(tileGrid)
+
+        sleep(1/10)
 
             
         
@@ -129,9 +146,14 @@ frameThread = Thread(target=countFrameRate)
 frameThread.daemon = True
 frameThread.start()
 
-# graphicsThread = Thread(target = updateGraphics)
-# graphicsThread.daemon = True
-# graphicsThread.start()
+calcThread = Thread(target = doGameCalculations)
+calcThread.daemon = True
+calcThread.start()
+
+graphCalcThread = Thread(target = doGraphicCalcs)
+graphCalcThread.daemon = True
+# graphCalcThread.start()
+
 
 def runGame():
     global firstTime
@@ -172,10 +194,17 @@ def runGame():
         if gameS.checkRendered(renderedTiles) == False:
             renderedTiles = gameS.setRenderGrid(tileGrid)
         gameS.showTiles(renderedTiles)
+        
+        # player.updateVelocity()
+        # player.move()
 
-        Cam.updateVelocity()
-        Cam.move()
-        Cam.applyFriction()
+        player.display()
+
+        testEntity.drawCollision()
+        testEntity.display()
+        
+        # player.applyFriction()
+        # Cam.applyFriction()
     
     
 
@@ -183,9 +212,9 @@ def runGame():
 
 def setInitialValues():
     global sWidth, sHeight
-    global mainS, settingsS, gameS, Cam, KH
+    global mainS, settingsS, gameS, Cam, KH, player
     global s, firstTime, updatePosition
-    global settings , TESTING
+    global settings , TESTING, testEntity
     global renderedTiles, tileGrid, tileData, tileSprites, tileMap
     global frame
 
@@ -206,9 +235,12 @@ def setInitialValues():
         imgTemp = Image.open(tileData[str(i)]["image"])
         tileSprites.append(ImageTk.PhotoImage(image=imgTemp))
 
+    startx = 1000
+    starty = 1000
 
     KH = KeyHandler(s)
-    Cam = Camera(s, KH)
+    Cam = Camera(startx, starty, s, KH)
+    player = Player(startx, starty, s, Cam, KH)
     
 
     if settings["window"]["fullscreen"] == True:
@@ -252,6 +284,9 @@ def setInitialValues():
         
     firstTime = True
     if TESTING: print(sWidth, sHeight)
+
+    testEntity = Entity(1200, 1200, "img", 0, "images/Tree1.png", s, Cam, ((-10, 80), (15, 80), (15, 106), (-10, 106)), True)
+
     while True:
         runGame()
         s.canv.update()
@@ -263,3 +298,6 @@ def setInitialValues():
 
 if __name__ == '__main__':    
     setInitialValues()
+    s.root.focus_set()
+    s.root.mainloop()
+    

@@ -2,6 +2,7 @@ from tkinter import *
 from getData import loadSettings
 from PIL import Image, ImageTk
 
+
 class GameObject:
     def __init__(self, initx, inity, objType, id, sprite, screen, camera, xOff = 0, yOff = 0):
         self.x = initx
@@ -11,8 +12,6 @@ class GameObject:
         self.screen = screen
         self.camera = camera
         if objType == "img" or objType == 'tile':
-            # self.image = Image.open(sprite)
-            # self.sprite = ImageTk.PhotoImage(image = self.image)
             self.sprite = sprite
         elif objType == "polygon":
             pass
