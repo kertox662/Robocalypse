@@ -11,9 +11,11 @@ class GameScene(Scene):
         self.camera = camera
 
     def showTiles(self, tileArray):
+        camX = self.camera.x
+        camY = self.camera.y
         for i in tileArray:
             for j in i:
-                j.display()
+                j.display(camX, camY)
     
     def checkRendered(self, tileArray):
         for i in tileArray:

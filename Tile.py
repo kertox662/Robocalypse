@@ -13,8 +13,10 @@ class Tile(GameObject):
         self.indexX = i1
         self.indexY = i2
     
-    # def display(self): #Don't want to use inherited version as it doesn't have a width and height parameter
-    #     self.screen.canv.delete(self.screenObj)
-    #     self.screenObj = self.screen.canv.create_rectangle(self.x - self.camera.x + self.screen.width/2, self.y - self.camera.y + self.screen.height/2, self.x - self.camera.x + Tile.tileWidth + self.screen.width/2, self.y - self.camera.y + Tile.tileHeight + self.screen.height/2, fill = self.color)
+    def display(self, camX, camY):
+        self.screen.canv.delete(self.screenObj)
+        if self.isOnScreen():
+            if self.type == "img" or self.type == 'tile':
+                self.screenObj = self.screen.canv.create_image(self.x - camX + self.xOff + self.screen.width/2, self.y - camY + self.yOff + self.screen.height/2, image = self.sprite)
 
 

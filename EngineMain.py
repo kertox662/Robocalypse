@@ -152,7 +152,7 @@ calcThread.start()
 
 graphCalcThread = Thread(target = doGraphicCalcs)
 graphCalcThread.daemon = True
-# graphCalcThread.start()
+graphCalcThread.start()
 
 
 def runGame():
@@ -191,8 +191,8 @@ def runGame():
         settingsS.displaySettings(sWidth//2, sHeight//2, *updatedSettings)
     
     elif Scene.current_scene == "scene_game":
-        if gameS.checkRendered(renderedTiles) == False:
-            renderedTiles = gameS.setRenderGrid(tileGrid)
+        # if gameS.checkRendered(renderedTiles) == False:
+        #     renderedTiles = gameS.setRenderGrid(tileGrid)
         gameS.showTiles(renderedTiles)
         
         # player.updateVelocity()
@@ -204,7 +204,6 @@ def runGame():
         testEntity.display()
         
         # player.applyFriction()
-        # Cam.applyFriction()
     
     
 
