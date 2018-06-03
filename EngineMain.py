@@ -280,6 +280,7 @@ def setInitialValues():
         s.canv.update()
         sleep(1/60)
         frame += 1
+        print(s.root.geometry())
 
 
 
