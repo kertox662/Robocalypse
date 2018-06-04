@@ -1,9 +1,9 @@
 {
-    "window": {
-        "fullscreen": false,
-        "height": 800,
-        "width": 1280
-    },
     "sound": true,
-    "displayFPS": true
+    "displayFPS": true,
+    "window": {
+        "height": 1080,
+        "width": 1920,
+        "fullscreen": true
+    }
 }
