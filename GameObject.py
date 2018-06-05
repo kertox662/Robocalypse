@@ -26,11 +26,16 @@ class GameObject:
         
         return False
     
-    def display(self):
-        self.screen.canv.delete(self.screenObj)
+    def display(self, player, lessOrGreater, collision, isPlayer = False):
+        collisionMid = (min(collision[1]) + max(collision[1]))/2
+        playerColDist = min(player.collisionBox[1])
+        if (self.y + self.yOff + collisionMid <= player.y + player.yOff + playerColDist) == lessOrGreater or isPlayer == True:
+            self.screen.canv.delete(self.screenObj)
+
         if self.isOnScreen():
-            if self.type == "img" or self.type == 'tile':
-                self.screenObj = self.screen.canv.create_image(self.x - self.camera.x + self.xOff + self.screen.width/2, self.y - self.camera.y + self.yOff + self.screen.height/2, image = self.sprite)
+            if (self.y + self.yOff + collisionMid <= player.y + player.yOff + playerColDist) == lessOrGreater or isPlayer == True:
+                if self.type == "img" or self.type == 'tile':
+                    self.screenObj = self.screen.canv.create_image(self.x - self.camera.x + self.xOff + self.screen.width/2, self.y - self.camera.y + self.yOff + self.screen.height/2, image = self.sprite)
 
         
 

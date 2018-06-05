@@ -6,6 +6,7 @@ from random import choice, randint
 import atexit
 import sys
 from threading import Thread
+from queue import Queue
 
 dependencyPath = __file__.split('EngineMain.py')[0] + "Dependencies"
 sys.path.append(dependencyPath)
@@ -34,7 +35,7 @@ from Player import Player
 from Entity import Entity, stationaryEntity, movingEntity
 
 #Downloaded Modules
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageFilter
 from pygame import mixer
 
 #Miscellaneous
@@ -130,6 +131,17 @@ def doGameCalculations():
             player.applyFriction()            
             player.updateVelocity()
             player.move()
+
+            for i in renderedTiles:
+                for j in i:
+                    for k in j.entities:
+                        player.doStationaryCollisions(player.isColliding(k), k)
+
+            
+            # if True in player.isColliding(testEntity):
+            #     print('colliding')
+            # else:
+            #     print("not colliding")
         
         sleep(1/60)
 
@@ -138,18 +150,65 @@ def doGraphicCalcs():
     while True:
         if Scene.current_scene == "scene_game":
             if gameS.checkRendered(renderedTiles) == False:
-                renderedTiles = gameS.setRenderGrid(tileGrid)
+                renderedTiles = gameS.setRenderGrid()
 
         sleep(1/10)
 
-frameThread = Thread(target=countFrameRate)
-frameThread.daemon = True
+        
 
-calcThread = Thread(target = doGameCalculations)
-calcThread.daemon = True
+def doAlert():
+    global alerts, alertCount, newAlert
+    global notifY
+    while True:
+        if not alerts.empty():
+            alertCount += 1
+            newAlert = alerts.get()
+            while notifY < 80:
+                notifY += 5
+                sleep(1/60)
+            sleep(newAlert["delay"])
+            while notifY > -85:
+                notifY -= 5
+                sleep(1/60)
+            sleep(1/4)
+        
+        else:
+            notifY = -85
+        
+        sleep(1/60)
 
-graphCalcThread = Thread(target = doGraphicCalcs)
-graphCalcThread.daemon = True
+def drawNotifBox():
+    global notifBox, notifText
+    s.canv.delete(notifBox)
+    s.canv.delete(notifText)
+    notifBox = s.canv.create_image(s.width - 240, notifY, image = UISprites["Notification"])
+    notifText = s.canv.create_text(s.width - 240, notifY, text = newAlert["text"])
+
+def drawGroundGraphics():
+    gameS.showTiles(renderedTiles)
+
+    gameS.displayStationaryEntities(player, True, renderedTiles)
+    player.display(player, True, player.collisionBox, True)
+    # player.drawCollision()
+
+    gameS.displayStationaryBoxes(renderedTiles, "hitBox")
+    gameS.displayStationaryEntities(player, False, renderedTiles)
+
+def drawResources():
+    resourceList = ["wood", "stone", "metal", "wires"]
+    for i in range(len(resourceList)):
+        key = resourceList[i]
+        s.canv.delete(resources[key]["icon"], resources[key]["text"])
+        resources[key]["icon"] = s.canv.create_image(25, 40*i + 25, image = resources[key]["sprite"])
+        resources[key]["text"] = s.canv.create_text(50, 40*i + 25, text = str(resources[key]["amount"]))
+
+def drawUIGraphics():
+    drawResources()
+    if settings["displayFPS"] == True:
+        displayFPS()
+        
+    drawNotifBox()
+
 
 def runGame():
     global firstTime
@@ -160,6 +219,17 @@ def runGame():
 
     if Scene.current_scene == "scene_main":
         mainS.displayOptions(sWidth//2, sHeight//2)
+        for i in tileGrid:
+            for j in i:
+                s.canv.delete(j.screenObj)
+                for k in j.entities:
+                    s.canv.delete(k.screenObj)
+        s.canv.delete(player.screenObj)
+        for i in renderedTiles:
+            for j in i:
+                for k in j.entities:
+                    s.canv.delete(k.screenObj)
+        s.canv.update()
         
     elif Scene.current_scene == "scene_settings":
         if not firstTime:
@@ -173,7 +243,7 @@ def runGame():
                     else:
                         updatedSettings.append(itemText[-1])
                 except IndexError:
-                    updatedSettings = [settings["window"]["width"],settings["window"]["height"],settings["window"]["fullscreen"],settings["sound"]]
+                    updatedSettings = [settings["window"]["width"],settings["window"]["height"],settings["window"]["fullscreen"],settings["sound"], settings["displayFPS"]]
                     saveSettings()
                     break
                         
@@ -188,35 +258,35 @@ def runGame():
         s.canv.tag_bind(applyButton, '<Button-1>', saveSettingsEvent)
     
     elif Scene.current_scene == "scene_game":
-        gameS.showTiles(renderedTiles)
+       drawGroundGraphics()
+       drawUIGraphics()
 
-        player.display()
-
-        testEntity.drawCollision()
-        testEntity.display()
-
-        if settings["displayFPS"] == True:
-            displayFPS()
+        
     
-    
-
-
 
 def setInitialValues():
     global sWidth, sHeight
     global mainS, settingsS, gameS, Cam, KH, player
     global s, firstTime, updatePosition
-    global settings , TESTING, testEntity
+    global settings , TESTING, testEntity, applyButton
     global renderedTiles, tileGrid, tileData, tileSprites, tileMap
     global frame, fpsText
-    global applyButton
+    global alerts, alertCount, newAlert, UISprites, notifBox, notifText
+    global resources
 
-    settings = loadSettings()
+
     TESTING = False
     frame = 0
     fpsText = -1
     applyButton = -1
+    alerts = Queue()
+    alertCount = 0
+    notifBox = -1
+    notifText = -1
+    newAlert = {"text":""}
 
+    settings = loadSettings()
+    
     if settings["window"]["width"] == None:
         s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
         settings["window"]["width"] = s.canv.winfo_screenwidth()
@@ -238,19 +308,6 @@ def setInitialValues():
     Cam = Camera(startx, starty, s, KH)
     player = Player(startx, starty, s, Cam, KH)
     
-
-    if settings["window"]["fullscreen"] == True:
-        sWidth = s.root.winfo_screenwidth()
-        sHeight = s.root.winfo_screenheight()
-        if TESTING:print(sHeight, sWidth)
-        
-    else:
-        sWidth = int(s.canv.cget('width'))
-        sHeight = int(s.canv.cget('height'))
-    mainS = MainScene("Robocalypse", s, KH)
-    settingsS = SettingsScene(s,KH)
-    gameS = GameScene(s,Cam, KH)
-
     with open('data/TileData.txt') as mapD:
         tileMap = mapD.read().split('\n')
     
@@ -263,16 +320,59 @@ def setInitialValues():
         for j in range(tileGridWidth):
             tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight, tileSprites[int(tileMap[i][j])-1], s, Cam, i, j))
 
-    renderedTiles = gameS.setRenderGrid(tileGrid)
+    if settings["window"]["fullscreen"] == True:
+        sWidth = s.root.winfo_screenwidth()
+        sHeight = s.root.winfo_screenheight()
+        if TESTING:print(sHeight, sWidth)
+        
+    else:
+        sWidth = int(s.canv.cget('width'))
+        sHeight = int(s.canv.cget('height'))
+    mainS = MainScene("Robocalypse", s, KH)
+    settingsS = SettingsScene(s,KH)
+    gameS = GameScene(s,Cam, KH, tileGrid, player)
+
+    renderedTiles = gameS.setRenderGrid()
         
     firstTime = True
     if TESTING: print(sWidth, sHeight)
 
-    testEntity = stationaryEntity(1200, 1200, "img", 0, "images/Tree1.png", s, Cam, ((-10, 80), (15, 80), (15, 106), (-10, 106)), True)
+    for i in range(20):
+        tempX = randint(1600, 2800)
+        tempY = randint(1600, 2800)
+        tempEntity = stationaryEntity(tempX, tempY, "img", 0, "images/Tree1.png", s, Cam, ((-15, 20, 20, -15),(80,80,106,106)), True, ((-15, 20, 20, -15),(60,60,106,106)))#(-10, 15, 15, -10),(80,80,106,106)
+        tileGrid[tempEntity.tileY][tempEntity.tileX].entities.append(tempEntity)
     
+    for i in tileGrid:
+        for j in i:
+            j.entities = sorted(j.entities, key = lambda entity: entity.y)
+
+    UISpritesData = loadSettings("data/UISprites.json")
+    UISprites = {}
+    for i in UISpritesData:
+        img = Image.open(UISpritesData[i])
+        UISprites[i] = ImageTk.PhotoImage(image=img)
+    
+    s.root.bind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
+
+    resources = {"wood":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Wood Log/log.png")}, "metal":{"amount": 0, "text":-1, "icon":-1, "sprite":loadImage("images/Resources/Metal/metal.png")}, "stone":{"amount":0, "text":-1, "icon": -1, "sprite":loadImage("images/Resources/Rock/rock2.png")}, "wires":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Electrical/wires.png")}}
+
+    frameThread = Thread(target=countFrameRate)
+    frameThread.daemon = True
+
+    calcThread = Thread(target = doGameCalculations)
+    calcThread.daemon = True
+
+    graphCalcThread = Thread(target = doGraphicCalcs)
+    graphCalcThread.daemon = True
+
+    alertThread = Thread(target=doAlert)
+    alertThread.daemon = True
+
     frameThread.start()
     calcThread.start()
     graphCalcThread.start()
+    alertThread.start()
     sleep(0.5)
 
     while True:
@@ -280,7 +380,7 @@ def setInitialValues():
         s.canv.update()
         sleep(1/60)
         frame += 1
-        print(s.root.geometry())
+        # print(s.root.geometry())
 
 
 

@@ -20,12 +20,12 @@ except ImportError:
 
 if False in results:
     if pyVerMinor == 3:
-        os.startfile(".\WheelsAndBatch\V3_3\installPackagesWin32.bat")
+        os.startfile(".\Dependencies\WheelsAndBatch\V3_3\installPackagesWin32.bat")
     elif pyVerMinor == 4:
-        os.startfile(".\WheelsAndBatch\V3_4\installPackagesWin32.bat")
+        os.startfile(".\Dependencies\WheelsAndBatch\V3_4\installPackagesWin32.bat")
     elif pyVerMinor == 5:
-        os.startfile(".\WheelsAndBatch\V3_5\installPackagesWin32.bat")
+        os.startfile(".\Dependencies\WheelsAndBatch\V3_5\installPackagesWin32.bat")
     elif pyVerMinor >= 6:
-        os.startfile(".\WheelsAndBatch\V3_6\installPackagesWin32.bat")
+        os.startfile(".\Dependencies\WheelsAndBatch\V3_6\installPackagesWin32.bat")
     else:
         print("An error has occured")

@@ -15,6 +15,7 @@ class KeyHandler:
         self.aToggle = False
         self.sToggle = False
         self.dToggle = False
+        self.shiftToggle = False
 
         t = Thread(target=keyboardThread, args=(self,))
         t.daemon = True
@@ -32,11 +33,11 @@ class KeyHandler:
         
         if ch == 'w':
             self.wToggle = True
-        elif ch == 'a':
+        if ch == 'a':
             self.aToggle = True
-        elif ch == 's':
+        if ch == 's':
             self.sToggle = True
-        elif ch == 'd':
+        if ch == 'd':
             self.dToggle = True
     
         # print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)
@@ -46,14 +47,16 @@ class KeyHandler:
             ch = key.char
             if ch == 'w':
                 self.wToggle = False
-            elif ch == 'a':
+            if ch == 'a':
                 self.aToggle = False
-            elif ch == 's':
+            if ch == 's':
                 self.sToggle = False
-            elif ch == 'd':
+            if ch == 'd':
                 self.dToggle = False
+            
         
         except AttributeError:
             pass
+        
         
         # print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)

@@ -16,7 +16,6 @@ class Tile(GameObject):
     def display(self, camX, camY):
         self.screen.canv.delete(self.screenObj)
         if self.isOnScreen():
-            if self.type == "img" or self.type == 'tile':
-                self.screenObj = self.screen.canv.create_image(self.x - camX + self.xOff + self.screen.width/2, self.y - camY + self.yOff + self.screen.height/2, image = self.sprite)
+            self.screenObj = self.screen.canv.create_image(self.x - camX + self.xOff + self.screen.width/2, self.y - camY + self.yOff + self.screen.height/2, image = self.sprite)
 
 
