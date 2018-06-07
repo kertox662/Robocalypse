@@ -7,6 +7,7 @@ import atexit
 import sys
 from threading import Thread
 from queue import Queue
+from math import *
 
 dependencyPath = __file__.split('EngineMain.py')[0] + "Dependencies"
 sys.path.append(dependencyPath)
@@ -33,6 +34,7 @@ from Tile import *
 from Camera import Camera
 from Player import Player
 from Entity import Entity, stationaryEntity, movingEntity
+from Hotbar import Hotbar
 
 #Downloaded Modules
 from PIL import Image, ImageTk, ImageFilter
@@ -47,6 +49,10 @@ def exitProcedure():
 
 atexit.register(exit)
 
+
+def dist(p1, p2):
+    l = sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2 )
+    return l
 
 def saveSettingsEvent(Event):
     saveSettings()
@@ -111,6 +117,11 @@ def saveSettings():
     
     s.updateDimensions()
 
+
+#==========================================
+#=============Thread Functions=============
+#==========================================
+
 def countFrameRate():
     global frame
     global fps
@@ -136,14 +147,30 @@ def doGameCalculations():
                 for j in i:
                     for k in j.entities:
                         player.doStationaryCollisions(player.isColliding(k), k)
-
             
-            # if True in player.isColliding(testEntity):
-            #     print('colliding')
-            # else:
-            #     print("not colliding")
+            for e in KH.checkEvents:
+                for i in renderedTiles:
+                    for j in i:
+                        for k in j.entities:
+                            if dist([player.x, player.y], [k.x, k.y]) < 140:
+                                if e == 'Cut Tree':
+                                    # print("Tree")
+                                    if k.type == "Tree":
+                                        if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
+                                            resources["wood"]["amount"] += randint(1,5)
+                                    
+                                elif e == "Mine Rock":
+                                    # print("Rock")
+                                    if k.type == "Rock":
+                                        if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
+                                            resources["stone"]["amount"] += randint(1,5)
+                            
+            
+                KH.checkEvents.pop(0)
+
         
         sleep(1/60)
+
 
 def doGraphicCalcs():
     global renderedTiles
@@ -152,9 +179,8 @@ def doGraphicCalcs():
             if gameS.checkRendered(renderedTiles) == False:
                 renderedTiles = gameS.setRenderGrid()
 
-        sleep(1/10)
+        sleep(1/60)
 
-        
 
 def doAlert():
     global alerts, alertCount, newAlert
@@ -163,6 +189,7 @@ def doAlert():
         if not alerts.empty():
             alertCount += 1
             newAlert = alerts.get()
+            hotbar.addItem(randint(1,2))
             while notifY < 80:
                 notifY += 5
                 sleep(1/60)
@@ -176,6 +203,11 @@ def doAlert():
             notifY = -85
         
         sleep(1/60)
+
+
+#===================================================
+#==============Draw Graphics Functions==============
+#===================================================
 
 def drawNotifBox():
     global notifBox, notifText
@@ -191,7 +223,7 @@ def drawGroundGraphics():
     player.display(player, True, player.collisionBox, True)
     # player.drawCollision()
 
-    gameS.displayStationaryBoxes(renderedTiles, "hitBox")
+    gameS.displayStationaryBoxes(renderedTiles, "collision")
     gameS.displayStationaryEntities(player, False, renderedTiles)
 
 def drawResources():
@@ -207,7 +239,15 @@ def drawUIGraphics():
     if settings["displayFPS"] == True:
         displayFPS()
         
+    hotbar.display()
     drawNotifBox()
+
+
+
+
+#==========================================================
+#====================Grouping Functions====================
+#==========================================================
 
 
 def runGame():
@@ -271,8 +311,8 @@ def setInitialValues():
     global settings , TESTING, testEntity, applyButton
     global renderedTiles, tileGrid, tileData, tileSprites, tileMap
     global frame, fpsText
-    global alerts, alertCount, newAlert, UISprites, notifBox, notifText
-    global resources
+    global alerts, alertCount, newAlert, UISprites, hotbar, notifBox, notifText
+    global resources, itemData, itemSprites
 
 
     TESTING = False
@@ -301,12 +341,20 @@ def setInitialValues():
         imgTemp = Image.open(tileData[str(i)]["image"])
         tileSprites.append(ImageTk.PhotoImage(image=imgTemp))
 
+    itemData = loadSettings("data/items.json")
+    itemSprites = []
+    for i in itemData:
+        itemSprites.append(loadImage(itemData[i]["icon"]))
+    
+    resources = {"wood":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Wood Log/log.png")}, "metal":{"amount": 0, "text":-1, "icon":-1, "sprite":loadImage("images/Resources/Metal/metal.png")}, "stone":{"amount":0, "text":-1, "icon": -1, "sprite":loadImage("images/Resources/Rock/rock2.png")}, "wires":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Electrical/wires.png")}}
+
     startx = 1000
     starty = 1000
 
-    KH = KeyHandler(s)
+    hotbar = Hotbar(s, itemSprites)
+    KH = KeyHandler(s, hotbar)
     Cam = Camera(startx, starty, s, KH)
-    player = Player(startx, starty, s, Cam, KH)
+    player = Player(startx, starty, s, Cam, KH, resources)
     
     with open('data/TileData.txt') as mapD:
         tileMap = mapD.read().split('\n')
@@ -337,10 +385,14 @@ def setInitialValues():
     firstTime = True
     if TESTING: print(sWidth, sHeight)
 
-    for i in range(20):
+    for i in range(10):
         tempX = randint(1600, 2800)
         tempY = randint(1600, 2800)
-        tempEntity = stationaryEntity(tempX, tempY, "img", 0, "images/Tree1.png", s, Cam, ((-15, 20, 20, -15),(80,80,106,106)), True, ((-15, 20, 20, -15),(60,60,106,106)))#(-10, 15, 15, -10),(80,80,106,106)
+        entityChoice = randint(1,2)
+        if entityChoice == 1:
+            tempEntity = stationaryEntity(tempX, tempY, "Tree", 0, "images/Tree1.png", s, Cam, ((-15, 20, 20, -15),(80,80,106,106)), True, ((-15, 20, 20, -15),(60,60,106,106)))#(-10, 15, 15, -10),(80,80,106,106)
+        elif entityChoice == 2:
+            tempEntity = stationaryEntity(tempX, tempY, "Rock", 0, "images/Rock1.png", s, Cam, ((-60, 60, 60, -60), (10, 10, 60, 60)), True, ((-60, 60, 60, -60), (-15, -15, 60, 60)))
         tileGrid[tempEntity.tileY][tempEntity.tileX].entities.append(tempEntity)
     
     for i in tileGrid:
@@ -355,8 +407,7 @@ def setInitialValues():
     
     s.root.bind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
 
-    resources = {"wood":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Wood Log/log.png")}, "metal":{"amount": 0, "text":-1, "icon":-1, "sprite":loadImage("images/Resources/Metal/metal.png")}, "stone":{"amount":0, "text":-1, "icon": -1, "sprite":loadImage("images/Resources/Rock/rock2.png")}, "wires":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Electrical/wires.png")}}
-
+    
     frameThread = Thread(target=countFrameRate)
     frameThread.daemon = True
 

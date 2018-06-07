@@ -7,15 +7,16 @@ class Player(movingEntity):
     playerSpeed = 7
     playerFriction = 0.9
 
-    def __init__(self, x, y, screen, camera, KH):
+    def __init__(self, x, y, screen, camera, KH, resources):
         # pImg = Image.open()
         # img = ImageTk.PhotoImage(image=pImg)
-        super().__init__(x,y,"img", 0, "images/Robot1.png", screen, camera, ((-25, 0, 25, 25, 25, 0, -25, -25), (20,20,20,35,50,50,50,35)), True, None)#(-25, 0, 25, 25, 25, 0, -25, -25), (20,20,20,35,50,50,50,35)
+        super().__init__(x,y,"Player", 0, "images/Robot1.png", screen, camera, ((-25, 0, 25, 25, 25, 0, -25, -25), (20,20,20,35,50,50,50,35)), True, None)#(-25, 0, 25, 25, 25, 0, -25, -25), (20,20,20,35,50,50,50,35)
         self.Velx = 0
         self.Vely = 0
         self.KH = KH
         self.resetX = False
         self.resetY = False
+        self.resources = resources
     
 
     def updateVelocity(self):
@@ -145,6 +146,10 @@ class Player(movingEntity):
             if abs(self.Velx) < 0.3:
                 self.Velx = 0
             # print("X")
+    
+    def calculateEvents(self):
+        pass
+
         
         
 

@@ -35,6 +35,34 @@ class stationaryEntity(Entity):
         self.tileX = self.x // Tile.tileWidth
         self.tileY = self.y // Tile.tileHeight
 
+    def isPointInBox(self, point, boxType, Mouse = False):
+        x = point[0]
+        y = point[1]
+
+        if Mouse == True:
+            bufferX = self.screen.width / 2 - self.camera.x
+            bufferY = self.screen.height / 2 - self.camera.y
+
+        else:
+            bufferX = 0
+            bufferY = 0
+        
+        # print("X:", min(self.collisionBox[0]) + self.x + self.xOff + bufferX, max(self.collisionBox[0]) + self.x + self.xOff + bufferX)
+        # print("Y:", min(self.hitBox[1]) + self.y + self.yOff + bufferY, max(self.hitBox[1]) + self.y + self.yOff + bufferY)
+
+        if boxType == "collision":
+            if min(self.collisionBox[0]) + self.x + self.xOff + bufferX <= x <= max(self.collisionBox[0]) + self.x + self.xOff + bufferX:
+                if min(self.collisionBox[1]) + self.y + self.yOff + bufferY <= y <= max(self.collisionBox[1]) + self.y + self.yOff + bufferY:
+                    return True
+        
+        elif boxType == "hitbox":
+             if min(self.hitBox[0]) + self.x + self.xOff + bufferX <= x <= max(self.hitBox[0]) + self.x + self.xOff + bufferX:
+                if min(self.hitBox[1]) + self.y + self.yOff + bufferY <= y <= max(self.hitBox[1]) + self.y + self.yOff + bufferY:
+                    return True
+        
+        return False
+
+
 
 class movingEntity(Entity):
     def __init__(self, x, y, entityType, id, sprite, screen, camera, collisionBox, doCollision, hitBox, xOff = 0, yOff = 0):

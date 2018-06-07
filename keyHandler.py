@@ -8,14 +8,24 @@ def keyboardThread(self):
 
 
 class KeyHandler:
-    def __init__(self, screen):
+    def __init__(self, screen, hotbar):
         self.screen = screen
         self.scene = "scene_main"
+        self.hotbar = hotbar
+
         self.wToggle = False
         self.aToggle = False
         self.sToggle = False
         self.dToggle = False
         self.shiftToggle = False
+
+        self.checkEvents = []
+        self.screen.canv.bind("<Button-1>", self.doAction)
+        self.screen.root.bind("<Motion>", self.updateMousePostion)
+        self.mouseClickx = -1000
+        self.mouseClicky = -1000
+        self.mouseX = -1000
+        self.mouseY = -1000
 
         t = Thread(target=keyboardThread, args=(self,))
         t.daemon = True
@@ -24,7 +34,6 @@ class KeyHandler:
     
             
     def onPress(self, key):
-        # print(arg2)
         try:
             ch = key.char
 
@@ -40,7 +49,6 @@ class KeyHandler:
         if ch == 'd':
             self.dToggle = True
     
-        # print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)
     
     def onRelease(self, key):
         try:
@@ -57,6 +65,28 @@ class KeyHandler:
         
         except AttributeError:
             pass
+    
+    def doAction(self, event):
+        if self.hotbar.inventory[self.hotbar.cursorPosition - 1] == 1:
+            self.checkEvents.append("Cut Tree")
         
+        elif self.hotbar.inventory[self.hotbar.cursorPosition - 1] == 2:
+            self.checkEvents.append("Mine Rock")
         
-        # print(self.aToggle, self.wToggle, self.sToggle, self.dToggle)
+        else:
+            print("No action checked")
+            return
+        
+        self.mouseClickx = event.x
+        self.mouseClicky = event.y
+
+        # print(self.checkEvents)
+    
+    def updateMousePostion(self, event):
+        self.mouseX = event.x 
+        self.mouseY = event.y
+        
+
+
+
+        

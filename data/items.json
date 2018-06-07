@@ -1,202 +1,45 @@
 {
-
-	"knife1": {
-		"id": 1,
-		"name": "Knife",
-		"type":"Weapon",
-		"subtype":"Melee",
-		"files":["images/Weapons/Knife/knife1.gif","images/Weapons/Knife/knife1Highlight.gif"],
-		"ammo":"Melee",
-		"damage":17
+	"1":{
+		"name":"Axe",
+		"type":"Tool",
+		"icon":"images/Tools/Axe/Axe.png"
 	},
 
-	"baseballBat":{
-		"id":2,
-		"name":"Bat",
-		"type":"Weapon",
-		"subtype":"Melee",
-		"files":["images/Weapons/Bat/baseballBat.gif","images/Weapons/Bat/baseballBatHighlight.gif"],
-		"ammo":"Melee",
-		"damage":20
+	"2":{
+		"name":"Pickaxe",
+		"type":"Tool",
+		"icon":"images/Tools/Pickaxe/Pickaxe.png"
 	},
 
-	"crowbar":{
-		"id":3,
-		"name":"Crowbar",
-		"type":"Weapon",
-		"subtype":"Melee",
-		"files":["images/Weapons/Crowbar/crowbar.gif","images/Weapons/Crowbar/crowbarHighlight.gif"],
-		"ammo":"Melee",
-		"damage":25
-	},
-
-	"pistol1":{
-		"id": 4,
-		"name": "M1911",
-		"type":"Weapon",
-		"subtype":"Pistol",
-		"files":["images/Weapons/M1911/M1911.gif","images/Weapons/M1911/M1911Highlight.gif"],
-		"ammo":7,
-		"damage":25
-	},
-
-	"pistol2":{
-		"id": 5,
-		"name": "Glock 17",
-		"type":"Weapon",
-		"subtype":"Pistol",
-		"files":["images/Weapons/Glock/glock.gif","images/Weapons/Glock/glockHighlight.gif"],
-		"ammo":17,
-		"damage":15
-	},
-
-	"automaticRifle1":{
-		"id":6,
-		"name":"M16",
-		"type":"Weapon",
-		"subtype":"Automatic Rifle",
-		"files":[],
-		"ammo":30,
-		"damage":20
-	},
-
-	"automaticRifle2":{
-		"id":7,
-		"name":"AK-47",
-		"type":"Weapon",
-		"subtype":"Automatic Rifle",
-		"files":["images/Weapons/Ak-47/ak47.gif","images/Weapons/Ak-47/ak47Highlight.gif"],
-		"ammo":30,
-		"damage":34
-	},
-
-	"cannedFood1":{
-		"id":8,
-		"name":"Canned Beans",
-		"type":"Food",
-		"files":["images/Food/Canned Beans/cannedBeans.gif","images/Food/Canned Beans/cannedBeansHighlight.gif"]
-	},
-
-	"cannedFood2":{
-		"id":9,
-		"name":"Canned Meat",
-		"type":"Food",
-		"files":["images/Food/Canned Meat/cannedMeat.gif","images/Food/Canned Meat/cannedMeatHighlight.gif"]
-	},
-
-	"rawMeat":{
-		"id":10,
-		"name":"Raw Meat",
-		"type":"Food",
-		"files":["images/Food/Raw Meat/rawMeat.gif","images/Food/Raw Meat/rawMeatHighlight.gif"]
-	},
-
-	"cookedMeat":{
-		"id":11,
-		"name":"Cooked Meat",
-		"type":"Food",
-		"files":["images/Food/Cooked Meat/cookedMeat.gif","images/Food/Cooked Meat/cookedMeatHighlight.gif"]
-	},
-
-	"fruit1":{
-		"id":12,
-		"name":"Apple",
-		"type":"Food",
-		"files":["images/Food/Apple/apple.gif","images/Food/Apple/appleHighlight.gif"]
-	},
-
-	"wood1":{
-		"id":13,
-		"name":"Wood Log",
-		"type":"Resource",
-		"files":["images/Resources/Wood Log/woodLog.gif","images/Resources/Wood Log/woodLogHighlight.gif"]
-	},
-
-	"wood2":{
-		"id":14,
-		"name":"Stick",
-		"type":"Resource",
-		"files":["images/Resources/Stick/stick.gif","images/Resources/Stick/stickHighlight.gif"]
-	},
-
-	"stone1":{
-		"id":15,
-		"name":"Rock",
-		"type":"Resource",
-		"files":["images/Resources/Rock/rock.gif","images/Resources/Rock/rockHighlight.gif"]
-	},
-
-	"shotgun1":{
-		"id":16,
-		"name":"Mossberg 500",
-		"type":"Weapon",
-		"subtype":"Shotgun",
-		"files":[],
-		"ammo":6,
-		"damage":12,
-		"shots":10
-	},
-
-	"shotgun2":{
-		"id":17,
-		"name":"M4",
-		"type":"Weapon",
-		"subtype":"Shotgun",
-		"files":[],
-		"ammo":8,
-		"damage":17,
-		"shots":8
-	},
-
-	"sniper1":{
-		"id":18,
-		"name":"M24",
-		"type":"Weapon",
-		"subtype":"Sniper",
-		"files":[],
-		"ammo":5,
-		"damage":120
-	},
-
-	"sniper2":{
-		"id":19,
-		"name":"Mosin Nagant",
-		"type":"Weapon",
-		"subtype":"Sniper",
-		"files":[],
-		"ammo":5,
-		"damage":90
-	},
-
-	"revolver":{
-		"id":20,
-		"name":"M1877 Revolver",
-		"type":"Weapon",
-		"subtype":"Pistol",
-		"files":[],
-		"ammo":6,
-		"damage":50
-	},
-
-	"flashlight":{
-		"id":21,
+	"3":{
 		"name":"Flashlight",
 		"type":"Tool",
-		"files":["images/Tools/Flashlight/flashlight.gif","images/Tools/Flashlight/flashlightHighlight.gif"]
+		"icon":"images/Tools/Flashlight/flashlight.gif"
+
 	},
 
-	"compass":{
-		"id":22,
-		"name":"Compass",
+	"4":{
+		"name":"Lighter",
 		"type":"Tool",
-		"files":["images/Tools/Compass/compass.gif","images/Tools/Compass/compassHighlight.gif"]
+		"icon":"images/Tools/Lighter/Lighter.png"
 	},
 
-	"waterBottle":{
-		"id":23,
+	"5":{
+		"name":"Matches",
+		"type":"Tool",
+		"icon":"images/Tools/Matches/Matches.png"
+	},
+
+	"6":{
+		"name":"Bucket",
+		"type":"Tool",
+		"icon":"images/Tools/Bucket/Bucket.png"
+	},
+
+	"7":{
 		"name":"Water Bottle",
 		"type":"Tool",
-		"files":["images/Tools/Water Bottle/waterBottle.gif","images/Tools/Water Bottle/waterBottleHighlight.gif"]
+		"icon":"images/Tools/Water Bottle/waterBottle.gif"
 	}
 
 }
