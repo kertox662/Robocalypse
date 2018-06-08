@@ -13,6 +13,7 @@ class Screen:
         self.canv = Canvas(self.root, width = self.width, height = self.height)
         self.canv.pack(fill = 'both', expand = True)
         self.root.title(winName)
+        # self.root.config(cursor = "none")
     
     def updateShownDimensions(self, width, height):
         self.setWidth = width

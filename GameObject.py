@@ -11,10 +11,7 @@ class GameObject:
         self.id = id
         self.screen = screen
         self.camera = camera
-        if objType == "img" or objType == 'tile':
-            self.sprite = sprite
-        elif objType == "polygon":
-            pass
+        self.sprite = sprite
         self.screenObj = -1
         self.xOff = xOff
         self.yOff = yOff
@@ -34,8 +31,7 @@ class GameObject:
 
         if self.isOnScreen():
             if (self.y + self.yOff + collisionMid <= player.y + player.yOff + playerColDist) == lessOrGreater or isPlayer == True:
-                if self.type == "img" or self.type == 'tile':
-                    self.screenObj = self.screen.canv.create_image(self.x - self.camera.x + self.xOff + self.screen.width/2, self.y - self.camera.y + self.yOff + self.screen.height/2, image = self.sprite)
+                self.screenObj = self.screen.canv.create_image(self.x - self.camera.x + self.xOff + self.screen.width/2, self.y - self.camera.y + self.yOff + self.screen.height/2, image = self.sprite)
 
         
 

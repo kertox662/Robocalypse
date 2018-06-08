@@ -51,7 +51,7 @@ class GameScene(Scene):
                 for k in j.entities:
                     if boxType == "hitBox":
                         k.drawEntityBox(k.hitBox)
-                    elif boxType == "collisionBox":
+                    elif boxType == "collision":
                         k.drawEntityBox(k.collisionBox)
                         
     
