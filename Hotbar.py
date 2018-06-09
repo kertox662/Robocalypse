@@ -6,16 +6,17 @@ class Hotbar(GameObject):
         import Item
         self.Item = Item.Item
         x = screen.width/2
+        y = screen.height - 25
         hotbarSprite = loadImage("images/UI/Hotbar.png")
-        super().__init__(x, screen.height - 25, "UI", 0, hotbarSprite, screen, None)
+        super().__init__(x, y, "UI", 0, hotbarSprite, screen, None)
         self.cursorSprite = loadImage("images/UI/cursor.png")
         self.cursorPosition = 1
         self.cursorScreenObj = -1
         self.inventory = [0] * 6
         self.invScreenObj = [-1]*6
-        # self.itemSprites = itemSprites
+        self.lockCursor = False
 
-        screen.root.bind("<KeyPress>", lambda e: self.changeCursorPosition(e))
+        screen.root.bind("<KeyPress>", self.changeCursorPosition)
     
     def display(self):
         self.screen.canv.delete(self.screenObj, self.cursorScreenObj)
@@ -29,8 +30,9 @@ class Hotbar(GameObject):
                 i.screenObj = self.screen.canv.create_image(self.x - 133 + 38*(self.inventory.index(i)+1),self.y, image = i.sprite)
     
     def changeCursorPosition(self, event):
-        if event.keysym in ['1','2','3','4','5','6']:
-            self.cursorPosition = int(event.keysym)
+        if not self.lockCursor:
+            if event.keysym in ['1','2','3','4','5','6']:
+                self.cursorPosition = int(event.keysym)
     
     def addItem(self, id):
         try:
@@ -38,3 +40,16 @@ class Hotbar(GameObject):
             return True
         except ValueError:
             return False
+    
+    def changeCursorPositionScroll(self,event):
+        if not self.lockCursor:
+            if event.delta < 0:
+                self.cursorPosition = (self.cursorPosition + 1) % 7
+                if self.cursorPosition == 0:
+                    self.cursorPosition = 1
+
+            
+            else:
+                self.cursorPosition = self.cursorPosition - 1
+                if self.cursorPosition < 1:
+                    self.cursorPosition = 6

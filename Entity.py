@@ -5,7 +5,10 @@ from getData import loadImage
 
 class Entity(GameObject):
     def __init__(self, x, y, entityType, id, sprite, screen, camera, collisionBox, doCollision, hitBox, xOff = 0, yOff = 0):
-        img = loadImage(sprite)
+        if type(sprite) == str:
+            img = loadImage(sprite)
+        else:
+            img = sprite
         super().__init__(x, y, entityType, id, img, screen, camera, xOff, yOff)
         self.collisionBox = collisionBox
         self.doCollision = doCollision
@@ -13,9 +16,6 @@ class Entity(GameObject):
         self.hitBox = hitBox
 
         self.rawBox = []
-        for i in range(len(collisionBox)):
-            self.rawBox.append(collisionBox[i][0])
-            self.rawBox.append(collisionBox[i][1])
     
     def drawEntityBox(self, box):
         self.screen.canv.delete(self.drawnCollision)

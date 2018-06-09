@@ -12,22 +12,6 @@ class GameScene(Scene):
         self.screen.root.bind("<Escape>", lambda e: self.change_scene("scene_main"))
         self.tileArray = tileArray
         self.player = player
-
-    
-    # def change_scene(self, targetscene = None):
-    #     if targetscene == "scene_main":
-    #         if Scene.current_scene == 'scene_game':
-    #             Scene.current_scene = targetscene
-    #             for i in self.tileArray:
-    #                 for j in i:
-    #                     self.screen.canv.delete(i)
-    #                     for k in j.entities:
-    #                         self.screen.canv.delete(k.screenObj)
-    #             self.screen.canv.delete(self.player.screenObj)
-    #             self.screen.canv.update()
-        
-    #     else:
-    #         super().change_scene(targetscene)
     
 
     def showTiles(self, tileArray):

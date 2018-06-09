@@ -12,9 +12,6 @@ from math import *
 dependencyPath = __file__.split('EngineMain.py')[0] + "Dependencies"
 sys.path.append(dependencyPath)
 
-#imagesPath = 
-#sys.path.append(imagesPath)
-
 import InstallPip
 if __name__ == '__main__':
     InstallPip.checkDependencies()
@@ -59,7 +56,7 @@ def saveSettingsEvent(Event):
     saveSettings()
     
 def saveSettings():
-    global s, sWidth, sHeight, settings
+    global s, sWidth, sHeight, settings, hotbar
     updatedSettings = []
     for item in settingsS.settingText:
         itemText = s.canv.itemcget(item, 'text').split()
@@ -88,7 +85,7 @@ def saveSettings():
     with open('data/configs.json', 'w') as jsonFile:
         js.dump(settings, jsonFile, indent = 4)
     
-    
+    s.fullscreen = fullScr
     
     global applyButton
     s.canv.delete(applyButton)
@@ -99,14 +96,17 @@ def saveSettings():
     firstTime = True
     settingsS.change_scene("scene_main")
     
-    if fullScr:
-        sWidth = s.canv.winfo_screenwidth()
-        sHeight = s.canv.winfo_screenheight()
-        
-        s.root.geometry("{}x{}+0+0".format(width, height))
+    if fullScr == True:
+        # s.root.geometry("{}x{}+0+0".format(width, height))
         if TESTING:print(s.root.geometry())
         s.canv.config(width = width, height = height)
         s.root.attributes("-fullscreen", fullScr)
+        sleep(0.1)
+        sWidth = s.root.winfo_screenwidth()
+        sHeight = s.root.winfo_screenheight()
+
+        s.width = sWidth
+        s.height = sHeight
     else:
         sWidth = width
         sHeight = height
@@ -115,8 +115,15 @@ def saveSettings():
         s.root.geometry("{}x{}+20+20".format(width, height))
         if TESTING: print(s.root.geometry())
         s.canv.config(width = width, height = height)
+
+        
     
     s.updateDimensions()
+
+    hotbar.x = s.width / 2
+    hotbar.y = s.height - 25
+    
+        
 
 
 #==========================================
@@ -138,63 +145,129 @@ def displayFPS():
     fpsText = s.canv.create_text(30, 10, text = text, fill = '#20FF20')
 
 def doGameCalculations():
+    
     while True:
         if Scene.current_scene == "scene_game":
             player.applyFriction()            
             player.updateVelocity()
             player.move()
+            player.checkNearTable(renderedTiles)
 
             for i in renderedTiles:
                 for j in i:
                     for k in j.entities:
                         player.doStationaryCollisions(player.isColliding(k), k)
             
-            for e in KH.checkEvents:
-                for i in renderedTiles:
-                    for j in i:
-                        for k in j.entities:
-                            if dist([player.x, player.y], [k.x, k.y]) < 140:
-                                if e == 'Cut Tree':
-                                    # print("Tree")
-                                    if k.type == "Tree":
-                                        if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
-                                            resources["wood"]["amount"] += randint(1,5)
-                                    
-                                elif e == "Mine Rock":
-                                    # print("Rock")
-                                    if k.type == "Rock":
-                                        if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
-                                            resources["stone"]["amount"] += randint(1,5)
+            
+
+        sleep(1/60)
+
+def customEventHandler():
+    global resources, CraftWin, tempFurniture
+    while True:
+        for e in KH.checkEvents:
+                if e == "Place Furniture":
+                    print(KH.checkEvents)
+                    print(e)
+                    if player.isPlacing == False:
+                        player.isPlacing = True
+                        hotbar.lockCursor = True
+                        tempFurniture = FurnitureClass(KH.mouseX, KH.mouseY, hotbar.inventory[hotbar.cursorPosition - 1].furnitureId, s, Cam, player)
+                    
+                    if player.isPlacing == True:
+                        if tempFurniture.shownSprite == tempFurniture.spriteGreen:
+                            tempFurniture.isPlacing = False
+                            tempFurniture.doCollision = True
+                            
+                            tileX = int(tempFurniture.x // Tile.tileWidth)
+                            tileY = int(tempFurniture.y // Tile.tileHeight)
+                            tileGrid[tileY][tileX].entities.append(tempFurniture)
+
+                            tempFurniture = None
+
+                            player.isPlacing = False
+                            hotbar.lockCursor = False
+                            hotbar.inventory[hotbar.cursorPosition - 1] = 0
+                            
+                
+                
+                else:
+                    for i in renderedTiles:
+                        for j in i:
+                            for k in j.entities:
+                                if dist([player.x, player.y], [k.x, k.y]) < 140:
+                                    if e == 'Cut Tree':
+                                        # print("Tree")
+                                        if k.type == "Tree":
+                                            if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
+                                                resources["wood"]["amount"] += randint(1,5)
+                                        
+                                    elif e == "Mine Rock":
+                                        # print("Rock")
+                                        if k.type == "Rock":
+                                            if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
+                                                resources["stone"]["amount"] += randint(1,5)
+                                                metalChance = randint(1,100)
+                                                if metalChance <= 7:
+                                                    amountChance = randint(1,100)
+                                                    if amountChance <= 80:
+                                                        amount = 1
+                                                    elif amountChance <= 98:
+                                                        amount = 2
+                                                    else:
+                                                        amount = 3
+                                                    resources["metal"]["amount"] += amount
+                                
+                                
+
                             
             
                 KH.checkEvents.pop(0)
             
-            currentTileX = int(player.x // Tile.tileWidth)
-            currentTileY = int(player.y // Tile.tileHeight)
-            tileToCheck = tileGrid[currentTileY][currentTileX]
-            if int(tileToCheck.id) in [2,29,30,31,32]:
-                if tileToCheck.isPointInBox([player.x, player.y]):
-                    player.wireHP -= 0.1
+        currentTileX = int(player.x // Tile.tileWidth)
+        currentTileY = int(player.y // Tile.tileHeight)
+        tileToCheck = tileGrid[currentTileY][currentTileX]
+        if int(tileToCheck.id) in [2,29,30,31,32]:
+            if tileToCheck.isPointInBox([player.x, player.y + 35]):
+                player.wireHP -= 0.1
 
-            elif int(tileToCheck.id) in [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]:
-                if not tileToCheck.isPointInBox([player.x, player.y]):
-                    player.wireHP -= 0.1
-            
-            elif int(tileToCheck.id) in [20,21,22,23,24,25,26,27,28,33,34,35,36]:
-                if tileToCheck.isPointInBox([player.x, player.y]):
-                    Player.playerSpeed = 8.5
-                else:
-                    Player.playerSpeed = 7
-            
-            # else:
-            #     print(tileToCheck.id, type(tileToCheck.id))
-            #     print(tileToCheck.collisionBox)
-
-
+        elif int(tileToCheck.id) in [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]:
+            if not tileToCheck.isPointInBox([player.x, player.y + 35]):
+                player.wireHP -= 0.1
         
+        elif int(tileToCheck.id) in [20,21,22,23,24,25,26,27,28,33,34,35,36]:
+            if tileToCheck.isPointInBox([player.x, player.y]):
+                Player.playerSpeed = 8.5
+            else:
+                Player.playerSpeed = 7
+        
+        if CraftWin.toDoCrafting != False:
+            costForItem = itemData[str(CraftWin.toDoCrafting)]["cost"]
+            curResources = []
+            for i in resourceOrder:
+                curResources.append(resources[i]["amount"])
+            
+            # print(costForItem, curResources)
+            # print(resources)
+            craftAvailable = True
+            for i in range(len(curResources)):
+                if curResources[i] < costForItem[i]:
+                    craftAvailable = False
+                # print(craftAvailable)
+            
+            if craftAvailable == True:
+                if hotbar.addItem(CraftWin.toDoCrafting):
+                    for i in resourceOrder:
+                        resources[i]["amount"] -= costForItem[resourceOrder.index(i)]
+                
+                else:
+                    alerts.put({"text":"There is not enough space in the\ninventory to craft this item", "delay":2.5})
+            
+            else:
+                alerts.put({"text":"Insufficient Resources to craft this item", "delay":2.5})
+            
+            CraftWin.toDoCrafting = False
         sleep(1/60)
-
-
 def doGraphicCalcs():
     global renderedTiles
     while True:
@@ -212,7 +285,7 @@ def craftingWindowCalcs():
                 CraftWin.x += 8
         
         else:
-            if CraftWin.x > -192:
+            if CraftWin.x > -112:
                 CraftWin.x -= 8
         
         sleep(1/60)
@@ -226,9 +299,6 @@ def doAlert():
             alertCount += 1
             newAlert = alerts.get()
             if Scene.current_scene == "scene_game":
-                hotbar.addItem(randint(8,11))
-                # player.metalHP -= 3
-                # player.wireHP -=5
                 while notifY < 80:
                     notifY += 5
                     sleep(1/60)
@@ -270,25 +340,71 @@ def drawGroundGraphics():
     gameS.displayStationaryEntities(player, False, renderedTiles)
 
 def drawResources():
-    resourceList = ["wood", "stone", "metal", "wires"]
-    for i in range(len(resourceList)):
-        key = resourceList[i]
+    for i in range(len(resourceOrder)):
+        key = resourceOrder[i]
         s.canv.delete(resources[key]["icon"], resources[key]["text"])
         resources[key]["icon"] = s.canv.create_image(25, 40*i + 70, image = resources[key]["sprite"])
         resources[key]["text"] = s.canv.create_text(50, 40*i + 70, text = str(resources[key]["amount"]))
 
+def drawTempFurniture():
+    if tempFurniture != None:
+        print(tempFurniture)
+        tempFurniture.chooseSprite(renderedTiles)
+        if tempFurniture.isPlacing:
+            tempFurniture.display(player, None, None)
+
+def drawCostWindow():
+    global costBox, costIcons, costText, CraftWin
+    for i in costIcons:
+        s.canv.delete(i)
+    for i in costText:
+        s.canv.delete(i)
+    s.canv.delete(costBox)
+    
+    costIcons = []
+    costText = []
+
+    if not CraftWin.openWindow:
+        CraftWin.currentCostWindow = None
+
+    if CraftWin.currentCostWindow != None:
+        xPos = KH.mouseX
+        yPos = KH.mouseY
+        costBox = s.canv.create_rectangle(2, yPos - 60, 224, yPos - 15, fill = 'white', outline = 'black')
+        for i in range(4):
+            costIcons.append(s.canv.create_image(24 + 48*i, yPos - 50, image = resources[resourceOrder[i]]["spriteSmall"]))
+            
+            curCost = CraftWin.currentCostWindow[i]
+            if resources[resourceOrder[i]]["amount"] >= curCost:
+                color = 'green'
+            else:
+                color = 'red'
+            
+            costText.append(s.canv.create_text(24 + 48*i, yPos - 30, text = str(curCost), fill = color))
+        
+
+
 def drawUIGraphics():
     drawResources()
-    player.displayLife()
+    
     if settings["displayFPS"] == True:
         displayFPS()
-        
+    
+    drawTempFurniture()
     hotbar.display()
     CraftWin.display()
+    drawCostWindow()
+    player.displayLife()
     drawNotifBox()
 
 
 
+
+def doScroll(event):
+    if CraftWin.isMouseInWindow():
+        CraftWin.changeY(event)
+    else:
+        hotbar.changeCursorPositionScroll(event)
 
 #==========================================================
 #====================Grouping Functions====================
@@ -358,7 +474,8 @@ def setInitialValues():
     global frame, fpsText
     global alerts, alertCount, newAlert, UISprites, hotbar, notifBox, notifText
     global resources, itemData, itemSprites
-    global CraftWin
+    global CraftWin, costBox, costIcons, costText, resourceOrder
+    global tempFurniture, FurnitureClass
 
     #=====Primitive Variables=====
     TESTING = False
@@ -369,7 +486,12 @@ def setInitialValues():
     alertCount = 0
     notifBox = -1
     notifText = -1
+    costBox = -1
+    tempFurniture = None
+    costIcons = []
+    costText = []
     newAlert = {"text":""}
+    resourceOrder = ["wood", "stone", "metal", "wires"]
 
     settings = loadSettings()
     #=====Screen and Tkinter windows=====
@@ -380,6 +502,10 @@ def setInitialValues():
         
     else:
         s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Robocalypse Game", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
+
+
+    import Furniture
+    FurnitureClass = Furniture.Furniture
 
     #=====Tile Data From files=====
     tileData = loadSettings("data/tiles.json")
@@ -456,17 +582,21 @@ def setInitialValues():
         img = Image.open(UISpritesData[i])
         UISprites[i] = ImageTk.PhotoImage(image=img)
     
-    CraftWin = CraftingWindow(s, hotbar)
+    CraftWin = CraftingWindow(s, hotbar, KH, player)
 
 
     s.root.bind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
     s.root.bind("<c>", lambda e: toggleOpenCrafting(CraftWin, e))
-    
+    KH.addTkinterBind("<MouseWheel>", doScroll)
+
     frameThread = Thread(target=countFrameRate)
     frameThread.daemon = True
 
     calcThread = Thread(target = doGameCalculations)
     calcThread.daemon = True
+
+    eventThread = Thread(target = customEventHandler)
+    eventThread.daemon = True
 
     graphCalcThread = Thread(target = doGraphicCalcs)
     graphCalcThread.daemon = True
@@ -477,8 +607,15 @@ def setInitialValues():
     alertThread = Thread(target=doAlert)
     alertThread.daemon = True
 
+    hotbar.addItem(1)
+    hotbar.addItem(2)
+    hotbar.addItem(9)
+    hotbar.addItem(10)
+    hotbar.addItem(11)
+    
     frameThread.start()
     calcThread.start()
+    eventThread.start()
     graphCalcThread.start()
     craftWinThread.start()
     alertThread.start()

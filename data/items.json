@@ -3,6 +3,7 @@
 		"name":"Axe",
 		"type":"Tool",
 		"icon":"images/Tools/Axe/Axe.png",
+		"iconHighlight":"images/Tools/Axe/AxeHighlight.png",
 		"cost":[20, 5, 0, 0],
 		"tableRequired":false
 	},
@@ -11,6 +12,7 @@
 		"name":"Pickaxe",
 		"type":"Tool",
 		"icon":"images/Tools/Pickaxe/Pickaxe.png",
+		"iconHighlight":"images/Tools/Pickaxe/PickaxeHighlight.png",
 		"cost":[50, 15, 0, 0],
 		"tableRequired":false
 	},
@@ -19,6 +21,7 @@
 		"name":"Flashlight",
 		"type":"Tool",
 		"icon":"images/Tools/Flashlight/flashlight.png",
+		"iconHighlight":"images/Tools/Flashlight/flashlightHighlight.png",
 		"cost": [0,2, 15, 10],
 		"tableRequired":true
 	},
@@ -27,6 +30,7 @@
 		"name":"Lighter",
 		"type":"Tool",
 		"icon":"images/Tools/Lighter/Lighter.png",
+		"iconHighlight":"images/Tools/Lighter/LighterHighlight.png",
 		"cost":[3,1,10,0],
 		"tableRequired":true
 	},
@@ -35,6 +39,7 @@
 		"name":"Matches",
 		"type":"Tool",
 		"icon":"images/Tools/Matches/Matches.png",
+		"iconHighlight":"images/Tools/Matches/MatchesHighlight.png",
 		"cost":[10,0,0,0],
 		"tableRequired":false
 	},
@@ -43,6 +48,7 @@
 		"name":"Bucket",
 		"type":"Tool",
 		"icon":"images/Tools/Bucket/Bucket.png",
+		"iconHighlight":"images/Tools/Bucket/BucketHighlight.png",
 		"cost":[0,0,50,0],
 		"tableRequired":true
 	},
@@ -51,6 +57,7 @@
 		"name":"Water Bottle",
 		"type":"Tool",
 		"icon":"images/Tools/Water Bottle/waterBottle.png",
+		"iconHighlight":"images/Tools/Water Bottle/waterBottleHighlight.png",
 		"cost":[0,0,25,0],
 		"tableRequired":true
 	},
@@ -59,6 +66,7 @@
 		"name":"Battery",
 		"type":"Tool",
 		"icon":"images/Misc/Battery/Battery.png",
+		"iconHighlight":"images/Misc/Battery/BatteryHighlight.png",
 		"cost":[0,0,25,10],
 		"tableRequired":true
 	},
@@ -67,24 +75,33 @@
 		"name":"Engineering Table",
 		"type":"Furniture",
 		"icon":"images/Furniture/EngineeringTable/EngineeringTable.png",
+		"iconHighlight":"images/Furniture/EngineeringTable/EngineeringTableHighlight.png",
 		"cost":[100, 20, 0, 0],
-		"tableRequired":false
+		"tableRequired":false,
+
+		"furnitureID":1
 	},
 
 	"10":{
 		"name":"Chest",
 		"type":"Furniture",
 		"icon":"images/Furniture/Chest/Chest.png",
+		"iconHighlight":"images/Furniture/Chest/ChestHighlight.png",
 		"cost":[75, 20, 20, 0],
-		"tableRequired":true
+		"tableRequired":true,
+
+		"furnitureID":2
 	},
 
 	"11":{
 		"name":"Welding Station",
 		"type":"Furniture",
 		"icon":"images/Furniture/WeldingStation/WeldingStation.png",
+		"iconHighlight":"images/Furniture/WeldingStation/WeldingStationHighlight.png",
 		"cost":[0, 20, 100, 50],
-		"tableRequired":true
+		"tableRequired":true,
+
+		"furnitureID":3
 	}
 
 }

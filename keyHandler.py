@@ -17,7 +17,6 @@ class KeyHandler:
         self.aToggle = False
         self.sToggle = False
         self.dToggle = False
-        self.shiftToggle = False
 
         self.checkEvents = []
         self.screen.canv.bind("<Button-1>", self.doAction)
@@ -67,11 +66,17 @@ class KeyHandler:
             pass
     
     def doAction(self, event):
-        if self.hotbar.inventory[self.hotbar.cursorPosition - 1] == 1:
+        if self.hotbar.inventory[self.hotbar.cursorPosition - 1] == 0:
+            return
+
+        elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id == 1:
             self.checkEvents.append("Cut Tree")
         
-        elif self.hotbar.inventory[self.hotbar.cursorPosition - 1] == 2:
+        elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id == 2:
             self.checkEvents.append("Mine Rock")
+        
+        elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id in [9,10,11]:
+            self.checkEvents.append("Place Furniture")
         
         else:
             print("No action checked")
@@ -81,10 +86,15 @@ class KeyHandler:
         self.mouseClicky = event.y
 
         # print(self.checkEvents)
-    
+    def cancelAction(self, event):
+        self.checkEvents.append("Cancel")
+
     def updateMousePostion(self, event):
         self.mouseX = event.x 
         self.mouseY = event.y
+    
+    def addTkinterBind(self, bind, function):
+        self.screen.root.bind(bind, function)
         
 
 

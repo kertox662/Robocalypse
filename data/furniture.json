@@ -1,0 +1,27 @@
+{"1":
+    {   "name":"Engineering Table",
+        "furnitureSprite":"images/Furniture/EngineeringTable/EngineeringTableLarge.png",
+        "furnitureHighlight":"images/Furniture/EngineeringTable/EngineeringTableLargeHighlight.png",
+        "furnitureGreen":"images/Furniture/EngineeringTable/EngineeringTableLargeGreen.png",
+        "furnitureRed":"images/Furniture/EngineeringTable/EngineeringTableLargeRed.png",
+        "collision":[[-72, 72, 72, -72], [-72, -72, 72, 72]]
+    },
+    
+ "2":
+    {   "name":"Chest",
+        "furnitureSprite":"images/Furniture/Chest/ChestLarge.png",
+        "furnitureHighlight":"images/Furniture/Chest/ChestLargeHighlight.png",
+        "furnitureGreen":"images/Furniture/Chest/ChestLargeGreen.png",
+        "furnitureRed":"images/Furniture/Chest/ChestLargeRed.png",
+        "collision":[[-72, 72, 72, -72], [-72, -72, 72, 72]]
+    },
+
+"3":
+    {   "name":"Welding Station",
+        "furnitureSprite":"images/Furniture/WeldingStation/WeldingStationLarge.png",
+        "furnitureHighlight":"images/Furniture/WeldingStation/WeldingStationLargeHighlight.png",
+        "furnitureGreen":"images/Furniture/WeldingStation/WeldingStationLargeGreen.png",
+        "furnitureRed":"images/Furniture/WeldingStation/WeldingStationLargeRed.png",
+        "collision":[[-72, 72, 72, -72], [-72, -72, 72, 72]]
+    }
+}

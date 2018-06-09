@@ -18,6 +18,8 @@ class Player(movingEntity):
         self.resetX = False
         self.resetY = False
         self.resources = resources
+        self.isPlacing = False
+        self.nearTable = False
 
         self.metalHP = 50
         self.metalMaxHP = 50
@@ -184,4 +186,14 @@ class Player(movingEntity):
         self.metalHPText = self.screen.canv.create_text(65 + max(0,self.metalMaxHP), 32, text = "{}/{}".format(max(0,int(self.metalHP)), self.metalMaxHP))
         self.wireHPText = self.screen.canv.create_text(65 + max(0,self.wireMaxHP), 48, text = "{}/{}".format(max(0,int(self.wireHP)), self.wireMaxHP))
 
+    def checkNearTable(self, tileArray):
+        self.nearTable = False
+        for i in tileArray:
+            for j in i:
+                for k in j.entities:
+                    if k.type == "Furniture":
+                        if k.id == 1:
+                            if k.isPlacing == False:
+                                if k.dist(self.x, self.y) < 200:
+                                    self.nearTable = True
 
