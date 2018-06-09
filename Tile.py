@@ -7,11 +7,12 @@ tileGridHeight = 50
 class Tile(GameObject):
     tileWidth = 400
     tileHeight = 400
-    def __init__(self, x, y, sprite, screen, camera, i1, i2):
-        super().__init__(x, y, "tile", 0, sprite, screen, camera, xOff = 100, yOff = 100)
+    def __init__(self, x, y, id, sprite, screen, camera, i1, i2, collisionBox):
+        super().__init__(x, y, "tile", id, sprite, screen, camera, xOff = 200, yOff = 200)
         self.entities = []
         self.indexX = i1
         self.indexY = i2
+        self.collisionBox = collisionBox
     
     def display(self, camX, camY):
         self.screen.canv.delete(self.screenObj)
@@ -19,3 +20,13 @@ class Tile(GameObject):
             self.screenObj = self.screen.canv.create_image(self.x - camX + self.xOff + self.screen.width/2, self.y - camY + self.yOff + self.screen.height/2, image = self.sprite)
 
 
+    def isPointInBox(self, point):
+        x = point[0]
+        y = point[1]
+
+        for i in self.collisionBox:
+            if min(i[0]) + self.x + self.xOff <= x <= max(i[0]) + self.x + self.xOff:
+                if min(i[1]) + self.y + self.yOff <= y <= max(i[1]) + self.y + self.yOff:
+                    return True
+
+        return False

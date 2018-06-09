@@ -1,6 +1,7 @@
 from Entity import movingEntity
 from PIL import Image, ImageTk
 from Tile import *
+from getData import loadImage
 
 
 class Player(movingEntity):
@@ -17,7 +18,24 @@ class Player(movingEntity):
         self.resetX = False
         self.resetY = False
         self.resources = resources
-    
+
+        self.metalHP = 50
+        self.metalMaxHP = 50
+        self.wireHP = 50
+        self.wireMaxHP = 50
+
+        self.metalHPBar = -1
+        self.metalHPBarOutline = -1
+        self.metalHPText = -1
+        self.metalHPIcon = -1
+
+        self.wireHPBar = -1
+        self.wireHPBarOutline = -1
+        self.wireHPText = -1
+        self.wireHPIcon = -1
+
+        self.metalIcon = resources["metal"]["spriteSmall"]
+        self.wiresIcon = resources["wires"]["spriteSmall"]
 
     def updateVelocity(self):
         if self.KH.aToggle:
@@ -149,10 +167,21 @@ class Player(movingEntity):
     
     def calculateEvents(self):
         pass
+    
+    def displayLife(self):
+        self.screen.canv.delete(self.wireHPBar, self.wireHPIcon, self.wireHPText, self.wireHPBarOutline)
+        self.screen.canv.delete(self.metalHPBar, self.metalHPIcon, self.metalHPText, self.metalHPBarOutline)
 
+        self.metalHPBarOutline = self.screen.canv.create_polygon(9, 29, 9 + max(0,self.metalMaxHP), 29, 14 + max(0,self.metalMaxHP), 35, 14, 35, fill = 'white', outline = 'black', width = 1)
+        self.wireHPBarOutline = self.screen.canv.create_polygon(9, 44, 9 + max(0,self.wireMaxHP), 44, 14 + max(0,self.wireMaxHP), 50, 14, 50, fill = 'white', outline = 'black', width = 1)
+
+        self.metalHPBar = self.screen.canv.create_polygon(10, 30, 10 + max(0,self.metalHP), 30, 15 + max(0,self.metalHP), 35, 15, 35, fill = 'red', outline = '', width = 1)
+        self.wireHPBar = self.screen.canv.create_polygon(10, 45, 10 + max(0,self.wireHP), 45, 15 + max(0,self.wireHP), 50, 15, 50, fill = 'red', outline = '', width = 1)
         
-        
+        self.metalHPIcon = self.screen.canv.create_image(30 + max(0,self.metalMaxHP), 32, image = self.metalIcon)
+        self.wireHPIcon = self.screen.canv.create_image(30 + max(0,self.metalMaxHP), 48, image = self.wiresIcon)
+
+        self.metalHPText = self.screen.canv.create_text(65 + max(0,self.metalMaxHP), 32, text = "{}/{}".format(max(0,int(self.metalHP)), self.metalMaxHP))
+        self.wireHPText = self.screen.canv.create_text(65 + max(0,self.wireMaxHP), 48, text = "{}/{}".format(max(0,int(self.wireHP)), self.wireMaxHP))
 
 
-
-        

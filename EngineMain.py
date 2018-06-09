@@ -35,6 +35,7 @@ from Camera import Camera
 from Player import Player
 from Entity import Entity, stationaryEntity, movingEntity
 from Hotbar import Hotbar
+from CraftingWindow import CraftingWindow
 
 #Downloaded Modules
 from PIL import Image, ImageTk, ImageFilter
@@ -167,6 +168,28 @@ def doGameCalculations():
                             
             
                 KH.checkEvents.pop(0)
+            
+            currentTileX = int(player.x // Tile.tileWidth)
+            currentTileY = int(player.y // Tile.tileHeight)
+            tileToCheck = tileGrid[currentTileY][currentTileX]
+            if int(tileToCheck.id) in [2,29,30,31,32]:
+                if tileToCheck.isPointInBox([player.x, player.y]):
+                    player.wireHP -= 0.1
+
+            elif int(tileToCheck.id) in [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]:
+                if not tileToCheck.isPointInBox([player.x, player.y]):
+                    player.wireHP -= 0.1
+            
+            elif int(tileToCheck.id) in [20,21,22,23,24,25,26,27,28,33,34,35,36]:
+                if tileToCheck.isPointInBox([player.x, player.y]):
+                    Player.playerSpeed = 8.5
+                else:
+                    Player.playerSpeed = 7
+            
+            # else:
+            #     print(tileToCheck.id, type(tileToCheck.id))
+            #     print(tileToCheck.collisionBox)
+
 
         
         sleep(1/60)
@@ -181,6 +204,19 @@ def doGraphicCalcs():
 
         sleep(1/60)
 
+def craftingWindowCalcs():
+    global CraftWin
+    while True:
+        if CraftWin.openWindow:
+            if CraftWin.x < 112:
+                CraftWin.x += 8
+        
+        else:
+            if CraftWin.x > -192:
+                CraftWin.x -= 8
+        
+        sleep(1/60)
+        
 
 def doAlert():
     global alerts, alertCount, newAlert
@@ -189,16 +225,19 @@ def doAlert():
         if not alerts.empty():
             alertCount += 1
             newAlert = alerts.get()
-            hotbar.addItem(randint(1,2))
-            while notifY < 80:
-                notifY += 5
-                sleep(1/60)
-            sleep(newAlert["delay"])
-            while notifY > -85:
-                notifY -= 5
-                sleep(1/60)
-            sleep(1/4)
-        
+            if Scene.current_scene == "scene_game":
+                hotbar.addItem(randint(8,11))
+                # player.metalHP -= 3
+                # player.wireHP -=5
+                while notifY < 80:
+                    notifY += 5
+                    sleep(1/60)
+                sleep(newAlert["delay"])
+                while notifY > -85:
+                    notifY -= 5
+                    sleep(1/60)
+                sleep(1/4)
+       
         else:
             notifY = -85
         
@@ -208,6 +247,10 @@ def doAlert():
 #===================================================
 #==============Draw Graphics Functions==============
 #===================================================
+def toggleOpenCrafting(cWin, event):
+    if Scene.current_scene == "scene_game":
+        # print("toggled")
+        cWin.openWindow = not cWin.openWindow
 
 def drawNotifBox():
     global notifBox, notifText
@@ -223,7 +266,7 @@ def drawGroundGraphics():
     player.display(player, True, player.collisionBox, True)
     # player.drawCollision()
 
-    gameS.displayStationaryBoxes(renderedTiles, "collision")
+    # gameS.displayStationaryBoxes(renderedTiles, "collision")
     gameS.displayStationaryEntities(player, False, renderedTiles)
 
 def drawResources():
@@ -231,15 +274,17 @@ def drawResources():
     for i in range(len(resourceList)):
         key = resourceList[i]
         s.canv.delete(resources[key]["icon"], resources[key]["text"])
-        resources[key]["icon"] = s.canv.create_image(25, 40*i + 25, image = resources[key]["sprite"])
-        resources[key]["text"] = s.canv.create_text(50, 40*i + 25, text = str(resources[key]["amount"]))
+        resources[key]["icon"] = s.canv.create_image(25, 40*i + 70, image = resources[key]["sprite"])
+        resources[key]["text"] = s.canv.create_text(50, 40*i + 70, text = str(resources[key]["amount"]))
 
 def drawUIGraphics():
     drawResources()
+    player.displayLife()
     if settings["displayFPS"] == True:
         displayFPS()
         
     hotbar.display()
+    CraftWin.display()
     drawNotifBox()
 
 
@@ -313,8 +358,9 @@ def setInitialValues():
     global frame, fpsText
     global alerts, alertCount, newAlert, UISprites, hotbar, notifBox, notifText
     global resources, itemData, itemSprites
+    global CraftWin
 
-
+    #=====Primitive Variables=====
     TESTING = False
     frame = 0
     fpsText = -1
@@ -326,7 +372,7 @@ def setInitialValues():
     newAlert = {"text":""}
 
     settings = loadSettings()
-    
+    #=====Screen and Tkinter windows=====
     if settings["window"]["width"] == None:
         s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
         settings["window"]["width"] = s.canv.winfo_screenwidth()
@@ -335,21 +381,26 @@ def setInitialValues():
     else:
         s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Robocalypse Game", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
 
+    #=====Tile Data From files=====
     tileData = loadSettings("data/tiles.json")
     tileSprites = []
     for i in range(1,37):
         imgTemp = Image.open(tileData[str(i)]["image"])
         tileSprites.append(ImageTk.PhotoImage(image=imgTemp))
 
+    #=====Item Data From files=====
     itemData = loadSettings("data/items.json")
     itemSprites = []
     for i in itemData:
         itemSprites.append(loadImage(itemData[i]["icon"]))
-    
-    resources = {"wood":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Wood Log/log.png")}, "metal":{"amount": 0, "text":-1, "icon":-1, "sprite":loadImage("images/Resources/Metal/metal.png")}, "stone":{"amount":0, "text":-1, "icon": -1, "sprite":loadImage("images/Resources/Rock/rock2.png")}, "wires":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Electrical/wires.png")}}
 
-    startx = 1000
-    starty = 1000
+    resources = {"wood":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Wood Log/log.png"), "spriteSmall":loadImage("images/Resources/Wood Log/logsmall.png")},
+                 "metal":{"amount": 0, "text":-1, "icon":-1, "sprite":loadImage("images/Resources/Metal/metal.png"), "spriteSmall":loadImage("images/Resources/Metal/metalSmall.png")},
+                 "stone":{"amount":0, "text":-1, "icon": -1, "sprite":loadImage("images/Resources/Rock/rock2.png"),"spriteSmall":loadImage("images/Resources/Rock/rock2small.png")},
+                  "wires":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Electrical/wires.png"),"spriteSmall": loadImage("images/Resources/Electrical/wiresSmall.png")}}
+
+    startx = 1600
+    starty = 1600
 
     hotbar = Hotbar(s, itemSprites)
     KH = KeyHandler(s, hotbar)
@@ -366,7 +417,7 @@ def setInitialValues():
     for i in range(tileGridHeight):
         tileGrid.append([])
         for j in range(tileGridWidth):
-            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight, tileSprites[int(tileMap[i][j])-1], s, Cam, i, j))
+            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,tileMap[i][j], tileSprites[int(tileMap[i][j])-1], s, Cam, i, j, tileData[str(tileMap[i][j])]["collision"]))
 
     if settings["window"]["fullscreen"] == True:
         sWidth = s.root.winfo_screenwidth()
@@ -405,8 +456,11 @@ def setInitialValues():
         img = Image.open(UISpritesData[i])
         UISprites[i] = ImageTk.PhotoImage(image=img)
     
-    s.root.bind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
+    CraftWin = CraftingWindow(s, hotbar)
 
+
+    s.root.bind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
+    s.root.bind("<c>", lambda e: toggleOpenCrafting(CraftWin, e))
     
     frameThread = Thread(target=countFrameRate)
     frameThread.daemon = True
@@ -417,12 +471,16 @@ def setInitialValues():
     graphCalcThread = Thread(target = doGraphicCalcs)
     graphCalcThread.daemon = True
 
+    craftWinThread = Thread(target = craftingWindowCalcs)
+    craftWinThread.daemon = True
+
     alertThread = Thread(target=doAlert)
     alertThread.daemon = True
 
     frameThread.start()
     calcThread.start()
     graphCalcThread.start()
+    craftWinThread.start()
     alertThread.start()
     sleep(0.5)
 

@@ -3,6 +3,8 @@ from getData import loadImage
 
 class Hotbar(GameObject):
     def __init__(self, screen, itemSprites):
+        import Item
+        self.Item = Item.Item
         x = screen.width/2
         hotbarSprite = loadImage("images/UI/Hotbar.png")
         super().__init__(x, screen.height - 25, "UI", 0, hotbarSprite, screen, None)
@@ -11,7 +13,7 @@ class Hotbar(GameObject):
         self.cursorScreenObj = -1
         self.inventory = [0] * 6
         self.invScreenObj = [-1]*6
-        self.itemSprites = itemSprites
+        # self.itemSprites = itemSprites
 
         screen.root.bind("<KeyPress>", lambda e: self.changeCursorPosition(e))
     
@@ -21,20 +23,18 @@ class Hotbar(GameObject):
         self.screenObj = self.screen.canv.create_image(self.x, self.y, image = self.sprite)
         self.cursorScreenObj = self.screen.canv.create_image(self.x - 133 + 38*self.cursorPosition, self.y, image = self.cursorSprite)
 
-        for i in range(6):
-            self.screen.canv.delete(self.invScreenObj[i])
-            if self.inventory[i] == 0:
-                self.invScreenObj[i] = -1
-            else:
-                self.invScreenObj[i] = self.screen.canv.create_image(self.x - 133 + 38*(i+1),self.y, image = self.itemSprites[self.inventory[i] - 1])
+        for i in self.inventory:
+            if i != 0:
+                self.screen.canv.delete(i.screenObj)
+                i.screenObj = self.screen.canv.create_image(self.x - 133 + 38*(self.inventory.index(i)+1),self.y, image = i.sprite)
     
     def changeCursorPosition(self, event):
         if event.keysym in ['1','2','3','4','5','6']:
             self.cursorPosition = int(event.keysym)
     
-    def addItem(self, item):
+    def addItem(self, id):
         try:
-            self.inventory[self.inventory.index(0)] = item
+            self.inventory[self.inventory.index(0)] = self.Item(id, 100)
             return True
-        except IndexError:
+        except ValueError:
             return False

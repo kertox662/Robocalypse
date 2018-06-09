@@ -2,44 +2,89 @@
 	"1":{
 		"name":"Axe",
 		"type":"Tool",
-		"icon":"images/Tools/Axe/Axe.png"
+		"icon":"images/Tools/Axe/Axe.png",
+		"cost":[20, 5, 0, 0],
+		"tableRequired":false
 	},
 
 	"2":{
 		"name":"Pickaxe",
 		"type":"Tool",
-		"icon":"images/Tools/Pickaxe/Pickaxe.png"
+		"icon":"images/Tools/Pickaxe/Pickaxe.png",
+		"cost":[50, 15, 0, 0],
+		"tableRequired":false
 	},
 
 	"3":{
 		"name":"Flashlight",
 		"type":"Tool",
-		"icon":"images/Tools/Flashlight/flashlight.gif"
-
+		"icon":"images/Tools/Flashlight/flashlight.png",
+		"cost": [0,2, 15, 10],
+		"tableRequired":true
 	},
 
 	"4":{
 		"name":"Lighter",
 		"type":"Tool",
-		"icon":"images/Tools/Lighter/Lighter.png"
+		"icon":"images/Tools/Lighter/Lighter.png",
+		"cost":[3,1,10,0],
+		"tableRequired":true
 	},
 
 	"5":{
 		"name":"Matches",
 		"type":"Tool",
-		"icon":"images/Tools/Matches/Matches.png"
+		"icon":"images/Tools/Matches/Matches.png",
+		"cost":[10,0,0,0],
+		"tableRequired":false
 	},
 
 	"6":{
 		"name":"Bucket",
 		"type":"Tool",
-		"icon":"images/Tools/Bucket/Bucket.png"
+		"icon":"images/Tools/Bucket/Bucket.png",
+		"cost":[0,0,50,0],
+		"tableRequired":true
 	},
 
 	"7":{
 		"name":"Water Bottle",
 		"type":"Tool",
-		"icon":"images/Tools/Water Bottle/waterBottle.gif"
+		"icon":"images/Tools/Water Bottle/waterBottle.png",
+		"cost":[0,0,25,0],
+		"tableRequired":true
+	},
+
+	"8":{
+		"name":"Battery",
+		"type":"Tool",
+		"icon":"images/Misc/Battery/Battery.png",
+		"cost":[0,0,25,10],
+		"tableRequired":true
+	},
+
+	"9":{
+		"name":"Engineering Table",
+		"type":"Furniture",
+		"icon":"images/Furniture/EngineeringTable/EngineeringTable.png",
+		"cost":[100, 20, 0, 0],
+		"tableRequired":false
+	},
+
+	"10":{
+		"name":"Chest",
+		"type":"Furniture",
+		"icon":"images/Furniture/Chest/Chest.png",
+		"cost":[75, 20, 20, 0],
+		"tableRequired":true
+	},
+
+	"11":{
+		"name":"Welding Station",
+		"type":"Furniture",
+		"icon":"images/Furniture/WeldingStation/WeldingStation.png",
+		"cost":[0, 20, 100, 50],
+		"tableRequired":true
 	}
 
 }
