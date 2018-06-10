@@ -228,15 +228,15 @@ def customEventHandler():
         currentTileX = int(player.x // Tile.tileWidth)
         currentTileY = int(player.y // Tile.tileHeight)
         tileToCheck = tileGrid[currentTileY][currentTileX]
-        if int(tileToCheck.id) in [2,29,30,31,32]:
+        if int(tileToCheck.id) in [2, 19, 20, 21, 22]:
             if tileToCheck.isPointInBox([player.x, player.y + 35]):
                 player.wireHP -= 0.1
 
-        elif int(tileToCheck.id) in [4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]:
+        elif int(tileToCheck.id) in [4,5,6,7,8,9,10,11]:
             if not tileToCheck.isPointInBox([player.x, player.y + 35]):
                 player.wireHP -= 0.1
         
-        elif int(tileToCheck.id) in [20,21,22,23,24,25,26,27,28,33,34,35,36]:
+        elif int(tileToCheck.id) in [12,13,14,15,16,17,18,23,24,25,26]:
             if tileToCheck.isPointInBox([player.x, player.y]):
                 Player.playerSpeed = 8.5
             else:
