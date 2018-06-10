@@ -1,4 +1,5 @@
 from getData import loadImage
+import sys
 
 class CraftingWindow():
     def __init__(self, screen, hotbar, KH, player):
@@ -20,9 +21,9 @@ class CraftingWindow():
         self.itemSpriteHighlights = hotbar.Item.itemSpriteHighlights
         self.itemData = hotbar.Item.ItemData
         self.noTableItems = []
-        for i in self.itemData:
-            if self.itemData[i]["tableRequired"] == False:
-                self.noTableItems.append(i)
+        for i in range(len(self.itemData)):
+            if self.itemData[str(i+1)]["tableRequired"] == False:
+                self.noTableItems.append(str(i+1))
         
         self.listToUse = self.itemData
         
@@ -89,7 +90,16 @@ class CraftingWindow():
         self.toDoCrafting = indexY
     
     def changeY(self, event):
-        self.y += event.delta
+        
+        if sys.platform == "linux":
+            if event.num == 4:
+                self.y += 3
+            else:
+                self.y -= 3
+        
+        else:
+            self.y += event.delta
+        
         if self.y >0:
             self.y = 0
         

@@ -8,9 +8,9 @@ class Item:
     ItemData = loadSettings("data/items.json")
     itemSprites = []
     itemSpriteHighlights = []
-    for i in ItemData:
-        itemSprites.append(loadImage(ItemData[str(i)]["icon"]))
-        itemSpriteHighlights.append(loadImage(ItemData[str(i)]["iconHighlight"]))
+    for i in range(len(ItemData)):
+        itemSprites.append(loadImage(ItemData[str(i + 1)]["icon"]))
+        itemSpriteHighlights.append(loadImage(ItemData[str(i + 1)]["iconHighlight"]))
     def __init__(self, id, durability):
         self.id = id
         self.name = Item.ItemData[str(id)]["name"]

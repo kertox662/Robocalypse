@@ -11,11 +11,11 @@ class Furniture(stationaryEntity):
     furnitureSpritesRed = []
     furnitureSpritesGreen = []
 
-    for i in furnitureData:
-        furnitureSprites.append(loadImage(furnitureData[i]["furnitureSprite"]))
-        furnitureHighlights.append(loadImage(furnitureData[i]["furnitureHighlight"]))
-        furnitureSpritesRed.append(loadImage(furnitureData[i]["furnitureRed"]))
-        furnitureSpritesGreen.append(loadImage(furnitureData[i]["furnitureGreen"]))
+    for i in range(len(furnitureData)):
+        furnitureSprites.append(loadImage(furnitureData[str(i+1)]["furnitureSprite"]))
+        furnitureHighlights.append(loadImage(furnitureData[str(i+1)]["furnitureHighlight"]))
+        furnitureSpritesRed.append(loadImage(furnitureData[str(i+1)]["furnitureRed"]))
+        furnitureSpritesGreen.append(loadImage(furnitureData[str(i+1)]["furnitureGreen"]))
 
     def __init__(self, x, y, id, screen, camera, player):
         sprite = Furniture.furnitureSprites[int(id) - 1]

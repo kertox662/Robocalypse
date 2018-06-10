@@ -1,5 +1,6 @@
 from GameObject import *
 from getData import loadImage
+import sys
 
 class Hotbar(GameObject):
     def __init__(self, screen, itemSprites):
@@ -42,8 +43,17 @@ class Hotbar(GameObject):
             return False
     
     def changeCursorPositionScroll(self,event):
+        if sys.platform == "linux":
+            if event.num == 4:
+                delta = 1
+            else:
+                delta = -1
+        
+        else:
+            delta = event.delta
+        
         if not self.lockCursor:
-            if event.delta < 0:
+            if delta < 0:
                 self.cursorPosition = (self.cursorPosition + 1) % 7
                 if self.cursorPosition == 0:
                     self.cursorPosition = 1

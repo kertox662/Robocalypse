@@ -452,10 +452,10 @@ def runGame():
             updatedSettings = [settings["window"]["width"],settings["window"]["height"],settings["window"]["fullscreen"],settings["sound"], settings["displayFPS"]]
             firstTime = False
 
-        settingsS.displaySettings(sWidth//2, sHeight//2, *updatedSettings)
+        settingsS.displaySettings(s.width//2, s.height//2, *updatedSettings)
         
         s.canv.delete(applyButton)
-        applyButton = s.canv.create_text(sWidth // 2, sHeight - 100, text = "Save and Apply", fill = 'black', activefill = 'yellow', font = ('Helvetica', 16))
+        applyButton = s.canv.create_text(s.width // 2, s.height - 100, text = "Save and Apply", fill = 'black', activefill = 'yellow', font = ('Helvetica', 16))
         s.canv.tag_bind(applyButton, '<Button-1>', saveSettingsEvent)
     
     elif Scene.current_scene == "scene_game":
@@ -495,6 +495,7 @@ def setInitialValues():
 
     settings = loadSettings()
     #=====Screen and Tkinter windows=====
+    #print("ABout toe meke screen")
     if settings["window"]["width"] == None:
         s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
         settings["window"]["width"] = s.canv.winfo_screenwidth()
@@ -531,7 +532,6 @@ def setInitialValues():
         
         s.width = sWidth
         s.height = sHeight       
-        print(sHeight, sWidth)    
     
     startx = 1600
     starty = 1600
@@ -592,8 +592,17 @@ def setInitialValues():
 
     s.root.bind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
     s.root.bind("<c>", lambda e: toggleOpenCrafting(CraftWin, e))
-    KH.addTkinterBind("<MouseWheel>", doScroll)
-
+    
+    if sys.platform == 'linux':
+        KH.addTkinterBind("<4>", doScroll)
+        KH.addTkinterBind("<5>", doScroll)
+    else:
+        KH.addTkinterBind("<MouseWheel>", doScroll)
+    
+    print(itemData)
+    print("===============================")
+    print(itemSprites)
+    
     frameThread = Thread(target=countFrameRate)
     frameThread.daemon = True
 
