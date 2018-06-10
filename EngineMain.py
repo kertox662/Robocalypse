@@ -99,7 +99,6 @@ def saveSettings():
     if fullScr == True:
         # s.root.geometry("{}x{}+0+0".format(width, height))
         if TESTING:print(s.root.geometry())
-        s.canv.config(width = width, height = height)
         s.root.attributes("-fullscreen", fullScr)
         sleep(0.1)
         sWidth = s.root.winfo_screenwidth()
@@ -114,7 +113,9 @@ def saveSettings():
         s.root.attributes("-fullscreen", fullScr)
         s.root.geometry("{}x{}+20+20".format(width, height))
         if TESTING: print(s.root.geometry())
-        s.canv.config(width = width, height = height)
+    
+    
+    s.canv.config(width = s.width, height = s.height)
 
         
     
