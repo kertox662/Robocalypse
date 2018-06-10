@@ -419,7 +419,7 @@ def runGame():
     KH.scene = Scene.current_scene
 
     if Scene.current_scene == "scene_main":
-        mainS.displayOptions(sWidth//2, sHeight//2)
+        mainS.displayOptions(s.width//2, s.height//2)
         for i in tileGrid:
             for j in i:
                 s.canv.delete(j.screenObj)
@@ -524,7 +524,15 @@ def setInitialValues():
                  "metal":{"amount": 0, "text":-1, "icon":-1, "sprite":loadImage("images/Resources/Metal/metal.png"), "spriteSmall":loadImage("images/Resources/Metal/metalSmall.png")},
                  "stone":{"amount":0, "text":-1, "icon": -1, "sprite":loadImage("images/Resources/Rock/rock2.png"),"spriteSmall":loadImage("images/Resources/Rock/rock2small.png")},
                   "wires":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Electrical/wires.png"),"spriteSmall": loadImage("images/Resources/Electrical/wiresSmall.png")}}
-
+    
+    if settings["window"]["fullscreen"] == True:
+        sWidth = s.root.winfo_screenwidth()
+        sHeight = s.root.winfo_screenheight()
+        
+        s.width = sWidth
+        s.height = sHeight       
+        print(sHeight, sWidth)    
+    
     startx = 1600
     starty = 1600
 
@@ -545,10 +553,7 @@ def setInitialValues():
         for j in range(tileGridWidth):
             tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,tileMap[i][j], tileSprites[int(tileMap[i][j])-1], s, Cam, i, j, tileData[str(tileMap[i][j])]["collision"]))
 
-    if settings["window"]["fullscreen"] == True:
-        sWidth = s.root.winfo_screenwidth()
-        sHeight = s.root.winfo_screenheight()
-        if TESTING:print(sHeight, sWidth)
+    
         
     else:
         sWidth = int(s.canv.cget('width'))

@@ -1,9 +1,9 @@
 {
-    "sound": true,
-    "displayFPS": true,
     "window": {
-        "height": 720,
-        "width": 1280,
-        "fullscreen": false
-    }
+        "height": 768,
+        "fullscreen": true,
+        "width": 1024
+    },
+    "sound": true,
+    "displayFPS": true
 }
