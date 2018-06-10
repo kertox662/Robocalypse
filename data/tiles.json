@@ -1,182 +1,159 @@
 {
     "1":{
-        "image":"Tileset/400x400/SimpleGrass.png",
-        "collision":null
+        "imageBase":"Tileset/400x400/SimpleGrass",
+        "collision":null,
+        "variations":5
     },
 
     "2":{
-        "image":"Tileset/400x400/SimpleWater.png",
-        "collision":[[[-200, 200, 200, -200], [-200, -200, 200, 200]]]
+        "imageBase":"Tileset/400x400/SimpleWater",
+        "collision":[[[-200, 200, 200, -200], [-200, -200, 200, 200]]],
+        "variations":3
     },
 
     "3":{
-        "image":"Tileset/400x400/FlowerGrass.png",
-        "collision":null
+        "imageBase":"Tileset/400x400/FlowerGrass",
+        "collision":null,
+        "variations":5
     },
 
     "4":{
-        "image":"Tileset/400x400/Coast/CoastDown1.png",
-        "collision":[[[-200, 200, 200, -200],[60, 60, 200, 200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastDown",
+        "collision":[[[-200, 200, 200, -200],[60, 60, 200, 200]]],
+        "variations":4
     },
 
+
     "5":{
-        "image":"Tileset/400x400/Coast/CoastDown2.png",
-        "collision":[[[-200, 200, 200, -200],[60, 60, 200, 200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastLeft",
+        "collision":[[[-200, -60, -60, -200],[-200, -200, 200, 200]]],
+        "variations":4
     },
 
     "6":{
-        "image":"Tileset/400x400/Coast/CoastDown3.png",
-        "collision":[[[-200, 200, 200, -200],[60, 60, 200, 200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastUp",
+        "collision":[[[-200, 200, 200, -200],[-60, -60, -200, -200]]],
+        "variations":4
     },
 
     "7":{
-        "image":"Tileset/400x400/Coast/CoastLeft1.png",
-        "collision":[[[-200, -60, -60, -200],[-200, -200, 200, 200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastRight",
+        "collision":[[[200, 60, 60, 200],[-200, -200, 200, 200]]],
+        "variations":4
     },
 
     "8":{
-        "image":"Tileset/400x400/Coast/CoastLeft2.png",
-        "collision":[[[-200, -60, -60, -200],[-200, -200, 200, 200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastC1-",
+        "collision":[[[200, 60, 60, 200],[60, 60, 200, 200]]],
+        "variations":3
     },
 
     "9":{
-        "image":"Tileset/400x400/Coast/CoastLeft3.png",
-        "collision":[[[-200, -60, -60, -200],[-200, -200, 200, 200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastC2-",
+        "collision":[[[-200, -60, -60, -200],[60, 60, 200, 200]]],
+        "variations":3
     },
 
     "10":{
-        "image":"Tileset/400x400/Coast/CoastUp1.png",
-        "collision":[[[-200, 200, 200, -200],[-60, -60, -200, -200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastC3-",
+        "collision":[[[-200, -60, -60, -200],[-60, -60, -200, -200]]],
+        "variations":3
     },
 
     "11":{
-        "image":"Tileset/400x400/Coast/CoastUp2.png",
-        "collision":[[[-200, 200, 200, -200],[-60, -60, -200, -200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastC4-",
+        "collision":[[[200, 60, 60, 200],[-60, -60, -200, -200]]],
+        "variations":3
     },
 
     "12":{
-        "image":"Tileset/400x400/Coast/CoastUp3.png",
-        "collision":[[[-200, 200, 200, -200],[-60, -60, -200, -200]]]
+        "imageBase":"Tileset/400x400/Road/RoadHoriz",
+        "collision":[[[-200, 200, 200, -200],[-60,-60,60,60]]],
+        "variations":7
     },
 
     "13":{
-        "image":"Tileset/400x400/Coast/CoastRight1.png",
-        "collision":[[[200, 60, 60, 200],[-200, -200, 200, 200]]]
+        "imageBase":"Tileset/400x400/Road/RoadVert",
+        "collision":[[[-60,-60,60,60],[-200, 200, 200, -200]]],
+        "variations":7
     },
 
     "14":{
-        "image":"Tileset/400x400/Coast/CoastRight2.png",
-        "collision":[[[200, 60, 60, 200],[-200, -200, 200, 200]]]
+        "imageBase":"Tileset/400x400/Road/RoadT1-",
+        "collision":[[[-200, 200, 200, -200],[-60,-60,60,60]],  [[-60,-60,60,60],[-200, 0, 0, -200]] ],
+        "variations":2
     },
 
     "15":{
-        "image":"Tileset/400x400/Coast/CoastRight3.png",
-        "collision":[[[200, 60, 60, 200],[-200, -200, 200, 200]]]
+        "imageBase":"Tileset/400x400/Road/RoadT2-",
+        "collision":[[[-60,-60,60,60],[-200, 200, 200, -200]],   [[0, 200, 200, 0],[-60,-60,60,60]]],
+        "variations":2
     },
 
     "16":{
-        "image":"Tileset/400x400/Coast/CoastC1.png",
-        "collision":[[[200, 60, 60, 200],[60, 60, 200, 200]]]
+        "imageBase":"Tileset/400x400/Road/RoadT3-",
+        "collision":[[[-200, 200, 200, -200],[-60,-60,60,60]], [[-60,-60,60,60],[200, 0, 0, 200]]],
+        "variations":2
     },
 
     "17":{
-        "image":"Tileset/400x400/Coast/CoastC2.png",
-        "collision":[[[-200, -60, -60, -200],[60, 60, 200, 200]]]
+        "imageBase":"Tileset/400x400/Road/RoadT4-",
+        "collision":[[[-60,-60,60,60],[-200, 200, 200, -200]],  [[0, -200, -200, 0],[-60,-60,60,60]]],
+        "variations":2
     },
 
     "18":{
-        "image":"Tileset/400x400/Coast/CoastC3.png",
-        "collision":[[[-200, -60, -60, -200],[-60, -60, -200, -200]]]
+        "imageBase":"Tileset/400x400/Road/RoadIntersection",
+        "collision":[[[-60,-60,60,60],[-200, 200, 200, -200]], [[-200, 200, 200, -200],[-60,-60,60,60]]],
+        "variations":1
     },
-
+    
     "19":{
-        "image":"Tileset/400x400/Coast/CoastC4.png",
-        "collision":[[[200, 60, 60, 200],[-60, -60, -200, -200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastL1-",
+        "collision":[[[-200, 60, 60, -200], [-200, 60, 60, -200]]],
+        "variations":2
     },
 
     "20":{
-        "image":"Tileset/400x400/Road/RoadHorizontal1.png",
-        "collision":[[[-200, 200, 200, -200],[-60,-60,60,60]]]
+        "imageBase":"Tileset/400x400/Coast/CoastL2-",
+        "collision":[[[200, -60, -60, 200], [-200, 60, 60, -200]]],
+        "variations":2
     },
 
     "21":{
-        "image":"Tileset/400x400/Road/RoadHorizontal2.png",
-        "collision":[[[-200, 200, 200, -200],[-60,-60,60,60]]]
+        "imageBase":"Tileset/400x400/Coast/CoastL3-",
+        "collision":[[[200, -60, -60, 200], [200, -60, -60, 200]]],
+        "variations":2
     },
 
     "22":{
-        "image":"Tileset/400x400/Road/RoadVertical1.png",
-        "collision":[[[-60,-60,60,60],[-200, 200, 200, -200]]]
+        "imageBase":"Tileset/400x400/Coast/CoastL4-",
+        "collision":[[[-200, 60, 60, -200], [200, -60, -60, 200]]],
+        "variations":2
     },
 
     "23":{
-        "image":"Tileset/400x400/Road/RoadVertical2.png",
-        "collision":[[[-60,-60,60,60],[-200, 200, 200, -200]]]
+        "imageBase":"Tileset/400x400/Road/RoadL1-",
+        "collision":[[[-200, 60, 60, -200],[-60,-60,60,60]],     [[-60,-60,60,60],[-200, 60, 60, -200]]],
+        "variations":2
     },
 
     "24":{
-        "image":"Tileset/400x400/Road/RoadT1.png",
-        "collision":[[[-200, 200, 200, -200],[-60,-60,60,60]],  [[-60,-60,60,60],[-200, 0, 0, -200]] ]
+        "imageBase":"Tileset/400x400/Road/RoadL2-",
+        "collision":[[[-60, 200, 200, -60],[-60,-60,60,60]],     [[-60,-60,60,60],[-200, 60, 60, -200]]],
+        "variations":2
     },
 
     "25":{
-        "image":"Tileset/400x400/Road/RoadT2.png",
-        "collision":[[[-60,-60,60,60],[-200, 200, 200, -200]],   [[0, 200, 200, 0],[-60,-60,60,60]]]
+        "imageBase":"Tileset/400x400/Road/RoadL3-",
+        "collision":[[[-60, 200, 200, -60],[-60,-60,60,60]],      [[-60,-60,60,60],[-60, 200, 200, -60]]],
+        "variations":2
     },
 
     "26":{
-        "image":"Tileset/400x400/Road/RoadT3.png",
-        "collision":[[[-200, 200, 200, -200],[-60,-60,60,60]], [[-60,-60,60,60],[200, 0, 0, 200]]]
-    },
-
-    "27":{
-        "image":"Tileset/400x400/Road/RoadT4.png",
-        "collision":[[[-60,-60,60,60],[-200, 200, 200, -200]],  [[0, -200, -200, 0],[-60,-60,60,60]]]
-    },
-
-    "28":{
-        "image":"Tileset/400x400/Road/RoadIntersection.png",
-        "collision":[[[-60,-60,60,60],[-200, 200, 200, -200]], [[-200, 200, 200, -200],[-60,-60,60,60]]]
-    },
-    
-    "29":{
-        "image":"Tileset/400x400/Coast/CoastL1.png",
-        "collision":[[[-200, 60, 60, -200], [-200, 60, 60, -200]]]
-    },
-
-    "30":{
-        "image":"Tileset/400x400/Coast/CoastL2.png",
-        "collision":[[[200, -60, -60, 200], [-200, 60, 60, -200]]]
-    },
-
-    "31":{
-        "image":"Tileset/400x400/Coast/CoastL3.png",
-        "collision":[[[200, -60, -60, 200], [200, -60, -60, 200]]]
-    },
-
-    "32":{
-        "image":"Tileset/400x400/Coast/CoastL4.png",
-        "collision":[[[-200, 60, 60, -200], [200, -60, -60, 200]]]
-    },
-
-    "33":{
-        "image":"Tileset/400x400/Road/RoadL1.png",
-        "collision":[[[-200, 60, 60, -200],[-60,-60,60,60]],     [[-60,-60,60,60],[-200, 60, 60, -200]]]
-    },
-
-    "34":{
-        "image":"Tileset/400x400/Road/RoadL2.png",
-        "collision":[[[-60, 200, 200, -60],[-60,-60,60,60]],     [[-60,-60,60,60],[-200, 60, 60, -200]]]
-    },
-
-    "35":{
-        "image":"Tileset/400x400/Road/RoadL3.png",
-        "collision":[[[-60, 200, 200, -60],[-60,-60,60,60]],      [[-60,-60,60,60],[-60, 200, 200, -60]]]
-    },
-
-    "36":{
-        "image":"Tileset/400x400/Road/RoadL4.png",
-        "collision":[[[-200, 60, 60, -200],[-60,-60,60,60]],       [[-60,-60,60,60],[-60, 200, 200, -60]]]
+        "imageBase":"Tileset/400x400/Road/RoadL4-",
+        "collision":[[[-200, 60, 60, -200],[-60,-60,60,60]],       [[-60,-60,60,60],[-60, 200, 200, -60]]],
+        "variations":2
     }
 }
 

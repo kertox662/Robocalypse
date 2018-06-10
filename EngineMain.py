@@ -511,10 +511,16 @@ def setInitialValues():
 
     #=====Tile Data From files=====
     tileData = loadSettings("data/tiles.json")
-    tileSprites = []
-    for i in range(1,37):
-        imgTemp = Image.open(tileData[str(i)]["image"])
-        tileSprites.append(ImageTk.PhotoImage(image=imgTemp))
+    tileSprites = {}
+    for i in range(1,27):
+        tileSprites[str(i)] = []
+        imageBase = tileData[str(i)]["imageBase"]
+        for j in range(1, tileData[str(i)]["variations"] + 1):
+            imagePath = "{}{}.png".format(imageBase, j)
+            imgTemp = Image.open(imagePath)
+            spriteTemp = ImageTk.PhotoImage(image=imgTemp)
+            tileSprites[str(i)].append(spriteTemp)
+    
 
     #=====Item Data From files=====
     itemData = loadSettings("data/items.json")
@@ -552,7 +558,15 @@ def setInitialValues():
     for i in range(tileGridHeight):
         tileGrid.append([])
         for j in range(tileGridWidth):
-            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,tileMap[i][j], tileSprites[int(tileMap[i][j])-1], s, Cam, i, j, tileData[str(tileMap[i][j])]["collision"]))
+            tileId = tileMap[i][j]
+            variationAmount = tileData[str(tileId)]["variations"]
+            if variationAmount > 1:
+                variationChoice = randint(0,variationAmount - 1)
+            else:
+                variationChoice = 0
+            
+            sprite = tileSprites[str(tileId)][variationChoice]
+            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,tileId, sprite, s, Cam, i, j, tileData[str(tileMap[i][j])]["collision"]))
 
     
         
@@ -600,9 +614,9 @@ def setInitialValues():
     else:
         KH.addTkinterBind("<MouseWheel>", doScroll)
     
-    print(itemData)
-    print("===============================")
-    print(itemSprites)
+    # print(itemData)
+    # print("===============================")
+    # print(itemSprites)
     
     frameThread = Thread(target=countFrameRate)
     frameThread.daemon = True
