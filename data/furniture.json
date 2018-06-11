@@ -4,7 +4,7 @@
         "furnitureHighlight":"images/Furniture/EngineeringTable/EngineeringTableLargeHighlight.png",
         "furnitureGreen":"images/Furniture/EngineeringTable/EngineeringTableLargeGreen.png",
         "furnitureRed":"images/Furniture/EngineeringTable/EngineeringTableLargeRed.png",
-        "collision":[[-72, 72, 72, -72], [-72, -72, 72, 72]]
+        "collision":[[-68, 68, 68, -68], [0, 0, 66, 66]]
     },
     
  "2":
@@ -13,7 +13,7 @@
         "furnitureHighlight":"images/Furniture/Chest/ChestLargeHighlight.png",
         "furnitureGreen":"images/Furniture/Chest/ChestLargeGreen.png",
         "furnitureRed":"images/Furniture/Chest/ChestLargeRed.png",
-        "collision":[[-72, 72, 72, -72], [-72, -72, 72, 72]]
+        "collision":[[-34, 34, 34, -34], [0, 0, 28, 28]]
     },
 
 "3":
@@ -22,6 +22,6 @@
         "furnitureHighlight":"images/Furniture/WeldingStation/WeldingStationLargeHighlight.png",
         "furnitureGreen":"images/Furniture/WeldingStation/WeldingStationLargeGreen.png",
         "furnitureRed":"images/Furniture/WeldingStation/WeldingStationLargeRed.png",
-        "collision":[[-72, 72, 72, -72], [-72, -72, 72, 72]]
+        "collision":[[-70, 70, 70, -70], [16, 16, 68, 68]]
     }
 }

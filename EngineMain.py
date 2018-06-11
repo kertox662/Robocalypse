@@ -337,7 +337,7 @@ def drawGroundGraphics():
     player.display(player, True, player.collisionBox, True)
     # player.drawCollision()
 
-    # gameS.displayStationaryBoxes(renderedTiles, "collision")
+    #gameS.displayStationaryBoxes(renderedTiles, "collision")
     gameS.displayStationaryEntities(player, False, renderedTiles)
 
 def drawResources():
