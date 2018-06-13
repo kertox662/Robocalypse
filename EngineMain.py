@@ -226,7 +226,7 @@ def customEventHandler():
                 KH.checkEvents.pop(0)
             
         currentTileX = int(player.x // Tile.tileWidth)
-        currentTileY = int(player.y // Tile.tileHeight)
+        currentTileY = int((player.y + 35) // Tile.tileHeight)
         tileToCheck = tileGrid[currentTileY][currentTileX]
         if int(tileToCheck.id) in [2, 19, 20, 21, 22]:
             if tileToCheck.isPointInBox([player.x, player.y + 35]):
@@ -275,6 +275,8 @@ def doGraphicCalcs():
         if Scene.current_scene == "scene_game":
             if gameS.checkRendered(renderedTiles) == False:
                 renderedTiles = gameS.setRenderGrid()
+            
+            player.chooseAnimFrame()
 
         sleep(1/60)
 
@@ -568,7 +570,11 @@ def setInitialValues():
         tileMap[i] = tileMap[i].split(',')
     
     tileGrid = []
+    print("Starting to Build World...")
     for i in range(tileGridHeight):
+        percentDone = i / tileGridHeight * 100
+        if percentDone % 10 == 0:
+            print("{}% complete...".format(percentDone))
         tileGrid.append([])
         for j in range(tileGridWidth):
             tileId = tileMap[i][j]
@@ -583,6 +589,7 @@ def setInitialValues():
             curTile = tileGrid[i][j]
             if str(tileId) in entityArrangementData:
                 entityArrangementID = randint(1, len(entityArrangementData[str(tileId)]))
+                entityArrangementID = 3
                 entityArrangement = entityArrangementData[str(tileId)][str(entityArrangementID)].copy()
                 for ent in range(len(entityArrangement) // 3):
                     # print(entityArrangement)
@@ -593,7 +600,7 @@ def setInitialValues():
                     if len(entityArrangement) > 3:
                         entityArrangement = entityArrangement[3:]
     
-    print(len(tileGrid))
+    print("Finished Building World!")
 
     mainS = MainScene("Robocalypse", s, KH)
     settingsS = SettingsScene(s,KH)

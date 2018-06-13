@@ -9,12 +9,12 @@ c.pack()
 #animBase = "Walking/Left/"
 #animFrame = 12
 
-animBase = "Idle/Down/"
-animFrame = 8
+animBase = "Walking/Left/"
+animFrame = 11
 
 frames = []
 for i in range(animFrame):
-    imageTemp = Image.open(animBase + "Frame{}.png".format(i+1))
+    imageTemp = Image.open(animBase + "Frame{}.png".format(i+2))
     pImage = ImageTk.PhotoImage(image = imageTemp)
     frames.append(pImage)
 

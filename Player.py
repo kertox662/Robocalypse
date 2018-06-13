@@ -1,7 +1,7 @@
 from Entity import movingEntity
 from PIL import Image, ImageTk
 from Tile import *
-from getData import loadImage
+from getData import loadImage, loadAnimation
 
 
 class Player(movingEntity):
@@ -38,6 +38,15 @@ class Player(movingEntity):
 
         self.metalIcon = resources["metal"]["spriteSmall"]
         self.wiresIcon = resources["wires"]["spriteSmall"]
+
+        self.animFrame = 0
+        self.direction = ["down"]
+        self.previousDirection = self.direction.copy()
+
+        self.downIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Down/", 8)
+
+        self.leftWalkAnim = loadAnimation("images/PlayerAnimation/Walking/Left/", 11)
+        
 
     def updateVelocity(self):
         if self.KH.aToggle:
@@ -196,4 +205,29 @@ class Player(movingEntity):
                             if k.isPlacing == False:
                                 if k.dist(self.x, self.y) < 200:
                                     self.nearTable = True
+    
+    def chooseAnimFrame(self):
+        if len(self.direction) > 0:
+            self.previousDirection = self.direction.copy()
+        self.direction = []
+        if self.Velx > 0:
+            self.direction.append("right")
+        
+        elif self.Velx < 0:
+            self.direction.append("left")
+        
+        if self.Vely > 0:
+            self.direction.append("down")
+        
+        elif self.Vely < 0:
+            self.direction.append("up")
+        
+        if len(self.direction) == 0:
+            curAnim = eval("self.{}IdleAnim".format("".join(self.previousDirection)))
+        
+        else:
+            curAnim = eval("self.{}WalkAnim".format("".join(self.direction)))
+
+        self.animFrame = (self.animFrame + 1) % len(curAnim)
+        self.sprite = (curAnim[self.animFrame])
 

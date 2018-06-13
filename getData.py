@@ -16,3 +16,11 @@ def loadImage(imagePath):
     img = Image.open(imagePath)
     imgTk = ImageTk.PhotoImage(image = img)
     return imgTk
+
+def loadAnimation(animBase, frameNum):
+    animFrames = [0]*frameNum
+    for i in range(1, frameNum + 1):
+        img = loadImage(animBase + 'Frame{}.png'.format(i))
+        animFrames[i - 1] = img
+    
+    return animFrames
