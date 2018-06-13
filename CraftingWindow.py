@@ -87,7 +87,10 @@ class CraftingWindow():
         y = event.y
         y -= (self.screen.height - 428)
         indexY = y//44 + 1
-        self.toDoCrafting = indexY
+        if type(self.listToUse) == dict:
+            self.toDoCrafting = indexY
+        else:
+            self.toDoCrafting = int(self.listToUse[indexY - 1])
     
     def changeY(self, event):
         

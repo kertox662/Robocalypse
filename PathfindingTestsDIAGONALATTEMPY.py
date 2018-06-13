@@ -2,9 +2,10 @@ from tkinter import *
 from time import sleep
 from math import *
 from random import randint
+from time import time
 
 root = Tk()
-c = Canvas(root, width = 1000, height = 1000)
+c = Canvas(root, width = 800, height = 800)
 c.pack()
 
 def dist(x1, y1, x2, y2):
@@ -66,7 +67,7 @@ def travel(fromNode, toNode):
     #print("Target:",target.x, target.y)
     #print("Node Coor:",toNode.x, toNode.y)
     toNode.h = dist(toNode.x, toNode.y, target.x, target.y)
-    toNode.g = fromNode.g + 1
+    toNode.g = fromNode.g + 0.6
     toNode.f = toNode.h + toNode.g
     if toNode.shortPath == None:
         toNode.shortPath = fromNode
@@ -137,50 +138,64 @@ def goToNext():
     
     return True
 
+times = []
 
 def setup():
     global grid, gridSize, target, start, openNodes, closedNodes
-    gridSize = 100
-    grid = []
-    for i in range(gridSize):
-        grid.append([0]*gridSize)
     
     openNodes = []
     closedNodes = []    
     
     #grid = possibleGrid
     
+    for i in grid:
+        for j in i:
+            if j.nodeType == 0:
+                j.color = 'red'
+            
+            else:
+                closedNodes.append(j)
+    
+    
+    # target = grid[78][78]
+    # target.nodeType = 0
+    # target.color = 'yellow'
+    
+    
+
+
+def gridCreation():
+    global grid, gridSize
+    gridSize = 80
+    grid = []
+    for i in range(gridSize):
+        grid.append([0]*gridSize)
+    
     for i in range(len(grid)):
         for j in range(len(grid[i])):
             randomID = randint(1,100)
-            if randomID < 36:
+            if randomID < 26:
                 grid[i][j] = 1
             #if grid[i][j] == 1:
                 color = 'orange'
             else:
                 color = 'red'
             tempNode = Node(j,i, color, grid[i][j])
-            if tempNode.nodeType != 0:
-                closedNodes.append(tempNode)
             grid[i][j] = tempNode
-    
-    
-    target = grid[94][98]
-    target.nodeType = 0
-    target.color = 'yellow'
-    
-    start = grid[1][1]
+
+def getPath(grid, startx, starty, targetx, targety):
+    global atEnd, target, start
+
+    target = grid[targety][targetx]
+
+    start = grid[starty][startx]
     start.color = 'yellow'
     start.g = 0
+    print("Target:",target.x, target.y)
     start.f = dist(start.x, start.y, target.x, target.y)
     start.nodeType = 0
     openNodes.append(start)
 
-
-
-
-def getPath():
-    global atEnd
     exploredNode = []
     atEnd = False
     while atEnd == False:
@@ -197,23 +212,40 @@ def getPath():
         path = [openNodes[0]]
     except:
         print("=====\nError Occured, Resetting...\n=====")
+        gridCreation()
         run()
         return
         
     while start not in path:
-        #print("Path",path)
         path.append(path[-1].shortPath)
-        #print("Path")
-        #for node in path:
-            #print(node.x, node.y)
-    
-    print("Done Calculations\nStarting Graphics...")
+        
+        if len(path) >= 3:
+            for row in grid:
+                try:
+                    previousXInd = row.index(path[-3])
+                    previousYInd = grid.index(row)
+                
+                except ValueError:
+                    pass
+                
+                try:
+                    nextXInd = row.index(path[-1])
+                    nextYInd = grid.index(row)
+                
+                except ValueError:
+                    pass
+            
+            for x in [previousXInd - 1, previousXInd + 1]:
+                for y in [previousYInd - 1, previousYInd + 1]:
+                    if nextXInd == x and nextYInd == y:
+                        path.pop(-2)
     
     for i in grid:
         for j in i:
             j.display()
-            c.update()
     
+    c.update()
+    # sleep(3)    
     for i in path:
         i.color = "blue"
         i.display()
@@ -221,17 +253,26 @@ def getPath():
     c.update()
 
 
+gridCreation()
+
 def run():
-    print("Start Setup...")
+    global starttime
+    # starttime = time()
+    # print("Start Setup...")
     setup()
-    print("Done Setup\nStarting Calculations...")
-    getPath()
-    print("Finished All")
+    # print("Finished Setup after", time() - starttime, "s")
+    # print("Done Setup\nStarting Calculations...")
+    getPath(grid, 30, 41, 6, 37)
+    # print("Finished All")
 
 def runEv(event):
+    gridCreation()
     run()
 
-run()
+
+for i in range(1):
+    iteration = i + 1
+    run()
 
 root.bind("<space>", runEv)
 

@@ -32,8 +32,12 @@ class Screen:
         else:
             self.width = self.setWidth
             self.height = self.setHeight
+    
+    def destroyScreen(self):
+        self.canv.destroy()
+        self.root.destroy()
 
 def makeScreen(width, height, fullscreen, winName, winIcon):
     s = Screen(width, height, fullscreen, winName)
-    s.root.bind("<q>", lambda e: s.canv.destroy())
+    s.root.bind("<q>", lambda e: s.destroyScreen())
     return s

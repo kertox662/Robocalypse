@@ -2,7 +2,9 @@ from Tile import *
 from GameObject import *
 from GameItem import *
 from Scene import Scene
-from math import ceil, floor
+from math import ceil, floor, sqrt
+from threading import Thread
+from Node import Node
 
 class GameScene(Scene):
 
@@ -12,6 +14,7 @@ class GameScene(Scene):
         self.screen.root.bind("<Escape>", lambda e: self.change_scene("scene_main"))
         self.tileArray = tileArray
         self.player = player
+        self.nodeMap = []
     
 
     def showTiles(self, tileArray):
@@ -67,9 +70,41 @@ class GameScene(Scene):
                 newRenderArray[-1].append(j)
 
         # print(len(newRenderArray[0]), len(newRenderArray))
+        # self.setNodeMap()
 
         return newRenderArray
     
+    def setNodeMap(self):
+        mapRow = [0]*len(self.tileArray[0]) * 20
+        nodeMap = [mapRow] * len(self.tileArray) * 20
+        for i in range(len(nodeMap)):
+            for j in range(len(nodeMap[0])):
+                xCoor = j * 20
+                yCoor = i * 20
+                print("Checking Node at position {},{}".format(xCoor, yCoor))
+                isBlocked = False
+
+                xIndex = xCoor // 400
+                yIndex = yCoor // 400
+
+                for y in range(-1, 2):
+                    for x in range(-1, 2):
+                        tile = self.tileArray[yIndex + y][xIndex + x]
+                        if self.dist(xCoor, tile.x, yCoor, tile.y) < 700:
+                            for ent in tile.entities:
+                                if ent.isPointInBox([xCoor, yCorr], "collision"):
+                                    isBlocked = True
+                                    break
+
+                nodeMap[i][j] = Node(xCoor, yCoor, int(isBlocked))
+        self.nodeMap = nodeMap
+
+
+    def dist(self, x1, x2, y1 ,y2):
+        dx = (x1 - x2) ** 2
+        dy = (y1 - y2) ** 2
+        l = sqrt(dx + dy)
+        return l
 
     def doNotification(self):
         pass

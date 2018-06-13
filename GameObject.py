@@ -16,9 +16,9 @@ class GameObject:
         self.xOff = xOff
         self.yOff = yOff
 
-    def isOnScreen(self):
-        if -100 - self.screen.width/2 <= self.x - self.camera.x + self.screen.width/2<= self.screen.width + 100:
-            if -100 - self.screen.height/ 2<= self.y - self.camera.y + self.screen.height/2 <= self.screen.height + 100:
+    def isOnScreen(self, margin = 100):
+        if margin*-1 - self.screen.width/2 <= self.x - self.camera.x + self.screen.width/2<= self.screen.width + margin:
+            if margin * -1 - self.screen.height/ 2<= self.y - self.camera.y + self.screen.height/2 <= self.screen.height + margin:
                 return True
         
         return False

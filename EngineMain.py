@@ -337,7 +337,7 @@ def drawGroundGraphics():
     player.display(player, True, player.collisionBox, True)
     # player.drawCollision()
 
-    #gameS.displayStationaryBoxes(renderedTiles, "collision")
+    # gameS.displayStationaryBoxes(renderedTiles, "collision")
     gameS.displayStationaryEntities(player, False, renderedTiles)
 
 def drawResources():
@@ -463,6 +463,8 @@ def runGame():
        drawGroundGraphics()
        drawUIGraphics()
 
+    #    print(renderedTiles[0][0].x, renderedTiles[0][0].y)
+
         
     
 
@@ -477,6 +479,7 @@ def setInitialValues():
     global resources, itemData, itemSprites
     global CraftWin, costBox, costIcons, costText, resourceOrder
     global tempFurniture, FurnitureClass
+    global entityData
 
     #=====Primitive Variables=====
     TESTING = False
@@ -509,17 +512,7 @@ def setInitialValues():
     import Furniture
     FurnitureClass = Furniture.Furniture
 
-    #=====Tile Data From files=====
-    tileData = loadSettings("data/tiles.json")
-    tileSprites = {}
-    for i in range(1,27):
-        tileSprites[str(i)] = []
-        imageBase = tileData[str(i)]["imageBase"]
-        for j in range(1, tileData[str(i)]["variations"] + 1):
-            imagePath = "{}{}.png".format(imageBase, j)
-            imgTemp = Image.open(imagePath)
-            spriteTemp = ImageTk.PhotoImage(image=imgTemp)
-            tileSprites[str(i)].append(spriteTemp)
+   
     
 
     #=====Item Data From files=====
@@ -536,18 +529,38 @@ def setInitialValues():
     if settings["window"]["fullscreen"] == True:
         sWidth = s.root.winfo_screenwidth()
         sHeight = s.root.winfo_screenheight()
+    
+    else:
+        sWidth = int(s.canv.cget('width'))
+        sHeight = int(s.canv.cget('height'))
         
         s.width = sWidth
         s.height = sHeight       
     
-    startx = 1600
-    starty = 1600
+    startx = 1900
+    starty = 1200
 
     hotbar = Hotbar(s, itemSprites)
     KH = KeyHandler(s, hotbar)
     Cam = Camera(startx, starty, s, KH)
     player = Player(startx, starty, s, Cam, KH, resources)
     
+     #=====Tile Data From files=====
+    tileData = loadSettings("data/tiles.json")
+    entityData = loadSettings("data/entities.json")
+    entityArrangementData = loadSettings("data/tileEntityArrangement.json")
+
+    tileSprites = {}
+    for i in range(1,27):
+        tileSprites[str(i)] = []
+        imageBase = tileData[str(i)]["imageBase"]
+        for j in range(1, tileData[str(i)]["variations"] + 1):
+            imagePath = "{}{}.png".format(imageBase, j)
+            imgTemp = Image.open(imagePath)
+            spriteTemp = ImageTk.PhotoImage(image=imgTemp)
+            tileSprites[str(i)].append(spriteTemp)
+
+
     with open('data/TileData.txt') as mapD:
         tileMap = mapD.read().split('\n')
     
@@ -567,12 +580,21 @@ def setInitialValues():
             
             sprite = tileSprites[str(tileId)][variationChoice]
             tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,tileId, sprite, s, Cam, i, j, tileData[str(tileMap[i][j])]["collision"]))
-
+            curTile = tileGrid[i][j]
+            if str(tileId) in entityArrangementData:
+                entityArrangementID = randint(1, len(entityArrangementData[str(tileId)]))
+                entityArrangement = entityArrangementData[str(tileId)][str(entityArrangementID)].copy()
+                for ent in range(len(entityArrangement) // 3):
+                    # print(entityArrangement)
+                    x = entityArrangement[1]
+                    y = entityArrangement[2]
+                    eInfo = entityData[entityArrangement[0]]
+                    curTile.entities.append(stationaryEntity(x + curTile.x, y + curTile.y, eInfo["name"], 0, eInfo["sprite"], s, Cam, eInfo["collision"], eInfo["doCollision"], eInfo["hitbox"]))
+                    if len(entityArrangement) > 3:
+                        entityArrangement = entityArrangement[3:]
     
-        
-    else:
-        sWidth = int(s.canv.cget('width'))
-        sHeight = int(s.canv.cget('height'))
+    print(len(tileGrid))
+
     mainS = MainScene("Robocalypse", s, KH)
     settingsS = SettingsScene(s,KH)
     gameS = GameScene(s,Cam, KH, tileGrid, player)
@@ -582,15 +604,17 @@ def setInitialValues():
     firstTime = True
     if TESTING: print(sWidth, sHeight)
 
-    for i in range(10):
-        tempX = randint(1600, 2800)
-        tempY = randint(1600, 2800)
-        entityChoice = randint(1,2)
-        if entityChoice == 1:
-            tempEntity = stationaryEntity(tempX, tempY, "Tree", 0, "images/Tree1.png", s, Cam, ((-15, 20, 20, -15),(80,80,106,106)), True, ((-15, 20, 20, -15),(60,60,106,106)))#(-10, 15, 15, -10),(80,80,106,106)
-        elif entityChoice == 2:
-            tempEntity = stationaryEntity(tempX, tempY, "Rock", 0, "images/Rock1.png", s, Cam, ((-60, 60, 60, -60), (10, 10, 60, 60)), True, ((-60, 60, 60, -60), (-15, -15, 60, 60)))
-        tileGrid[tempEntity.tileY][tempEntity.tileX].entities.append(tempEntity)
+
+
+    # for i in range(10):
+    #     tempX = randint(1600, 2800)
+    #     tempY = randint(1600, 2800)
+    #     entityChoice = randint(1,2)
+    #     if entityChoice == 1:
+    #         tempEntity = stationaryEntity(tempX, tempY, "Tree", 0, "images/Tree1.png", s, Cam, ((-15, 20, 20, -15),(80,80,106,106)), True, ((-15, 20, 20, -15),(60,60,106,106)))#(-10, 15, 15, -10),(80,80,106,106)
+    #     elif entityChoice == 2:
+    #         tempEntity = stationaryEntity(tempX, tempY, "Rock", 0, "images/Rock1.png", s, Cam, ((-60, 60, 60, -60), (10, 10, 60, 60)), True, ((-60, 60, 60, -60), (-15, -15, 60, 60)))
+    #     tileGrid[tempEntity.tileY][tempEntity.tileX].entities.append(tempEntity)
     
     for i in tileGrid:
         for j in i:
@@ -636,11 +660,12 @@ def setInitialValues():
     alertThread = Thread(target=doAlert)
     alertThread.daemon = True
 
+    # gameS.setNodeMap()
+    # gameS.setNodesThread.start()
+    
+
     hotbar.addItem(1)
     hotbar.addItem(2)
-    hotbar.addItem(9)
-    hotbar.addItem(10)
-    hotbar.addItem(11)
     
     frameThread.start()
     calcThread.start()

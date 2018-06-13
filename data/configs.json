@@ -1,5 +1,5 @@
 {
-    "sound": true,
+    "sound": false,
     "window": {
         "height": 800,
         "fullscreen": false,
