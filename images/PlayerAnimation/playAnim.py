@@ -6,15 +6,15 @@ root = Tk()
 c = Canvas(root, width = 400, height = 400)
 c.pack()
 
-#animBase = "Walking/Left/"
-#animFrame = 12
+animBase = "Idle/Up/"
+animFrame = 8
 
-animBase = "Walking/Left/"
-animFrame = 11
+#animBase = "Walking/RightUp/"
+#animFrame = 14
 
 frames = []
 for i in range(animFrame):
-    imageTemp = Image.open(animBase + "Frame{}.png".format(i+2))
+    imageTemp = Image.open(animBase + "Frame{}.png".format(i+1))
     pImage = ImageTk.PhotoImage(image = imageTemp)
     frames.append(pImage)
 
