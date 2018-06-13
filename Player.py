@@ -44,8 +44,25 @@ class Player(movingEntity):
         self.previousDirection = self.direction.copy()
 
         self.downIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Down/", 8)
+        self.upIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Up/", 8)
+        self.leftIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Left/", 8)
+        self.rightIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Right/", 8)
 
-        self.leftWalkAnim = loadAnimation("images/PlayerAnimation/Walking/Left/", 11)
+        self.rightdownIdleAnim = loadAnimation("images/PlayerAnimation/Idle/RightDown/", 8)
+        self.leftdownIdleAnim = loadAnimation("images/PlayerAnimation/Idle/LeftDown/", 8)
+        self.rightupIdleAnim = loadAnimation("images/PlayerAnimation/Idle/RightUp/", 8)
+        self.leftupIdleAnim = loadAnimation("images/PlayerAnimation/Idle/RightDown/", 8)
+
+
+        self.leftWalkAnim = loadAnimation("images/PlayerAnimation/Walking/Left/", 14)
+        self.rightWalkAnim = loadAnimation("images/PlayerAnimation/Walking/Right/", 14)
+        self.upWalkAnim = loadAnimation("images/PlayerAnimation/Walking/Up/", 14)
+        self.downWalkAnim = loadAnimation("images/PlayerAnimation/Walking/Down/", 14)
+
+        self.leftupWalkAnim = loadAnimation("images/PlayerAnimation/Walking/LeftUp/", 14)
+        self.leftdownWalkAnim = loadAnimation("images/PlayerAnimation/Walking/LeftDown/", 14)
+        self.rightupWalkAnim = loadAnimation("images/PlayerAnimation/Walking/RightUp/", 14)
+        self.rightdownWalkAnim = loadAnimation("images/PlayerAnimation/Walking/RightDown/", 14)
         
 
     def updateVelocity(self):
@@ -102,12 +119,18 @@ class Player(movingEntity):
         
     
     def applyFriction(self):
-        # if self.KH.aToggle == False and self.KH.dToggle == False:
         self.Velx *= Player.playerFriction
-        
-        # if self.KH.wToggle == False and self.KH.sToggle == False:
         self.Vely *= Player.playerFriction
-    
+
+        if self.KH.wToggle == False and self.KH.sToggle == False:
+            if abs(self.Vely) < 0.3:
+                self.Vely = 0
+        
+        if self.KH.aToggle == False and self.KH.dToggle == False:
+            if abs(self.Velx) < 0.3:
+                self.Velx = 0
+        
+
     def moveCam(self, directionRestrictions):
         self.camera.updateVelocity(self.Velx, self.Vely)
         self.camera.move(directionRestrictions, Player.playerSpeed)
@@ -210,16 +233,16 @@ class Player(movingEntity):
         if len(self.direction) > 0:
             self.previousDirection = self.direction.copy()
         self.direction = []
-        if self.Velx > 0:
+        if self.KH.dToggle == True and self.KH.aToggle == False:
             self.direction.append("right")
         
-        elif self.Velx < 0:
+        elif self.KH.aToggle == True and self.KH.dToggle == False:
             self.direction.append("left")
         
-        if self.Vely > 0:
+        if self.KH.sToggle == True and self.KH.wToggle == False:
             self.direction.append("down")
         
-        elif self.Vely < 0:
+        elif self.KH.wToggle == True and self.KH.sToggle == False:
             self.direction.append("up")
         
         if len(self.direction) == 0:
@@ -227,7 +250,8 @@ class Player(movingEntity):
         
         else:
             curAnim = eval("self.{}WalkAnim".format("".join(self.direction)))
-
-        self.animFrame = (self.animFrame + 1) % len(curAnim)
-        self.sprite = (curAnim[self.animFrame])
+        
+        self.animFrame += 1
+        id = self.animFrame//3 % len(curAnim)
+        self.sprite = (curAnim[id])
 

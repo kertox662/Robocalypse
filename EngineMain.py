@@ -589,7 +589,6 @@ def setInitialValues():
             curTile = tileGrid[i][j]
             if str(tileId) in entityArrangementData:
                 entityArrangementID = randint(1, len(entityArrangementData[str(tileId)]))
-                entityArrangementID = 3
                 entityArrangement = entityArrangementData[str(tileId)][str(entityArrangementID)].copy()
                 for ent in range(len(entityArrangement) // 3):
                     # print(entityArrangement)
