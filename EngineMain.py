@@ -231,16 +231,27 @@ def customEventHandler():
         if int(tileToCheck.id) in [2, 19, 20, 21, 22]:
             if tileToCheck.isPointInBox([player.x, player.y + 35]):
                 player.wireHP -= 0.1
+                Player.playerSpeed = 5
+            
+            else:
+                Player.playerSpeed = 7
 
         elif int(tileToCheck.id) in [4,5,6,7,8,9,10,11]:
             if not tileToCheck.isPointInBox([player.x, player.y + 35]):
                 player.wireHP -= 0.1
+                Player.playerSpeed = 5
+            
+            else:
+                Player.playerSpeed = 7
         
         elif int(tileToCheck.id) in [12,13,14,15,16,17,18,23,24,25,26]:
             if tileToCheck.isPointInBox([player.x, player.y]):
                 Player.playerSpeed = 8.5
             else:
                 Player.playerSpeed = 7
+        
+        else:
+            Player.playerSpeed = 7
         
         if CraftWin.toDoCrafting != False:
             costForItem = itemData[str(CraftWin.toDoCrafting)]["cost"]
@@ -269,6 +280,8 @@ def customEventHandler():
             
             CraftWin.toDoCrafting = False
         sleep(1/60)
+    
+
 def doGraphicCalcs():
     global renderedTiles
     while True:
@@ -315,6 +328,13 @@ def doAlert():
             notifY = -85
         
         sleep(1/60)
+    
+
+def doPathFindingCalc():
+    currentNodeMap = [[]]*(len(renderedTiles) * 20)
+    for i in range(len(renderedTiles)):
+        for j in range(len(renderedTiles[0])):
+            pass
 
 
 #===================================================
@@ -574,7 +594,7 @@ def setInitialValues():
     for i in range(tileGridHeight):
         percentDone = i / tileGridHeight * 100
         if percentDone % 10 == 0:
-            print("{}% complete...".format(percentDone))
+            print("{}% complete...".format(int(percentDone)))
         tileGrid.append([])
         for j in range(tileGridWidth):
             tileId = tileMap[i][j]
@@ -598,6 +618,8 @@ def setInitialValues():
                     curTile.entities.append(stationaryEntity(x + curTile.x, y + curTile.y, eInfo["name"], 0, eInfo["sprite"], s, Cam, eInfo["collision"], eInfo["doCollision"], eInfo["hitbox"]))
                     if len(entityArrangement) > 3:
                         entityArrangement = entityArrangement[3:]
+                
+                curTile.setNodeMap(entityArrangement[0])
     
     print("Finished Building World!")
 

@@ -17,7 +17,7 @@ def dist(x1, y1, x2, y2):
     return l
 
 class Node:
-    size = 10
+    size = 5
     
     def __init__(self,x,y, color, nodeType):
         self.x = x
@@ -67,7 +67,7 @@ def travel(fromNode, toNode):
     #print("Target:",target.x, target.y)
     #print("Node Coor:",toNode.x, toNode.y)
     toNode.h = dist(toNode.x, toNode.y, target.x, target.y)
-    toNode.g = fromNode.g + 0.6
+    toNode.g = fromNode.g + 0.3
     toNode.f = toNode.h + toNode.g
     if toNode.shortPath == None:
         toNode.shortPath = fromNode
@@ -89,7 +89,6 @@ def travel(fromNode, toNode):
 
 def goToNext():
     global grid, openNodes, closedNodes, atEnd
-    
     try:
         currentNode = openNodes[0]
     except IndexError:
@@ -166,7 +165,7 @@ def setup():
 
 def gridCreation():
     global grid, gridSize
-    gridSize = 80
+    gridSize = 160
     grid = []
     for i in range(gridSize):
         grid.append([0]*gridSize)
@@ -174,7 +173,7 @@ def gridCreation():
     for i in range(len(grid)):
         for j in range(len(grid[i])):
             randomID = randint(1,100)
-            if randomID < 26:
+            if randomID < 16:
                 grid[i][j] = 1
             #if grid[i][j] == 1:
                 color = 'orange'
@@ -184,7 +183,7 @@ def gridCreation():
             grid[i][j] = tempNode
 
 def getPath(grid, startx, starty, targetx, targety):
-    global atEnd, target, start
+    global atEnd, target, start, openNodes
 
     target = grid[targety][targetx]
 
@@ -198,9 +197,10 @@ def getPath(grid, startx, starty, targetx, targety):
 
     exploredNode = []
     atEnd = False
-    while atEnd == False:
+
+    calcStartTime = time()
+    while atEnd == False and time() - calcStartTime < 5:
         goToNext()
-        
         #print("Open",openNodes[0].x, openNodes[0].y)
         #for i in closedNodes:
             #print("Closed:", i.x, i.y)
@@ -208,6 +208,9 @@ def getPath(grid, startx, starty, targetx, targety):
         #for i in openNodes:
             #print(i.f, i.x, i.y)
         #print("=====")
+    if time() - calcStartTime > 5:
+        openNodes = []
+    print("Calc End: ",time() - starttime,"seconds")
     try:
         path = [openNodes[0]]
     except:
@@ -240,9 +243,9 @@ def getPath(grid, startx, starty, targetx, targety):
                     if nextXInd == x and nextYInd == y:
                         path.pop(-2)
     
-    for i in grid:
-        for j in i:
-            j.display()
+    # for i in grid:
+    #     for j in i:
+    #         j.display()
     
     c.update()
     # sleep(3)    
@@ -253,24 +256,24 @@ def getPath(grid, startx, starty, targetx, targety):
     c.update()
 
 
-gridCreation()
-
 def run():
     global starttime
-    # starttime = time()
-    # print("Start Setup...")
+    starttime = time()
+    print("Start Setup...")
     setup()
-    # print("Finished Setup after", time() - starttime, "s")
-    # print("Done Setup\nStarting Calculations...")
-    getPath(grid, 30, 41, 6, 37)
-    # print("Finished All")
+    print("Finished Setup after", time() - starttime, "s")
+    print("Done Setup\nStarting Calculations...")
+    starttime = time()
+    getPath(grid, 159, 146, 1, 1)
+    print("Finished All")
 
 def runEv(event):
     gridCreation()
     run()
 
 
-for i in range(1):
+for i in range(20):
+    gridCreation()
     iteration = i + 1
     run()
 

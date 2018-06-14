@@ -1,5 +1,6 @@
 from GameObject import *
 from PIL import Image, ImageTk
+from Node import Node
 
 tileGridWidth = 50
 tileGridHeight = 50
@@ -30,4 +31,11 @@ class Tile(GameObject):
                     return True
 
         return False
+    
+    def setNodeMap(self, nMap):
+        for i in range(20):
+            for j in range(20):
+                nMap[i][j] = Node(self.x - 200 + j * 20, self.y - 200 + i*20, nMap[i][j])
+        
+        self.nodeMap = nMap
     

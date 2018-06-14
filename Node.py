@@ -4,3 +4,8 @@ class Node:
         self.y = y
         self.nodeType = nodeType
         self.shortPath = None
+    
+    @classmethod
+    def fromCopy(cls, copy):
+        newNode = cls(copy.x, copy.y, copy.nodeType)
+        return newNode

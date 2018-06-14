@@ -51,7 +51,7 @@ class Player(movingEntity):
         self.rightdownIdleAnim = loadAnimation("images/PlayerAnimation/Idle/RightDown/", 8)
         self.leftdownIdleAnim = loadAnimation("images/PlayerAnimation/Idle/LeftDown/", 8)
         self.rightupIdleAnim = loadAnimation("images/PlayerAnimation/Idle/RightUp/", 8)
-        self.leftupIdleAnim = loadAnimation("images/PlayerAnimation/Idle/RightDown/", 8)
+        self.leftupIdleAnim = loadAnimation("images/PlayerAnimation/Idle/LeftUp/", 8)
 
 
         self.leftWalkAnim = loadAnimation("images/PlayerAnimation/Walking/Left/", 14)
