@@ -243,9 +243,9 @@ def getPath(grid, startx, starty, targetx, targety):
                     if nextXInd == x and nextYInd == y:
                         path.pop(-2)
     
-    # for i in grid:
-    #     for j in i:
-    #         j.display()
+    for i in grid:
+        for j in i:
+            j.display()
     
     c.update()
     # sleep(3)    
@@ -272,7 +272,7 @@ def runEv(event):
     run()
 
 
-for i in range(20):
+for i in range(1):
     gridCreation()
     iteration = i + 1
     run()

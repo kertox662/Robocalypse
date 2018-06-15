@@ -7,5 +7,6 @@ class Node:
     
     @classmethod
     def fromCopy(cls, copy):
+        print(copy.x, copy.y, copy.nodeType)
         newNode = cls(copy.x, copy.y, copy.nodeType)
         return newNode

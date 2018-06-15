@@ -1,6 +1,5 @@
 from Tile import *
 from GameObject import *
-from GameItem import *
 from Scene import Scene
 from math import ceil, floor, sqrt
 from threading import Thread

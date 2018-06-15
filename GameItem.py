@@ -1,18 +1,76 @@
-class Tester:
-    def __init__(self, value):
-        self.val = value
+from time import sleep, time
+
+start = time()
+sleep(1)
+print(time() - start)
 
 
-l1 = []
-for i in range(10):
-    l1.append(Tester(i))
+# from random import randint
+# # class Tester:
+# #     def __init__(self, value):
+# #         self.val = value
 
-l2 = l1.copy()
 
-for i in range(10):
-    l1[i].val *= 3
+# # l1 = []
+# # for i in range(10):
+# #     l1.append(Tester(i))
 
-print(l1, l2)
-print()
-for i in range(10):
-    print(l1[i].val, l2[i].val)
+# # l2 = []
+# # for i in range(10):
+# #     l2.append(Tester(l1[0].val))
+# #     l2[i].val *= 3
+
+# # for i in range(10):
+# #     print(l1[i].val, l2[i].val)
+
+# class Grid:
+#     def __init__(self):
+#         row = [0]*5
+#         self.grid = []
+#         # for i in self.grid:
+#         #     print(i)
+#         # print()
+#         for i in range(5):
+#             self.grid.append(row.copy())
+#             for j in range(5):
+#                 self.grid[i][j] = randint(0,9)
+#                 # print(self.grid[i][j])
+
+#     def display(self):
+#         for i in self.grid:
+#             print(i)
+
+
+# gridOfGrids = [[]]*3
+# for i in range(3):
+#     for j in range(3):
+#         gridOfGrids[i].append(Grid())
+#         print(len(gridOfGrids[i]))
+
+# print(len(gridOfGrids))
+
+# print(gridOfGrids)
+
+# for i in range(len(gridOfGrids)):
+#     for j in range(len(gridOfGrids[0])):
+#         grid = gridOfGrids[i][j]
+#         grid.display()
+#         for i in range(len(gridOfGrids)):
+#             try:
+#                 indX = gridOfGrids[i].index(grid)
+#                 indY = i
+            
+#             except:
+#                 pass
+        
+#         print("Index:", indX, indY)
+#         print()
+
+# # for i in range(len(renderedTiles)):
+# #         for j in range(len(renderedTiles[0])):
+# #             curTile = renderedTiles[i][j]
+# #             for y in range(20):
+# #                 for x in range(20):
+# #                     curNode = curTile.nodeMap[y][x]
+# #                     # print(curNode.x, curNode.y)
+# #                     currentNodeMap[y + i*20].append(Node.fromCopy(curNode))

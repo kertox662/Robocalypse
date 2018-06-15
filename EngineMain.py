@@ -1,7 +1,7 @@
 #Standard Library
 import json as js
 import os
-from time import sleep
+
 from random import choice, randint
 import atexit
 import sys
@@ -41,6 +41,8 @@ from pygame import mixer
 #Miscellaneous
 from keyHandler import KeyHandler
 from getData import *
+
+from time import sleep, time
 
 def exitProcedure():
     pass
@@ -134,16 +136,18 @@ def saveSettings():
 def countFrameRate():
     global frame
     global fps
+    startTime = time()
     while True:
         sleep(1)
-        fps = frame
+        fps = round(frame / (time() - startTime),2)
         frame = 0
+        startTime = time()
 
 def displayFPS():
     global fpsText
     text = "{} fps".format(fps)
     s.canv.delete(fpsText)
-    fpsText = s.canv.create_text(30, 10, text = text, fill = '#20FF20')
+    fpsText = s.canv.create_text(37, 10, text = text, fill = '#20FF20')
 
 def doGameCalculations():
     
@@ -331,10 +335,24 @@ def doAlert():
     
 
 def doPathFindingCalc():
-    currentNodeMap = [[]]*(len(renderedTiles) * 20)
+    start = time()
+    currentNodeMap = []#[[]]*(len(renderedTiles) * 20)
     for i in range(len(renderedTiles)):
+        for row in range(20):
+            currentNodeMap.append([])
         for j in range(len(renderedTiles[0])):
-            pass
+            curTile = renderedTiles[i][j]
+            for y in range(20):
+                for x in range(20):
+                    curNode = curTile.nodeMap[y][x]
+                    # print(curNode.x, curNode.y)
+                    # print(y, i*20)
+                    currentNodeMap[y + i*20].append(Node.fromCopy(curNode))
+    print(time() - start)
+    print(len(currentNodeMap), len(currentNodeMap[0]))
+    # for i in currentNodeMap:
+    #     for j in i:
+    #         print(j.x, j.y)
 
 
 #===================================================
@@ -620,6 +638,9 @@ def setInitialValues():
                         entityArrangement = entityArrangement[3:]
                 
                 curTile.setNodeMap(entityArrangement[0])
+            
+            else:
+                curTile.setNodeMap([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
     
     print("Finished Building World!")
 
@@ -669,7 +690,7 @@ def setInitialValues():
     # print(itemData)
     # print("===============================")
     # print(itemSprites)
-    
+
     frameThread = Thread(target=countFrameRate)
     frameThread.daemon = True
 
@@ -688,6 +709,8 @@ def setInitialValues():
     alertThread = Thread(target=doAlert)
     alertThread.daemon = True
 
+    pathFindingThread = Thread(target = doPathFindingCalc)
+    pathFindingThread.daemon = True
     # gameS.setNodeMap()
     # gameS.setNodesThread.start()
     
@@ -701,7 +724,9 @@ def setInitialValues():
     graphCalcThread.start()
     craftWinThread.start()
     alertThread.start()
-    sleep(0.5)
+    pathFindingThread.start()
+
+    sleep(0.1)
 
     while True:
         runGame()
