@@ -1,9 +1,9 @@
 {
     "1":{
         "name":"Tree",
-        "collision":[[-15, 20, 20, -15],[80,80,106,106]],
-        "hitbox": [[-15, 20, 20, -15],[60,60,106,106]],
-        "sprite": "images/Tree1.png",
+        "collision":[[-15, 20, 20, -15],[125,125,150,150]],
+        "hitbox": [[-15, 20, 20, -15],[100,100,150,150]],
+        "sprite": "images/Tree3.png",
         "doCollision": true
     },
 
