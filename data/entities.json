@@ -3,7 +3,7 @@
         "name":"Tree",
         "collision":[[-15, 20, 20, -15],[125,125,150,150]],
         "hitbox": [[-15, 20, 20, -15],[100,100,150,150]],
-        "sprite": "images/Tree3.png",
+        "sprite": "images/Entities/TreeAnim/Static/Tree2.png",
         "doCollision": true
     },
 
