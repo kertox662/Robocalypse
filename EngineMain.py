@@ -33,6 +33,7 @@ from Player import Player
 from Entity import Entity, stationaryEntity, movingEntity
 from Hotbar import Hotbar
 from CraftingWindow import CraftingWindow
+from GroundItem import GroundItem
 
 #Downloaded Modules
 from PIL import Image, ImageTk, ImageFilter
@@ -628,12 +629,20 @@ def setInitialValues():
             if str(tileId) in entityArrangementData:
                 entityArrangementID = randint(1, len(entityArrangementData[str(tileId)]))
                 entityArrangement = entityArrangementData[str(tileId)][str(entityArrangementID)].copy()
-                for ent in range(len(entityArrangement) // 3):
-                    # print(entityArrangement)
+                entityNum = entityArrangement[0]
+                entityArrangement.pop(0)
+                for ent in range(entityNum):
                     x = entityArrangement[1]
                     y = entityArrangement[2]
-                    eInfo = entityData[entityArrangement[0]]
-                    curTile.entities.append(stationaryEntity(x + curTile.x, y + curTile.y, eInfo["name"], 0, eInfo["sprite"], s, Cam, eInfo["collision"], eInfo["doCollision"], eInfo["hitbox"]))
+                    eID = entityArrangement[0]
+
+                    if eID in ['1','2','3','4']:
+                        eInfo = None
+                        curTile.entities.append()
+                    
+                    else:
+                        eInfo = entityData[entityArrangement[0]]
+                        curTile.entities.append(stationaryEntity(x + curTile.x, y + curTile.y, eInfo["name"], 0, eInfo["sprite"], s, Cam, eInfo["collision"], eInfo["doCollision"], eInfo["hitbox"]))
                     if len(entityArrangement) > 3:
                         entityArrangement = entityArrangement[3:]
                 
