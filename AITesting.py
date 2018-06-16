@@ -95,7 +95,7 @@ class Agent:
                 canvasObjects.append(c.create_rectangle(i.x, i.y, i.x + squareSize, i.y + squareSize, fill = self.pathcolor))
 
 
-colors = ['green', 'red']
+colors = ['gray25', 'black']
 
 maze  = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
@@ -202,8 +202,8 @@ def deleteCanvasStuffs():
 
 def showGrid():
     for i in range(40):
-        gridObjects.append(c.create_text(i * squareSize + squareSize/2, squareSize / 2, text = str(i)))
-        gridObjects.append(c.create_text(squareSize / 2, i * squareSize + squareSize/2, text = str(i)))
+        gridObjects.append(c.create_text(i * squareSize + squareSize/2, squareSize / 2, text = str(i), fill = 'white'))
+        gridObjects.append(c.create_text(squareSize / 2, i * squareSize + squareSize/2, text = str(i), fill = 'white'))
 
 def initCount():
     while True:
@@ -219,6 +219,9 @@ targets = []
 agents.append(Agent(6*20, 13*20, 'SpringGreen2', 'maroon1'))
 agents.append(Agent(31*20, 20*16, 'blue', 'orange'))
 agents.append(Agent(15*20, 28*20, 'purple2', 'tomato'))
+#agents.append(Agent(1*20, 30*20, 'coral', 'SlateBlue2'))
+#agents.append(Agent(33*20, 2*16, 'sienna', 'snow3'))
+#agents.append(Agent(20*20, 38*20, 'LightSkyBlue3', 'S'))
 nextAgent = Queue()
 
 for i in agents:
