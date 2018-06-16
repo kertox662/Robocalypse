@@ -1,13 +1,13 @@
 #Standard Library
 import json as js
 import os
-
 from random import choice, randint
 import atexit
 import sys
 from threading import Thread
 from queue import Queue
 from math import *
+
 
 dependencyPath = __file__.split('EngineMain.py')[0] + "Dependencies"
 sys.path.append(dependencyPath)
@@ -18,22 +18,32 @@ if __name__ == '__main__':
 
 #Parent Classes
 from Screen import *
-from Scene import Scene
+from getData import *
+
+settings = loadSettings()
+    #=====Screen and Tkinter windows=====
+    #print("ABout toe meke screen")
+if settings["window"]["width"] == None:
+    s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
+    settings["window"]["width"] = s.canv.winfo_screenwidth()
+    settings["window"]["height"] = s.canv.winfo_screenheight()
+    
+else:
+    s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Robocalypse Game", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
+
+if settings["window"]["fullscreen"] == True:
+        sWidth = s.root.winfo_screenwidth()
+        sHeight = s.root.winfo_screenheight()
+    
+else:
+    sWidth = int(s.canv.cget('width'))
+    sHeight = int(s.canv.cget('height'))
+    
+    s.width = sWidth
+    s.height = sHeight   
 
 #Scenes
-from MainScene import *
-from SettingsScene import *
-from GameScene import *
-
-#Game Scene Stuff
-from GameObject import *
-from Tile import *
-from Camera import Camera
-from Player import Player
-from Entity import Entity, stationaryEntity, movingEntity
-from Hotbar import Hotbar
-from CraftingWindow import CraftingWindow
-from GroundItem import GroundItem
+from SceneManager import *
 
 #Downloaded Modules
 from PIL import Image, ImageTk, ImageFilter
@@ -41,9 +51,16 @@ from pygame import mixer
 
 #Miscellaneous
 from keyHandler import KeyHandler
-from getData import *
 
+
+#Game Scene Stuff
+from GameSceneObjects import *
+from UserInterfaces import *
+
+#Import here due to coflicts
 from time import sleep, time
+from tkinter import *
+
 
 def exitProcedure():
     pass
@@ -137,6 +154,7 @@ def saveSettings():
 def countFrameRate():
     global frame
     global fps
+    fps = 0
     startTime = time()
     while True:
         sleep(1)
@@ -163,6 +181,7 @@ def doGameCalculations():
                 for j in i:
                     for k in j.entities:
                         player.doStationaryCollisions(player.isColliding(k), k)
+                        k.checkLife()
             
             
 
@@ -178,7 +197,7 @@ def customEventHandler():
                     if player.isPlacing == False:
                         player.isPlacing = True
                         hotbar.lockCursor = True
-                        tempFurniture = FurnitureClass(KH.mouseX, KH.mouseY, hotbar.inventory[hotbar.cursorPosition - 1].furnitureId, s, Cam, player)
+                        tempFurniture = Furniture(KH.mouseX, KH.mouseY, hotbar.inventory[hotbar.cursorPosition - 1].furnitureId, s, Cam, player)
                     
                     if player.isPlacing == True:
                         if tempFurniture.shownSprite == tempFurniture.spriteGreen:
@@ -201,12 +220,14 @@ def customEventHandler():
                     for i in renderedTiles:
                         for j in i:
                             for k in j.entities:
-                                if dist([player.x, player.y], [k.x, k.y]) < 140:
+                                if dist([player.x, player.y], [k.x, k.y]) < 220:
                                     if e == 'Cut Tree':
                                         # print("Tree")
                                         if k.type == "Tree":
                                             if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
-                                                resources["wood"]["amount"] += randint(1,5)
+                                                amount = randint(1,5)
+                                                resources["wood"]["amount"] += amount
+                                                k.life -= amount
                                         
                                     elif e == "Mine Rock":
                                         # print("Rock")
@@ -223,6 +244,7 @@ def customEventHandler():
                                                     else:
                                                         amount = 3
                                                     resources["metal"]["amount"] += amount
+                                                    k.life -= amount
                                 
                                 
 
@@ -355,6 +377,54 @@ def doPathFindingCalc():
     #     for j in i:
     #         print(j.x, j.y)
 
+def loadTiles():
+    global tileGrid, percentDone
+    tileGrid = []
+    
+
+    print("Starting to Build World...")
+    for i in range(tileGridHeight):
+        percentDone[0] = (i + 1) / tileGridHeight * 100
+        if percentDone[0] % 10 == 0:
+            print("{}% complete...".format(int(percentDone[0])))
+        tileGrid.append([])
+        for j in range(tileGridWidth):
+            tileId = tileMap[i][j]
+            variationAmount = tileData[str(tileId)]["variations"]
+            if variationAmount > 1:
+                variationChoice = randint(0,variationAmount - 1)
+            else:
+                variationChoice = 0
+            
+            sprite = tileSprites[str(tileId)][variationChoice]
+            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,tileId, sprite, s, Cam, i, j, tileData[str(tileMap[i][j])]["collision"]))
+            curTile = tileGrid[i][j]
+            if str(tileId) in entityArrangementData:
+                entityArrangementID = randint(1, len(entityArrangementData[str(tileId)]))
+                entityArrangement = entityArrangementData[str(tileId)][str(entityArrangementID)].copy()
+                entityNum = entityArrangement[0]
+                entityArrangement.pop(0)
+                for ent in range(entityNum):
+                    x = entityArrangement[1]
+                    y = entityArrangement[2]
+                    eID = entityArrangement[0]
+
+                    if eID in ['1','2','3','4']:
+                        eInfo = groundItemData[entityArrangement[0]]
+                        curTile.entities.append(GroundItem(x + curTile.x, y + curTile.y, eInfo["name"], 0, entitySprites[eID], entityHighlights[eID], s, Cam, resources, curTile, player, eInfo["resource"], deleteQueue))
+                    
+                    else:
+                        eInfo = entityData[entityArrangement[0]]
+                        curTile.entities.append(stationaryEntity(x + curTile.x, y + curTile.y, eInfo["name"], 0, entitySprites[eID], s, Cam, eInfo["collision"], eInfo["doCollision"], eInfo["hitbox"], curTile, deleteQueue))
+                    if len(entityArrangement) > 3:
+                        entityArrangement = entityArrangement[3:]
+                
+                curTile.setNodeMap(entityArrangement[0])
+            
+            else:
+                curTile.setNodeMap([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+    
+    print("Finished Building World!")
 
 #===================================================
 #==============Draw Graphics Functions==============
@@ -439,7 +509,12 @@ def drawUIGraphics():
     player.displayLife()
     drawNotifBox()
 
-
+def emptyDelQueue():
+    global deleteQueue
+    if not deleteQueue.empty():
+        objToDelete = deleteQueue.get()
+        s.canv.delete(objToDelete.screenObj)
+        objToDelete.tile.entities.remove(objToDelete)
 
 
 def doScroll(event):
@@ -503,6 +578,7 @@ def runGame():
     elif Scene.current_scene == "scene_game":
        drawGroundGraphics()
        drawUIGraphics()
+       emptyDelQueue()
 
     #    print(renderedTiles[0][0].x, renderedTiles[0][0].y)
 
@@ -517,10 +593,10 @@ def setInitialValues():
     global renderedTiles, tileGrid, tileData, tileSprites, tileMap
     global frame, fpsText
     global alerts, alertCount, newAlert, UISprites, hotbar, notifBox, notifText
-    global resources, itemData, itemSprites
+    global resources, itemData, itemSprites, deleteQueue
     global CraftWin, costBox, costIcons, costText, resourceOrder
-    global tempFurniture, FurnitureClass
-    global entityData
+    global tempFurniture
+    global entityData, entityArrangementData, entitySprites, entityHighlights, groundItemData, percentDone
 
     #=====Primitive Variables=====
     TESTING = False
@@ -537,21 +613,21 @@ def setInitialValues():
     costText = []
     newAlert = {"text":""}
     resourceOrder = ["wood", "stone", "metal", "wires"]
+    deleteQueue = Queue()
 
     settings = loadSettings()
     #=====Screen and Tkinter windows=====
     #print("ABout toe meke screen")
-    if settings["window"]["width"] == None:
-        s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
-        settings["window"]["width"] = s.canv.winfo_screenwidth()
-        settings["window"]["height"] = s.canv.winfo_screenheight()
+    
+    # if settings["window"]["width"] == None:
+    #     s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
+    #     settings["window"]["width"] = s.canv.winfo_screenwidth()
+    #     settings["window"]["height"] = s.canv.winfo_screenheight()
         
-    else:
-        s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Robocalypse Game", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
+    # else:
+    #     s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Robocalypse Game", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
 
 
-    import Furniture
-    FurnitureClass = Furniture.Furniture
 
    
     
@@ -567,16 +643,7 @@ def setInitialValues():
                  "stone":{"amount":0, "text":-1, "icon": -1, "sprite":loadImage("images/Resources/Rock/rock2.png"),"spriteSmall":loadImage("images/Resources/Rock/rock2small.png")},
                   "wires":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Electrical/wires.png"),"spriteSmall": loadImage("images/Resources/Electrical/wiresSmall.png")}}
     
-    if settings["window"]["fullscreen"] == True:
-        sWidth = s.root.winfo_screenwidth()
-        sHeight = s.root.winfo_screenheight()
-    
-    else:
-        sWidth = int(s.canv.cget('width'))
-        sHeight = int(s.canv.cget('height'))
         
-        s.width = sWidth
-        s.height = sHeight       
     
     startx = 1900
     starty = 1200
@@ -590,6 +657,18 @@ def setInitialValues():
     tileData = loadSettings("data/tiles.json")
     entityData = loadSettings("data/entities.json")
     entityArrangementData = loadSettings("data/tileEntityArrangement.json")
+    groundItemData = loadSettings("data/groundItemData.json")
+
+    entitySprites = {}
+    entityHighlights = {}
+    # entityAnimations = {}
+
+    for i in entityData:
+        entitySprites[i] = loadImage(entityData[i]["sprite"])
+    
+    for i in groundItemData:
+        entitySprites[i] = loadImage(groundItemData[i]["sprite"])
+        entityHighlights[i] = loadImage(groundItemData[i]["spriteHighlight"])
 
     tileSprites = {}
     for i in range(1,27):
@@ -597,61 +676,24 @@ def setInitialValues():
         imageBase = tileData[str(i)]["imageBase"]
         for j in range(1, tileData[str(i)]["variations"] + 1):
             imagePath = "{}{}.png".format(imageBase, j)
-            imgTemp = Image.open(imagePath)
-            spriteTemp = ImageTk.PhotoImage(image=imgTemp)
-            tileSprites[str(i)].append(spriteTemp)
-
+            tileSprites[str(i)].append(loadImage(imagePath))
 
     with open('data/TileData.txt') as mapD:
         tileMap = mapD.read().split('\n')
     
     for i in range(len(tileMap)):
         tileMap[i] = tileMap[i].split(',')
-    
-    tileGrid = []
-    print("Starting to Build World...")
-    for i in range(tileGridHeight):
-        percentDone = i / tileGridHeight * 100
-        if percentDone % 10 == 0:
-            print("{}% complete...".format(int(percentDone)))
-        tileGrid.append([])
-        for j in range(tileGridWidth):
-            tileId = tileMap[i][j]
-            variationAmount = tileData[str(tileId)]["variations"]
-            if variationAmount > 1:
-                variationChoice = randint(0,variationAmount - 1)
-            else:
-                variationChoice = 0
-            
-            sprite = tileSprites[str(tileId)][variationChoice]
-            tileGrid[i].append(Tile(j * Tile.tileWidth,i * Tile.tileHeight,tileId, sprite, s, Cam, i, j, tileData[str(tileMap[i][j])]["collision"]))
-            curTile = tileGrid[i][j]
-            if str(tileId) in entityArrangementData:
-                entityArrangementID = randint(1, len(entityArrangementData[str(tileId)]))
-                entityArrangement = entityArrangementData[str(tileId)][str(entityArrangementID)].copy()
-                entityNum = entityArrangement[0]
-                entityArrangement.pop(0)
-                for ent in range(entityNum):
-                    x = entityArrangement[1]
-                    y = entityArrangement[2]
-                    eID = entityArrangement[0]
 
-                    if eID in ['1','2','3','4']:
-                        eInfo = None
-                        curTile.entities.append()
-                    
-                    else:
-                        eInfo = entityData[entityArrangement[0]]
-                        curTile.entities.append(stationaryEntity(x + curTile.x, y + curTile.y, eInfo["name"], 0, eInfo["sprite"], s, Cam, eInfo["collision"], eInfo["doCollision"], eInfo["hitbox"]))
-                    if len(entityArrangement) > 3:
-                        entityArrangement = entityArrangement[3:]
-                
-                curTile.setNodeMap(entityArrangement[0])
-            
-            else:
-                curTile.setNodeMap([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+    percentDone = [0]
+
+    loadingThread = Thread(target = loadTiles)
+    loadingThread.daemon = True
+    loadingThread.start()
+
+    loadScene = LoadingScene(s, percentDone)
+    loadScene.updateLoading()
+
     
-    print("Finished Building World!")
 
     mainS = MainScene("Robocalypse", s, KH)
     settingsS = SettingsScene(s,KH)
@@ -662,17 +704,6 @@ def setInitialValues():
     firstTime = True
     if TESTING: print(sWidth, sHeight)
 
-
-
-    # for i in range(10):
-    #     tempX = randint(1600, 2800)
-    #     tempY = randint(1600, 2800)
-    #     entityChoice = randint(1,2)
-    #     if entityChoice == 1:
-    #         tempEntity = stationaryEntity(tempX, tempY, "Tree", 0, "images/Tree1.png", s, Cam, ((-15, 20, 20, -15),(80,80,106,106)), True, ((-15, 20, 20, -15),(60,60,106,106)))#(-10, 15, 15, -10),(80,80,106,106)
-    #     elif entityChoice == 2:
-    #         tempEntity = stationaryEntity(tempX, tempY, "Rock", 0, "images/Rock1.png", s, Cam, ((-60, 60, 60, -60), (10, 10, 60, 60)), True, ((-60, 60, 60, -60), (-15, -15, 60, 60)))
-    #     tileGrid[tempEntity.tileY][tempEntity.tileX].entities.append(tempEntity)
     
     for i in tileGrid:
         for j in i:
@@ -681,8 +712,7 @@ def setInitialValues():
     UISpritesData = loadSettings("data/UISprites.json")
     UISprites = {}
     for i in UISpritesData:
-        img = Image.open(UISpritesData[i])
-        UISprites[i] = ImageTk.PhotoImage(image=img)
+        UISprites[i] = loadImage(UISpritesData[i])
     
     CraftWin = CraftingWindow(s, hotbar, KH, player)
 

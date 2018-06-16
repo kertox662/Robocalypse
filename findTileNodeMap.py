@@ -7,8 +7,10 @@ def findMap(tileID, variation):
     entityData = tileData[tileID][variation].copy()
     print(entityData)
     entities = []
-    for i in range(len(entityData) // 3):
-        entities.append(stationaryEntity(entityData[1], entityData[2], "None", 0, None, None, None, entityInfo[entityData[0]]["collision"] , True, None))
+    entNum = entityData[0]
+    entityData.pop(0)
+    for i in range(entNum):
+        entities.append(stationaryEntity(entityData[1], entityData[2], "None", 0, None, None, None, entityInfo[entityData[0]]["collision"] , True, None, None, None))
         if len(entityData) >= 3:
             for j in range(3):
                 entityData.pop(0)

@@ -1,4 +1,13 @@
 {"1":{
     "name":"Stick",
-    "sprite":"images/Resources/Stick"
-}}
+    "sprite":"images/Resources/Stick/Stick.png",
+    "spriteHighlight": "images/Resources/Stick/StickHighlight.png",
+    "resource":"wood"
+    },
+ "2":{
+    "name":"Rock",
+    "sprite":"images/Resources/Rock/Rock.png",
+    "spriteHighlight": "images/Resources/Rock/RockHighlight.png",
+    "resource":"stone"
+ }
+}

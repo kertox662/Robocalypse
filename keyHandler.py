@@ -1,4 +1,4 @@
-from Camera import Camera
+from GameSceneObjects import Camera
 from pynput import keyboard
 from threading import Thread
 
