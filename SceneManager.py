@@ -72,7 +72,7 @@ class MainScene(Scene):
                 elif self.options[i] == "Settings":
                     self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_settings'))
                 elif self.options[i] == "Quit Game":
-                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: screen.root.destroy())
+                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.screen.root.destroy())
 
         else:
             for i in range(len(self.optionsText)-1 , -1, -1):
@@ -86,17 +86,14 @@ class MainScene(Scene):
                 elif self.options[i] == "Settings":
                     self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_settings'))
                 elif self.options[i] == "Quit Game":
-                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.screen.canv.destroy())
-    
+                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.screen.destroyScreen())
+
+
+
 TESTING = False
-screenOptions = [(1920,1200),(1920,1080),(1680,1050),(1600,900),(1440,900),(1360,768),(1280,1024),(1280,800),(1280,720),(1024,768)]
-
-
-
-
-
 
 class SettingsScene(Scene):
+    screenOptions = [(1920,1200),(1920,1080),(1680,1050),(1600,900),(1440,900),(1360,768),(1280,1024),(1280,800),(1280,720),(1024,768)]
     def __init__(self, screen, KHandler):
         super().__init__("scene_settings", screen, KHandler,connections = ["scene_main", "scene_menu"])
         self.settings = ["Screen Size", "Fullscreen","Sound", "Show FPS"]
@@ -109,10 +106,9 @@ class SettingsScene(Scene):
         maxWidth = screen.canv.winfo_screenwidth()
         maxHeight = screen.canv.winfo_screenheight()
 
-        global screenOptions
-        for i in range(len(screenOptions)-1, -1, -1):
-            if screenOptions[i][0] > maxWidth or screenOptions[i][1] > maxHeight:
-                screenOptions.pop(i)
+        for i in range(len(SettingsScene.screenOptions)-1, -1, -1):
+            if SettingsScene.screenOptions[i][0] > maxWidth or SettingsScene.screenOptions[i][1] > maxHeight:
+                SettingsScene.screenOptions.pop(i)
     
 
     def changeSetting(self, Event):

@@ -10,10 +10,10 @@ c = Canvas(root, width = 800, height = 800)
 c.pack()
 
 def dist(x1, x2, y1, y2):
-        dx = (x2 - x1)**2
-        dy = (y2 - y1)**2
-        l = sqrt(dx + dy)
-        return l
+    dx = (x2 - x1)**2
+    dy = (y2 - y1)**2
+    l = sqrt(dx + dy)
+    return l
 
 class Node:
     def __init__(self,x,y, nodeType):
@@ -172,16 +172,14 @@ for i in range(len(maze)):
         maze[i][j] = Node(j*squareSize, i*squareSize, maze[i][j])
 
 canvasObjects = []
+gridObjects = []
 
 def displayMaze():
-    global canvasObjects
-    for i in range(len(canvasObjects) - 1, -1, -1):
-        c.delete(canvasObjects.pop(-1))
-
+    global gridObjects
     for i in range(40):
         for j in range(40):
             color = colors[maze[i][j].nodeType]
-            canvasObjects.append(c.create_rectangle(j * squareSize, i * squareSize, (j + 1)*squareSize, (i + 1)*squareSize, fill = color))
+            gridObjects.append(c.create_rectangle(j * squareSize, i * squareSize, (j + 1)*squareSize, (i + 1)*squareSize, fill = color))
 
 def displayTarget():
     for t in targets:
@@ -197,11 +195,15 @@ def targetFromClick(e):
         nextAgent.put(agents[agentchoice%len(agents)])
         agentchoice += 1
 
+def deleteCanvasStuffs():
+    global canvasObjects
+    for i in range(len(canvasObjects) - 1, -1, -1):
+        c.delete(canvasObjects.pop(-1))    
 
 def showGrid():
     for i in range(40):
-        canvasObjects.append(c.create_text(i * squareSize + squareSize/2, squareSize / 2, text = str(i)))
-        canvasObjects.append(c.create_text(squareSize / 2, i * squareSize + squareSize/2, text = str(i)))
+        gridObjects.append(c.create_text(i * squareSize + squareSize/2, squareSize / 2, text = str(i)))
+        gridObjects.append(c.create_text(squareSize / 2, i * squareSize + squareSize/2, text = str(i)))
 
 def initCount():
     while True:
@@ -231,9 +233,9 @@ root.bind("<Button-1>", targetFromClick)
 
 agentchoice = 0
 
+displayMaze()
+showGrid()
 while True:
-    displayMaze()
-    
     for i in agents:
         if len(i.path) >= 1:
             i.move()
@@ -243,7 +245,8 @@ while True:
     displayTarget()
     for i in agents:
         i.display()
-    showGrid()
+    
     c.update()
     sleep(0.03)
+    deleteCanvasStuffs()
 
