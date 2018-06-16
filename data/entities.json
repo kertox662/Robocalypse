@@ -1,10 +1,11 @@
 {
     "5":{
         "name":"Tree",
-        "collision":[[-15, 20, 20, -15],[125,125,150,150]],
-        "hitbox": [[-15, 20, 20, -15],[100,100,150,150]],
-        "sprite": "images/Entities/TreeAnim/Static/Tree2.png",
-        "doCollision": true
+        "collision":[[-15, 10, 10, -15],[175,175,205,205]],
+        "hitbox": [[-15, 12, 12, -15],[125,125,205,205]],
+        "sprite": "images/Entities/TreeAnim/Static/Tree.png",
+        "doCollision": true,
+        "animations":["images/Entities/TreeAnim/Falling/", 28]
     },
 
     "6":{
@@ -12,7 +13,8 @@
         "collision": [[-60, 60, 60, -60], [10, 10, 60, 60]],
         "hitbox": [[-60, 60, 60, -60], [-15, -15, 60, 60]],
         "sprite": "images/Rock1.png",
-        "doCollision": true
+        "doCollision": true,
+        "animations":[]
     }
 
 

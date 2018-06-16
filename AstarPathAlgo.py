@@ -11,13 +11,16 @@ def dist(x1, y1, x2, y2):
 
 def travel(fromNode, toNode):
     toNode.h = dist(toNode.x, toNode.y, target.x, target.y)
-    toNode.g = fromNode.g + 0.6
+    toNode.g = fromNode.g + 0.5
     toNode.f = toNode.h + toNode.g
-    if toNode.shortPath == None:
+    if toNode.shortPath is None:
+        # print("New Path")
         toNode.shortPath = fromNode
     else:
+        # print("Old Path")
         if fromNode.g < toNode.shortPath.g:
             toNode.shortPath = fromNode
+            # print("Overwrote old path")
     toNode.color = 'green'
     
     if toNode not in openNodes:
@@ -29,8 +32,8 @@ def travel(fromNode, toNode):
         if toNode not in openNodes:
             openNodes.insert(0, toNode)
 
-def goToNext():
-    global grid, openNodes, closedNodes, atEnd
+def goToNext(grid):
+    global  openNodes, closedNodes, atEnd
     
     try:
         currentNode = openNodes[0]
@@ -87,6 +90,8 @@ def getPath(grid, startx, starty, targetx, targety):
         for j in i:
             if j.nodeType == 1:
                 closedNodes.append(j)
+            
+            j.shortPath = None
 
     target = grid[targety][targetx]
 
@@ -99,13 +104,16 @@ def getPath(grid, startx, starty, targetx, targety):
 
     exploredNode = []
     atEnd = False
+    iteration = 0
     while atEnd == False:
-        goToNext()
+        goToNext(grid)
+        iteration += 1
+        # print(iteration)
         
     try:
         path = [openNodes[0]]
     except:
-        pass
+        path = [start]
         
     while start not in path:
         path.append(path[-1].shortPath)

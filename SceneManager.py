@@ -284,14 +284,14 @@ class LoadingScene:
         animFrame = 0
         outline, bar, loadingtitle, loadtext, playerFrame = -1,-1,-1,-1, -1
         while self.percentDone[0] < 100:
+            print(animFrame)
             self.screen.canv.delete(outline, bar, loadingtitle, loadtext, playerFrame)
             outline = self.screen.canv.create_rectangle(100, self.screen.height/2 - 50, self.screen.width - 100, self.screen.height/2 + 50, width = 3)
             bar = self.screen.canv.create_rectangle(100, self.screen.height/2 - 50, (self.screen.width - 100)*self.percentDone[0]/100, self.screen.height/2 + 50, fill = 'red')
             loadingtitle = self.screen.canv.create_text(self.screen.width /2 , self.screen.height / 2 - 100, text = "Loading, Please Wait...")
-            loadtext = self.screen.canv.create_text(self.screen.width / 2, self.screen.height / 2, text = "{}% Complete".format(round(self.percentDone[0], 1)))
+            loadtext = self.screen.canv.create_text(self.screen.width / 2, self.screen.height / 2, text = "{}% Complete".format(int(self.percentDone[0])))
             
             playerFrame = self.screen.canv.create_image(100 + (self.screen.width-200)*self.percentDone[0]/100, self.screen.height/2 + 130, image = self.playerAnim[(animFrame) % len(self.playerAnim)])
-            print(self.screen.canv.coords(playerFrame))
             self.screen.canv.update()
             animFrame += 1
             sleep(0.02)

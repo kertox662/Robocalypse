@@ -74,17 +74,20 @@ class Entity(GameObject):
 
 
 class stationaryEntity(Entity):
-    def __init__(self, x, y, entityType, id, sprite, screen, camera, collisionBox, doCollision, hitBox, tile, delQueue, xOff = 0, yOff = 0):
+    def __init__(self, x, y, entityType, id, sprite, animations, screen, camera, collisionBox, doCollision, hitBox, tile, delQueue, xOff = 0, yOff = 0):
         super().__init__(x, y, entityType, id, sprite, screen, camera, collisionBox, doCollision, hitBox, xOff, yOff)
-        self.tile = tile
         self.tileX = self.x // Tile.tileWidth
         self.tileY = self.y // Tile.tileHeight
+        self.tile = tile
         self.life = randint(25, 50)
+        self.dead = False
 
         self.delQueue = delQueue
         if self.type == "Tree":
             self.falling = False
             self.display = self.treeDisplay
+            self.fallAnim = animations[0]
+            self.xOff = -43
 
 
     def isPointInBox(self, point, boxType, Mouse = False):
@@ -116,21 +119,28 @@ class stationaryEntity(Entity):
         return False
     
     def checkLife(self):
-        if self.life <= 0:
-            if self.type == "Tree":
-                self.fallAnim = loadAnimation("images/Entities/TreeAnim/Falling/", 28)
-                self.animFrame = 0
-                self.falling = True
-                print("I'm a dead tree")
-            
-            else:
-                self.delQueue.put(self)
-                print("I'm dead")
+        if not isinstance(self, GroundItem):
+            # print("Life", self.life, self)
+            if self.life <= 0 and self.dead == False:
+                if self.type == "Tree":
+                    # self.fallAnim = loadAnimation("images/Entities/TreeAnim/Falling/", 28)
+                    self.animFrame = 0
+                    self.falling = True
+                    self.dead = True
+                    # self.xOff = 
+                    print("I'm a dead tree")
+                
+                else:
+                    print("I'm dead")
+                    self.dead = True
+                    self.delQueue.put(self)
+                    
+                    
     
     def treeDisplay(self, player, lessOrGreater, collision, isPlayer = False):
 
         if self.falling:
-            self.sprite = self.fallAnim[self.animFrame]
+            self.sprite = self.fallAnim[self.animFrame // 2]
             self.animFrame += 1
 
         collisionMid = (min(collision[1]) + max(collision[1]))/2
@@ -141,7 +151,7 @@ class stationaryEntity(Entity):
             self.screenObj = self.screen.canv.create_image(self.x - self.camera.x + self.xOff + self.screen.width/2, self.y - self.camera.y + self.yOff + self.screen.height/2, image = self.sprite)
         
         if self.falling:
-            if self.animFrame == len(self.fallAnim):
+            if self.animFrame // 2 == len(self.fallAnim):
                 self.delQueue.put(self)
 
 
@@ -161,8 +171,8 @@ class movingEntity(Entity):
 
         for i in range(len(self.collisionBox[0])):
             # print("MAX:",min(box[1]) - colObj.y, self.collisionBox[1][i] - self.y,"MIN:", max(box[1]) - colObj.y)
-            if min(box[0]) + colObj.x + colObj.xOff <= self.collisionBox[0][i] + self.x <= max(box[0]) + colObj.x + colObj.xOff:
-                if min(box[1]) + colObj.y + colObj.yOff <= self.collisionBox[1][i] + self.y <= max(box[1]) + colObj.y + colObj.yOff:
+            if min(box[0]) + colObj.x <= self.collisionBox[0][i] + self.x <= max(box[0]) + colObj.x:
+                if min(box[1]) + colObj.y <= self.collisionBox[1][i] + self.y <= max(box[1]) + colObj.y:
                     collisions[i] = True
                     
         return collisions
@@ -432,8 +442,8 @@ class Player(movingEntity):
 
 
 
-tileGridWidth = 50
-tileGridHeight = 50
+tileGridWidth = 10
+tileGridHeight = 10
 
 class Tile(GameObject):
     tileWidth = 400
@@ -456,8 +466,8 @@ class Tile(GameObject):
         y = point[1]
 
         for i in self.collisionBox:
-            if min(i[0]) + self.x + self.xOff <= x <= max(i[0]) + self.x + self.xOff:
-                if min(i[1]) + self.y + self.yOff <= y <= max(i[1]) + self.y + self.yOff:
+            if min(i[0]) + self.x<= x <= max(i[0]) + self.x:
+                if min(i[1]) + self.y <= y <= max(i[1]) + self.y:
                     return True
 
         return False
@@ -532,7 +542,7 @@ class Camera:
 
 class GroundItem(stationaryEntity):
     def __init__(self, x, y, entityType, id, sprite, highlight, screen, camera, resources, tile, player, resourceType, delQueue):
-        super().__init__(x,y,entityType, id, sprite, screen, camera, None, False, None, tile, delQueue)
+        super().__init__(x,y,entityType, id, sprite, [], screen, camera, None, False, None, tile, delQueue)
         self.resources = resources
         self.player = player
         self.resourceType = resourceType
@@ -570,7 +580,7 @@ class Furniture(stationaryEntity):
         furnitureSpritesRed.append(loadImage(furnitureData[str(i+1)]["furnitureRed"]))
         furnitureSpritesGreen.append(loadImage(furnitureData[str(i+1)]["furnitureGreen"]))
 
-    def __init__(self, x, y, id, screen, camera, player):
+    def __init__(self, x, y, id, screen, camera, player, tile, delQueue):
         sprite = Furniture.furnitureSprites[int(id) - 1]
         self.highlight = Furniture.furnitureHighlights[int(id) - 1]
         self.spriteRed = Furniture.furnitureSpritesRed[int(id) - 1]
@@ -578,7 +588,7 @@ class Furniture(stationaryEntity):
 
         colBox = Furniture.furnitureData[str(id)]["collision"]
 
-        super().__init__(x,y, "Furniture", id, sprite, screen, camera, colBox, False, None)
+        super().__init__(x,y, "Furniture", id, sprite, [], screen, camera, colBox, False, None, tile, delQueue )
 
         self.player = player
         self.isPlacing = True

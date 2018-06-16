@@ -17,7 +17,7 @@ def dist(x1, y1, x2, y2):
     return l
 
 class Node:
-    size = 5
+    size = 10
     
     def __init__(self,x,y, color, nodeType):
         self.x = x
@@ -67,8 +67,8 @@ def travel(fromNode, toNode):
     #print("Target:",target.x, target.y)
     #print("Node Coor:",toNode.x, toNode.y)
     toNode.h = dist(toNode.x, toNode.y, target.x, target.y)
-    toNode.g = fromNode.g + 0.3
-    toNode.f = toNode.h + toNode.g
+    toNode.g = fromNode.g + 0.1
+    toNode.f = toNode.g + toNode.h
     if toNode.shortPath == None:
         toNode.shortPath = fromNode
     else:
@@ -165,7 +165,7 @@ def setup():
 
 def gridCreation():
     global grid, gridSize
-    gridSize = 160
+    gridSize = 40
     grid = []
     for i in range(gridSize):
         grid.append([0]*gridSize)
@@ -173,7 +173,7 @@ def gridCreation():
     for i in range(len(grid)):
         for j in range(len(grid[i])):
             randomID = randint(1,100)
-            if randomID < 16:
+            if randomID < 31:
                 grid[i][j] = 1
             #if grid[i][j] == 1:
                 color = 'orange'
@@ -264,7 +264,7 @@ def run():
     print("Finished Setup after", time() - starttime, "s")
     print("Done Setup\nStarting Calculations...")
     starttime = time()
-    getPath(grid, 159, 146, 1, 1)
+    getPath(grid, 29, 29, 1, 1)
     print("Finished All")
 
 def runEv(event):

@@ -5,7 +5,7 @@
     "resource":"wood"
     },
  "2":{
-    "name":"Rock",
+    "name":"Stone",
     "sprite":"images/Resources/Rock/Rock.png",
     "spriteHighlight": "images/Resources/Rock/RockHighlight.png",
     "resource":"stone"

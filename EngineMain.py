@@ -180,6 +180,8 @@ def doGameCalculations():
             for i in renderedTiles:
                 for j in i:
                     for k in j.entities:
+                        if True in player.isColliding(k):
+                            print(k.type)
                         player.doStationaryCollisions(player.isColliding(k), k)
                         k.checkLife()
             
@@ -197,7 +199,10 @@ def customEventHandler():
                     if player.isPlacing == False:
                         player.isPlacing = True
                         hotbar.lockCursor = True
-                        tempFurniture = Furniture(KH.mouseX, KH.mouseY, hotbar.inventory[hotbar.cursorPosition - 1].furnitureId, s, Cam, player)
+                        curTileX = int(player.x // Tile.tileWidth)
+                        curTileY = int(player.y // Tile.tileHeight)
+                        curTile = tileGrid[curTileY][curTileX]
+                        tempFurniture = Furniture(KH.mouseX, KH.mouseY, hotbar.inventory[hotbar.cursorPosition - 1].furnitureId, s, Cam, player, deleteQueue, curTile)
                     
                     if player.isPlacing == True:
                         if tempFurniture.shownSprite == tempFurniture.spriteGreen:
@@ -220,32 +225,41 @@ def customEventHandler():
                     for i in renderedTiles:
                         for j in i:
                             for k in j.entities:
-                                if dist([player.x, player.y], [k.x, k.y]) < 220:
+                                if k.life > 0:
                                     if e == 'Cut Tree':
                                         # print("Tree")
                                         if k.type == "Tree":
-                                            if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
-                                                amount = randint(1,5)
-                                                resources["wood"]["amount"] += amount
-                                                k.life -= amount
-                                        
+                                            if dist([player.x, player.y], [k.x, k.y]) < 280:
+                                                print("Close Enough")
+                                                if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
+                                                    print("In box")
+                                                    amount = randint(1,5)
+                                                    resources["wood"]["amount"] += amount
+                                                    k.life -= amount
+                                                    print(k.life)
+                                            
                                     elif e == "Mine Rock":
                                         # print("Rock")
                                         if k.type == "Rock":
-                                            if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
-                                                resources["stone"]["amount"] += randint(1,5)
-                                                metalChance = randint(1,100)
-                                                if metalChance <= 7:
-                                                    amountChance = randint(1,100)
-                                                    if amountChance <= 80:
-                                                        amount = 1
-                                                    elif amountChance <= 98:
-                                                        amount = 2
-                                                    else:
-                                                        amount = 3
-                                                    resources["metal"]["amount"] += amount
-                                                    k.life -= amount
-                                
+                                            if dist([player.x, player.y], [k.x, k.y]) < 280:
+                                                if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
+                                                    amountStone = randint(1,5)
+                                                    resources["stone"]["amount"] += amountStone
+                                                    k.life -= amountStone
+                                                    print(k.life)
+                                                    metalChance = randint(1,100)
+                                                    if metalChance <= 7:
+                                                        amountChance = randint(1,100)
+                                                        if amountChance <= 80:
+                                                            amount = 1
+                                                        elif amountChance <= 98:
+                                                            amount = 2
+                                                        else:
+                                                            amount = 3
+                                                        resources["metal"]["amount"] += amount
+                                                        # 
+                                                    
+                            
                                 
 
                             
@@ -415,7 +429,7 @@ def loadTiles():
                     
                     else:
                         eInfo = entityData[entityArrangement[0]]
-                        curTile.entities.append(stationaryEntity(x + curTile.x, y + curTile.y, eInfo["name"], 0, entitySprites[eID], s, Cam, eInfo["collision"], eInfo["doCollision"], eInfo["hitbox"], curTile, deleteQueue))
+                        curTile.entities.append(stationaryEntity(x + curTile.x, y + curTile.y, eInfo["name"], 0, entitySprites[eID],entityAnimations[eID], s, Cam, eInfo["collision"], eInfo["doCollision"], eInfo["hitbox"], curTile, deleteQueue))
                     if len(entityArrangement) > 3:
                         entityArrangement = entityArrangement[3:]
                 
@@ -425,6 +439,17 @@ def loadTiles():
                 curTile.setNodeMap([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
     
     print("Finished Building World!")
+
+
+def testDraw():
+    global s
+    x = s.canv.create_oval(100, 100, 200, 200, fill = 'red')
+    while True:
+        s.canv.delete(x)
+        x = s.canv.create_oval(100, 100, 200, 200, fill = 'red')
+        s.canv.update()
+        sleep(0.05)
+
 
 #===================================================
 #==============Draw Graphics Functions==============
@@ -596,7 +621,7 @@ def setInitialValues():
     global resources, itemData, itemSprites, deleteQueue
     global CraftWin, costBox, costIcons, costText, resourceOrder
     global tempFurniture
-    global entityData, entityArrangementData, entitySprites, entityHighlights, groundItemData, percentDone
+    global entityData, entityArrangementData, entitySprites, entityHighlights, entityAnimations, groundItemData, percentDone
 
     #=====Primitive Variables=====
     TESTING = False
@@ -633,38 +658,27 @@ def setInitialValues():
     
 
     #=====Item Data From files=====
+    print("Starting to load data...")
     itemData = loadSettings("data/items.json")
-    itemSprites = []
-    for i in itemData:
-        itemSprites.append(loadImage(itemData[i]["icon"]))
-
-    resources = {"wood":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Wood Log/log.png"), "spriteSmall":loadImage("images/Resources/Wood Log/logsmall.png")},
-                 "metal":{"amount": 0, "text":-1, "icon":-1, "sprite":loadImage("images/Resources/Metal/metal.png"), "spriteSmall":loadImage("images/Resources/Metal/metalSmall.png")},
-                 "stone":{"amount":0, "text":-1, "icon": -1, "sprite":loadImage("images/Resources/Rock/rock2.png"),"spriteSmall":loadImage("images/Resources/Rock/rock2small.png")},
-                  "wires":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Electrical/wires.png"),"spriteSmall": loadImage("images/Resources/Electrical/wiresSmall.png")}}
-    
-        
-    
-    startx = 1900
-    starty = 1200
-
-    hotbar = Hotbar(s, itemSprites)
-    KH = KeyHandler(s, hotbar)
-    Cam = Camera(startx, starty, s, KH)
-    player = Player(startx, starty, s, Cam, KH, resources)
-    
-     #=====Tile Data From files=====
     tileData = loadSettings("data/tiles.json")
     entityData = loadSettings("data/entities.json")
     entityArrangementData = loadSettings("data/tileEntityArrangement.json")
     groundItemData = loadSettings("data/groundItemData.json")
+    UISpritesData = loadSettings("data/UISprites.json")
+    print("Finished Loading Data!")
 
+
+    print("Starting to Load images...")
     entitySprites = {}
     entityHighlights = {}
-    # entityAnimations = {}
+    entityAnimations = {}
 
     for i in entityData:
         entitySprites[i] = loadImage(entityData[i]["sprite"])
+        entityAnimations[i] = []
+        curAnimations = entityData[i]["animations"]
+        for j in range(0,len(curAnimations), 2):
+            entityAnimations[i].append(loadAnimation(curAnimations[j], curAnimations[j+1]))
     
     for i in groundItemData:
         entitySprites[i] = loadImage(groundItemData[i]["sprite"])
@@ -677,6 +691,34 @@ def setInitialValues():
         for j in range(1, tileData[str(i)]["variations"] + 1):
             imagePath = "{}{}.png".format(imageBase, j)
             tileSprites[str(i)].append(loadImage(imagePath))
+
+    itemSprites = []
+    for i in itemData:
+        itemSprites.append(loadImage(itemData[i]["icon"]))
+    
+    UISprites = {}
+    for i in UISpritesData:
+        UISprites[i] = loadImage(UISpritesData[i])
+
+    resources = {"wood":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Wood Log/log.png"), "spriteSmall":loadImage("images/Resources/Wood Log/logsmall.png")},
+                 "metal":{"amount": 0, "text":-1, "icon":-1, "sprite":loadImage("images/Resources/Metal/metal.png"), "spriteSmall":loadImage("images/Resources/Metal/metalSmall.png")},
+                 "stone":{"amount":0, "text":-1, "icon": -1, "sprite":loadImage("images/Resources/Rock/rock2.png"),"spriteSmall":loadImage("images/Resources/Rock/rock2small.png")},
+                  "wires":{"amount": 0, "text":-1, "icon":-1, "sprite": loadImage("images/Resources/Electrical/wires.png"),"spriteSmall": loadImage("images/Resources/Electrical/wiresSmall.png")}}
+    
+    
+    print("Finished loading images!")
+    
+    startx = 1900
+    starty = 1200
+
+    hotbar = Hotbar(s, itemSprites)
+    KH = KeyHandler(s, hotbar)
+    Cam = Camera(startx, starty, s, KH)
+    player = Player(startx, starty, s, Cam, KH, resources)
+    
+    
+
+    
 
     with open('data/TileData.txt') as mapD:
         tileMap = mapD.read().split('\n')
@@ -708,11 +750,6 @@ def setInitialValues():
     for i in tileGrid:
         for j in i:
             j.entities = sorted(j.entities, key = lambda entity: entity.y)
-
-    UISpritesData = loadSettings("data/UISprites.json")
-    UISprites = {}
-    for i in UISpritesData:
-        UISprites[i] = loadImage(UISpritesData[i])
     
     CraftWin = CraftingWindow(s, hotbar, KH, player)
 
@@ -752,6 +789,9 @@ def setInitialValues():
     pathFindingThread.daemon = True
     # gameS.setNodeMap()
     # gameS.setNodesThread.start()
+
+    testThread = Thread(target=testDraw)
+    testThread.daemon = True
     
 
     hotbar.addItem(1)
@@ -764,6 +804,7 @@ def setInitialValues():
     craftWinThread.start()
     alertThread.start()
     pathFindingThread.start()
+    # testThread.start()
 
     sleep(0.1)
 
@@ -778,7 +819,7 @@ def setInitialValues():
 
 
 if __name__ == '__main__':    
-    setInitialValues()
-    s.root.focus_set()
-    s.root.mainloop()
+    s.canv.after(200,setInitialValues())
+    s.canv.focus_set()
+    s.canv.mainloop()
     
