@@ -180,8 +180,6 @@ def doGameCalculations():
             for i in renderedTiles:
                 for j in i:
                     for k in j.entities:
-                        if True in player.isColliding(k):
-                            print(k.type)
                         player.doStationaryCollisions(player.isColliding(k), k)
                         k.checkLife()
             
@@ -194,8 +192,8 @@ def customEventHandler():
     while True:
         for e in KH.checkEvents:
                 if e == "Place Furniture":
-                    print(KH.checkEvents)
-                    print(e)
+                    # print(KH.checkEvents)
+                    # print(e)
                     if player.isPlacing == False:
                         player.isPlacing = True
                         hotbar.lockCursor = True
@@ -203,6 +201,7 @@ def customEventHandler():
                         curTileY = int(player.y // Tile.tileHeight)
                         curTile = tileGrid[curTileY][curTileX]
                         tempFurniture = Furniture(KH.mouseX, KH.mouseY, hotbar.inventory[hotbar.cursorPosition - 1].furnitureId, s, Cam, player, deleteQueue, curTile)
+                        curTile.entities.sort(key = lambda entity: entity.y)
                     
                     if player.isPlacing == True:
                         if tempFurniture.shownSprite == tempFurniture.spriteGreen:
@@ -432,6 +431,8 @@ def loadTiles():
                         curTile.entities.append(stationaryEntity(x + curTile.x, y + curTile.y, eInfo["name"], 0, entitySprites[eID],entityAnimations[eID], s, Cam, eInfo["collision"], eInfo["doCollision"], eInfo["hitbox"], curTile, deleteQueue))
                     if len(entityArrangement) > 3:
                         entityArrangement = entityArrangement[3:]
+                    
+                    curTile.entities.sort(key = lambda entity: entity.y)
                 
                 curTile.setNodeMap(entityArrangement[0])
             
@@ -471,9 +472,9 @@ def drawGroundGraphics():
 
     gameS.displayStationaryEntities(player, True, renderedTiles)
     player.display(player, True, player.collisionBox, True)
-    player.drawEntityBox(player.collisionBox)
+    # player.drawEntityBox(player.collisionBox)
 
-    gameS.displayStationaryBoxes(renderedTiles, "collision")
+    # gameS.displayStationaryBoxes(renderedTiles, "collision")
     gameS.displayStationaryEntities(player, False, renderedTiles)
 
 def drawResources():
@@ -485,7 +486,6 @@ def drawResources():
 
 def drawTempFurniture():
     if tempFurniture != None:
-        print(tempFurniture)
         tempFurniture.chooseSprite(renderedTiles)
         if tempFurniture.isPlacing:
             tempFurniture.display(player, None, None)
@@ -547,6 +547,27 @@ def doScroll(event):
         CraftWin.changeY(event)
     else:
         hotbar.changeCursorPositionScroll(event)
+
+def interact(event):
+
+    x = KH.mouseX + Cam.x - s.width/2
+    y = KH.mouseY + Cam.y - s.height/2
+
+    print("Player:", player.x, player.y)
+    print("Clicked:",x,y)
+
+    indX = int(x // Tile.tileWidth)
+    indY = int(y // Tile.tileHeight)
+
+    curTile = tileGrid[indY][indX]
+
+    if dist([x, y], [player.x, player.y]) < 200:
+        for i in curTile.entities:
+            if dist([x,y], [i.x, i.y]) < 30:
+                i.pickUpItem()
+    
+    else:
+        print(dist([x, y], [player.x, player.y]))
 
 #==========================================================
 #====================Grouping Functions====================
@@ -754,14 +775,15 @@ def setInitialValues():
     CraftWin = CraftingWindow(s, hotbar, KH, player)
 
 
-    s.root.bind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
-    s.root.bind("<c>", lambda e: toggleOpenCrafting(CraftWin, e))
-    
+    KH.addTkinterBind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
+    KH.addTkinterBind("<c>", lambda e: toggleOpenCrafting(CraftWin, e))
     if sys.platform == 'linux':
         KH.addTkinterBind("<4>", doScroll)
         KH.addTkinterBind("<5>", doScroll)
     else:
         KH.addTkinterBind("<MouseWheel>", doScroll)
+    
+    KH.addTkinterBind("e", interact)
     
     # print(itemData)
     # print("===============================")
@@ -796,6 +818,7 @@ def setInitialValues():
 
     hotbar.addItem(1)
     hotbar.addItem(2)
+    hotbar.addItem(9)
     
     frameThread.start()
     calcThread.start()

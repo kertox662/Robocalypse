@@ -554,16 +554,12 @@ class GroundItem(stationaryEntity):
         if lessOrGreater == True:
             self.screen.canv.delete(self.screenObj)
             self.screenObj = self.screen.canv.create_image(self.x - self.camera.x + self.xOff + self.screen.width/2, self.y - self.camera.y + self.yOff + self.screen.height/2, image = self.sprite, activeimage = self.highlight)
-            self.screen.canv.tag_bind(self.screenObj, 'e', self.pickUpItem)
+            self.screen.canv.tag_bind(self.screenObj, 'KeyPress', self.pickUpItem)
 
-    def pickUpItem(self, e):
-        # if e.keysym == "e":
-        print(e)
-        if dist(self.x, self.y, player.x, player.y) < 150:
-            self.resources[self.resourceType]["amount"] += randint(1,2)
-            
-            self.screen.canv.delete(self.screenObj)
-            self.tile.entities.remove(self)
+    def pickUpItem(self):
+        self.resources[self.resourceType]["amount"] += randint(1,2)
+        self.screen.canv.delete(self.screenObj)
+        self.tile.entities.remove(self)
 
 
 class Furniture(stationaryEntity):
@@ -606,11 +602,12 @@ class Furniture(stationaryEntity):
         for i in tileArray:
             for j in i:
                 for k in j.entities:
-                    if self.dist(k.x, k.y) < 400:
-                        for p in range(len(k.collisionBox[0])):
-                            point = [k.x + k.collisionBox[0][p], k.y + k.collisionBox[1][p]]
-                            if self.isPointInBox(point, "collision"):
-                                self.colliding = True
+                    if not isinstance(k, GroundItem):
+                        if self.dist(k.x, k.y) < 400:
+                            for p in range(len(k.collisionBox[0])):
+                                point = [k.x + k.collisionBox[0][p], k.y + k.collisionBox[1][p]]
+                                if self.isPointInBox(point, "collision"):
+                                    self.colliding = True
         
         if self.dist(self.player.x, self.player.y) < 400:
             # print(dist(self.x, self.player.x, self.y, self.player.y))

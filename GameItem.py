@@ -1,8 +1,38 @@
 from time import sleep, time
+from tkinter import *
 
-start = time()
-sleep(1)
-print(time() - start)
+root = Tk()
+c = Canvas(root, width = 800, height = 800)
+c.pack()
+
+def func(e):
+    print(e.x, e.y)
+    try:
+        print(e.keysym)
+    except:
+        pass
+
+x = -1
+
+while True:
+    c.delete(x)
+    x = c.create_rectangle(200, 200, 300, 300, fill = 'red')
+    c.tag_bind(x, "<Button-1>", func)
+    c.tag_bind(x, "e", func)
+    c.update()
+    sleep(0.03)
+
+
+
+
+
+
+
+
+
+# start = time()
+# sleep(1)
+# print(time() - start)
 
 
 # from random import randint
