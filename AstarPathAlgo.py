@@ -97,7 +97,7 @@ def getPath(grid, startx, starty, targetx, targety):
 
     start = grid[starty][startx]
     start.g = 0
-    print("Target:",target.x, target.y)
+    # print("Target:",target.x, target.y)
     start.f = dist(start.x, start.y, target.x, target.y)
     start.nodeType = 0
     openNodes.append(start)

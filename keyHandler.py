@@ -8,7 +8,7 @@ def keyboardThread(self):
 
 
 class KeyHandler:
-    def __init__(self, screen, hotbar):
+    def __init__(self, screen, hotbar, SceneClass):
         self.screen = screen
         self.scene = "scene_main"
         self.hotbar = hotbar
@@ -29,6 +29,8 @@ class KeyHandler:
         t = Thread(target=keyboardThread, args=(self,))
         t.daemon = True
         t.start()
+
+        self.SceneClass = SceneClass
         
     
             
@@ -66,24 +68,25 @@ class KeyHandler:
             pass
     
     def doAction(self, event):
-        if self.hotbar.inventory[self.hotbar.cursorPosition - 1] == 0:
-            return
+        if self.SceneClass.current_scene == "scene_game":
+            if self.hotbar.inventory[self.hotbar.cursorPosition - 1] == 0:
+                return
 
-        elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id == 1:
-            self.checkEvents.append("Cut Tree")
-        
-        elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id == 2:
-            self.checkEvents.append("Mine Rock")
-        
-        elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id in [9,10,11]:
-            self.checkEvents.append("Place Furniture")
-        
-        else:
-            print("No action checked")
-            return
-        
-        self.mouseClickx = event.x
-        self.mouseClicky = event.y
+            elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id == 1:
+                self.checkEvents.append("Cut Tree")
+            
+            elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id == 2:
+                self.checkEvents.append("Mine Rock")
+            
+            elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id in [9,10,11]:
+                self.checkEvents.append("Place Furniture")
+            
+            else:
+                print("No action checked")
+                return
+            
+            self.mouseClickx = event.x
+            self.mouseClicky = event.y
 
         # print(self.checkEvents)
     def cancelAction(self, event):
