@@ -225,37 +225,46 @@ def customEventHandler():
                         for j in i:
                             for k in j.entities:
                                 if k.life > 0:
-                                    if e == 'Cut Tree':
-                                        # print("Tree")
-                                        if k.type == "Tree":
-                                            if dist([player.x, player.y], [k.x, k.y]) < 280:
-                                                print("Close Enough")
-                                                if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
-                                                    print("In box")
-                                                    amount = randint(1,5)
-                                                    resources["wood"]["amount"] += amount
-                                                    k.life -= amount
-                                                    print(k.life)
-                                            
-                                    elif e == "Mine Rock":
-                                        # print("Rock")
-                                        if k.type == "Rock":
-                                            if dist([player.x, player.y], [k.x, k.y]) < 280:
-                                                if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
-                                                    amountStone = randint(1,5)
-                                                    resources["stone"]["amount"] += amountStone
-                                                    k.life -= amountStone
-                                                    print(k.life)
-                                                    metalChance = randint(1,100)
-                                                    if metalChance <= 7:
-                                                        amountChance = randint(1,100)
-                                                        if amountChance <= 80:
-                                                            amount = 1
-                                                        elif amountChance <= 98:
-                                                            amount = 2
-                                                        else:
-                                                            amount = 3
-                                                        resources["metal"]["amount"] += amount
+                                    if player.actionFrame == 0:
+                                        if e == 'Cut Tree':
+                                            # print("Tree")
+                                            if k.type == "Tree":
+                                                player.doingAction = "Tree"
+                                                player.actionFrame = 0
+                                                player.Velx = 0
+                                                player.Vely = 0
+                                                if dist([player.x, player.y], [k.x, k.y]) < 280:
+                                                    print("Close Enough")
+                                                    if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
+                                                        print("In box")
+                                                        amount = randint(1,5)
+                                                        resources["wood"]["amount"] += amount
+                                                        k.life -= amount
+                                                        print(k.life)
+                                                
+                                        elif e == "Mine Rock":
+                                            player.doingAction = "Rock"
+                                            player.actionFrame = 0
+                                            player.Velx = 0
+                                            player.Vely = 0
+                                            print("=" * 20)
+                                            if k.type == "Rock":
+                                                if dist([player.x, player.y], [k.x, k.y]) < 280:
+                                                    if k.isPointInBox([KH.mouseClickx, KH.mouseClicky], "hitbox", True):
+                                                        amountStone = randint(1,5)
+                                                        resources["stone"]["amount"] += amountStone
+                                                        k.life -= amountStone
+                                                        print(k.life)
+                                                        metalChance = randint(1,100)
+                                                        if metalChance <= 7:
+                                                            amountChance = randint(1,100)
+                                                            if amountChance <= 80:
+                                                                amount = 1
+                                                            elif amountChance <= 98:
+                                                                amount = 2
+                                                            else:
+                                                                amount = 3
+                                                            resources["metal"]["amount"] += amount
                                                         # 
                                                     
                             

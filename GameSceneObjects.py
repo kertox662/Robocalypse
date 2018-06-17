@@ -88,6 +88,10 @@ class stationaryEntity(Entity):
             self.display = self.treeDisplay
             self.fallAnim = animations[0]
             self.xOff = -43
+        
+        elif self.type == "Rock":
+            self.display = self.rockDisplay
+            self.damageSprites = animations[0]
 
 
     def isPointInBox(self, point, boxType, Mouse = False):
@@ -106,13 +110,13 @@ class stationaryEntity(Entity):
         # print("Y:", min(self.hitBox[1]) + self.y + self.yOff + bufferY, max(self.hitBox[1]) + self.y + self.yOff + bufferY)
 
         if boxType == "collision":
-            if min(self.collisionBox[0]) + self.x + self.xOff + bufferX <= x <= max(self.collisionBox[0]) + self.x + self.xOff + bufferX:
-                if min(self.collisionBox[1]) + self.y + self.yOff + bufferY <= y <= max(self.collisionBox[1]) + self.y + self.yOff + bufferY:
+            if min(self.collisionBox[0]) + self.x + bufferX <= x <= max(self.collisionBox[0]) + self.x + bufferX:
+                if min(self.collisionBox[1]) + self.y + bufferY <= y <= max(self.collisionBox[1]) + self.y + bufferY:
                     return True
         
         elif boxType == "hitbox":
-             if min(self.hitBox[0]) + self.x + self.xOff + bufferX <= x <= max(self.hitBox[0]) + self.x + self.xOff + bufferX:
-                if min(self.hitBox[1]) + self.y + self.yOff + bufferY <= y <= max(self.hitBox[1]) + self.y + self.yOff + bufferY:
+             if min(self.hitBox[0]) + self.x + bufferX <= x <= max(self.hitBox[0]) + self.x + bufferX:
+                if min(self.hitBox[1]) + self.y + bufferY <= y <= max(self.hitBox[1]) + self.y + bufferY:
                     return True
         
         
@@ -133,7 +137,6 @@ class stationaryEntity(Entity):
                 else:
                     print("I'm dead")
                     self.dead = True
-                    self.delQueue.put(self)
                     
                     
     
@@ -154,6 +157,21 @@ class stationaryEntity(Entity):
             if self.animFrame // 2 == len(self.fallAnim):
                 self.delQueue.put(self)
 
+    def rockDisplay(self, player, lessOrGreater, collision, isPlayer = False):
+        if self.dead:
+            self.sprite = self.damageSprites[1]
+        
+        elif self.life < 20:
+            self.sprite = self.damageSprites[0]
+        
+        collisionMid = (min(collision[1]) + max(collision[1]))/2
+        playerColDist = min(player.collisionBox[1])    
+
+        if (self.y + self.yOff + collisionMid <= player.y + player.yOff + playerColDist) == lessOrGreater or isPlayer == True:
+            self.screen.canv.delete(self.screenObj)
+            self.screenObj = self.screen.canv.create_image(self.x - self.camera.x + self.xOff + self.screen.width/2, self.y - self.camera.y + self.yOff + self.screen.height/2, image = self.sprite)
+         
+         
 
 
 
@@ -222,6 +240,9 @@ class Player(movingEntity):
         self.direction = ["down"]
         self.previousDirection = self.direction.copy()
 
+        self.doingAction = False
+        self.actionFrame = 0
+
         self.downIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Down/", 8)
         self.upIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Up/", 8)
         self.leftIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Left/", 8)
@@ -243,6 +264,26 @@ class Player(movingEntity):
         self.rightupWalkAnim = loadAnimation("images/PlayerAnimation/Walking/RightUp/", 14)
         self.rightdownWalkAnim = loadAnimation("images/PlayerAnimation/Walking/RightDown/", 14)
         
+        self.leftPickAnim = loadAnimation("images/PlayerAnimation/Pickaxe/Left/", 18)
+        self.rightPickAnim = loadAnimation("images/PlayerAnimation/Pickaxe/Right/", 18)
+        self.upPickAnim = loadAnimation("images/PlayerAnimation/Pickaxe/Up/", 18)
+        self.downPickAnim = loadAnimation("images/PlayerAnimation/Pickaxe/Down/", 18)
+
+        self.leftupPickAnim = loadAnimation("images/PlayerAnimation/Pickaxe/LeftUp/", 18)
+        self.leftdownPickAnim = loadAnimation("images/PlayerAnimation/Pickaxe/LeftDown/", 18)
+        self.rightupPickAnim = loadAnimation("images/PlayerAnimation/Pickaxe/RightUp/", 18)
+        self.rightdownPickAnim = loadAnimation("images/PlayerAnimation/Pickaxe/RightDown/", 18)
+
+        self.leftAxeAnim = loadAnimation("images/PlayerAnimation/Axe/Left/", 11)
+        self.rightAxeAnim = loadAnimation("images/PlayerAnimation/Axe/Right/", 11)
+        self.upAxeAnim = loadAnimation("images/PlayerAnimation/Axe/Up/", 11)
+        self.downAxeAnim = loadAnimation("images/PlayerAnimation/Axe/Down/", 11)
+
+        self.leftupAxeAnim = loadAnimation("images/PlayerAnimation/Axe/LeftUp/", 11)
+        self.leftdownAxeAnim = loadAnimation("images/PlayerAnimation/Axe/LeftDown/", 11)
+        self.rightupAxeAnim = loadAnimation("images/PlayerAnimation/Axe/RightUp/", 11)
+        self.rightdownAxeAnim = loadAnimation("images/PlayerAnimation/Axe/RightDown/", 11)
+
 
     def updateVelocity(self):
         if self.KH.aToggle:
@@ -265,8 +306,9 @@ class Player(movingEntity):
             self.Vely = -1
         
     def move(self):
-        self.x += self.Velx * Player.playerSpeed
-        self.y += self.Vely * Player.playerSpeed
+        if self.doingAction == False:
+            self.x += self.Velx * Player.playerSpeed
+            self.y += self.Vely * Player.playerSpeed
 
         if self.x < 0:
             self.x = 0
@@ -409,26 +451,47 @@ class Player(movingEntity):
                                     self.nearTable = True
     
     def chooseAnimFrame(self):
-        if len(self.direction) > 0:
-            self.previousDirection = self.direction.copy()
-        self.direction = []
-        if self.KH.dToggle == True and self.KH.aToggle == False:
-            self.direction.append("right")
-        
-        elif self.KH.aToggle == True and self.KH.dToggle == False:
-            self.direction.append("left")
-        
-        if self.KH.sToggle == True and self.KH.wToggle == False:
-            self.direction.append("down")
-        
-        elif self.KH.wToggle == True and self.KH.sToggle == False:
-            self.direction.append("up")
-        
-        if len(self.direction) == 0:
-            curAnim = eval("self.{}IdleAnim".format("".join(self.previousDirection)))
-        
+        if self.doingAction in ["Rock", "Tree"]:
+            if self.doingAction == "Rock":
+                curAnim = eval("self.{}PickAnim".format("".join(self.previousDirection)))
+                divisor = 2
+
+            elif self.doingAction == "Tree":
+                curAnim = eval("self.{}AxeAnim".format("".join(self.previousDirection)))
+                divisor = 3
+            
+            if self.actionFrame // divisor == len(curAnim):
+                self.actionFrame = 0
+                self.doingAction = False
+                self.chooseAnimFrame()
+                return
+
+            self.sprite = curAnim[self.actionFrame // divisor % len(curAnim)]
+            self.actionFrame += 1
+            
+            return
+
         else:
-            curAnim = eval("self.{}WalkAnim".format("".join(self.direction)))
+            if len(self.direction) > 0:
+                self.previousDirection = self.direction.copy()
+            self.direction = []
+            if self.KH.dToggle == True and self.KH.aToggle == False:
+                self.direction.append("right")
+            
+            elif self.KH.aToggle == True and self.KH.dToggle == False:
+                self.direction.append("left")
+            
+            if self.KH.sToggle == True and self.KH.wToggle == False:
+                self.direction.append("down")
+            
+            elif self.KH.wToggle == True and self.KH.sToggle == False:
+                self.direction.append("up")
+            
+            if len(self.direction) == 0:
+                curAnim = eval("self.{}IdleAnim".format("".join(self.previousDirection)))
+            
+            else:
+                curAnim = eval("self.{}WalkAnim".format("".join(self.direction)))
         
         self.animFrame += 1
         id = self.animFrame//3 % len(curAnim)
