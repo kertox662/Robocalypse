@@ -162,13 +162,16 @@ class Hotbar(GameObject):
                 self.cursorPosition = int(event.keysym)
                 self.itemFrame = 0
     
-    def addItem(self, id):
+    def addItem(self, id, item = None):
         try:
             index = self.inventory.index(0)
             if self.cursorPosition - 1 == index:
                 self.itemFrame = 0
 
-            self.inventory[self.inventory.index(0)] = Item(id, 100)
+            if id == None:
+                self.inventory[self.inventory.index(0)] = item
+            else:
+                self.inventory[self.inventory.index(0)] = Item(id, 100)
             return True
         except ValueError:
             return False

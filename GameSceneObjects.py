@@ -4,7 +4,6 @@ from PIL import Image, ImageTk, ImageFilter
 import sys
 from random import *
 from math import *
-from AstarPathAlgo import getPath
 
 def dist(x1, y1, x2, y2):
     dx = (x2 - x1)**2
@@ -218,6 +217,7 @@ class Player(movingEntity):
         self.resources = resources
         self.isPlacing = False
         self.nearTable = False
+        self.inChest = [False, None]
 
         self.metalHP = 50
         self.metalMaxHP = 50
@@ -243,6 +243,7 @@ class Player(movingEntity):
 
         self.doingAction = False
         self.actionFrame = 0
+
 
         self.downIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Down/", 8)
         self.upIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Up/", 8)
@@ -284,6 +285,7 @@ class Player(movingEntity):
         self.leftdownAxeAnim = loadAnimation("images/PlayerAnimation/Axe/LeftDown/", 11)
         self.rightupAxeAnim = loadAnimation("images/PlayerAnimation/Axe/RightUp/", 11)
         self.rightdownAxeAnim = loadAnimation("images/PlayerAnimation/Axe/RightDown/", 11)
+
 
 
     def updateVelocity(self):
@@ -421,9 +423,6 @@ class Player(movingEntity):
                 self.Velx = 0
             # print("X")
     
-    def calculateEvents(self):
-        pass
-    
     def displayLife(self):
         self.screen.canv.delete(self.wireHPBar, self.wireHPIcon, self.wireHPText, self.wireHPBarOutline)
         self.screen.canv.delete(self.metalHPBar, self.metalHPIcon, self.metalHPText, self.metalHPBarOutline)
@@ -450,6 +449,36 @@ class Player(movingEntity):
                             if k.isPlacing == False:
                                 if k.dist(self.x, self.y) < 200:
                                     self.nearTable = True
+    
+    def checkNearChest(self):
+        if self.inChest[0] == True:
+            chest = self.inChest[1]
+            if dist(self.x, self.y, chest.x, chest.y) > 250:
+                chest.toggleChest()
+    
+    def itemInChestMovement(self, e):
+        if self.inChest[0] == True:
+            chest = self.inChest[1]
+            if self.KH.hotbar.inventory[self.KH.hotbar.cursorPosition - 1] != 0 and chest.cursorPosition == None:
+                item = self.KH.hotbar.inventory[self.KH.hotbar.cursorPosition - 1]
+                if chest.addItemToChest(item):
+                    self.KH.hotbar.inventory[self.KH.hotbar.cursorPosition - 1] = 0
+            
+            elif chest.cursorPosition != None:
+                if chest.inventory[chest.cursorPosition - 1] != 0:
+                    if self.KH.hotbar.addItem(None, chest.inventory[chest.cursorPosition - 1]):
+                        chest.inventory[chest.cursorPosition - 1] = 0
+                
+                else:
+                    chest.cursorPosition = None
+
+            elif self.KH.hotbar.inventory[self.KH.hotbar.cursorPosition - 1] == 0:
+                chest.cursorPosition = 1
+            
+
+
+
+
     
     def chooseAnimFrame(self):
         if self.doingAction in ["Rock", "Tree"]:
@@ -627,6 +656,7 @@ class Furniture(stationaryEntity):
     furnitureHighlights = []
     furnitureSpritesRed = []
     furnitureSpritesGreen = []
+    chestUI = [loadImage("images/UI/Hotbar8.png"), loadImage("images/UI/cursor.png")]
 
     for i in range(len(furnitureData)):
         furnitureSprites.append(loadImage(furnitureData[str(i+1)]["furnitureSprite"]))
@@ -653,8 +683,18 @@ class Furniture(stationaryEntity):
 
         self.colliding = False
 
+
         if self.id == 2:
             self.inventory = [0]*8
+            self.inventoryBarSprite = Furniture.chestUI[0]
+            self.inventoryBar = -1
+            self.open = False
+            self.cursorSprite = Furniture.chestUI[1]
+            self.cursorScreenObj = -1
+            self.cursorPosition = None
+        
+            
+
     
     def chooseSprite(self, tileArray):
         self.colliding = False
@@ -713,6 +753,59 @@ class Furniture(stationaryEntity):
         dy = (self.y - y)**2
         l = sqrt(dx + dy)
         return l
+    
+
+    def displayInventory(self):
+        if self.open:
+            self.screen.canv.delete(self.inventoryBar, self.cursorScreenObj)
+            self.inventoryBar = self.screen.canv.create_image(self.x - self.camera.x +self.screen.width/2, self.y - self.camera.y + self.screen.height/2 - 50, image = self.inventoryBarSprite)
+            if self.cursorPosition != None:
+                self.cursorScreenObj = self.screen.canv.create_image(self.x - self.camera.x +self.screen.width/2 - 171 + 38*self.cursorPosition, self.y - self.camera.y + self.screen.height/2 - 50, image = self.cursorSprite)
+
+            for i in self.inventory:
+                if i != 0:
+                    self.screen.canv.delete(i.screenObj)
+                    i.screenObj = self.screen.canv.create_image(self.x - self.camera.x +self.screen.width/2 - 171 + 38*(self.inventory.index(i)+1),self.y - self.camera.y + self.screen.height/2 - 50, image = i.sprite)
+
+
+    def toggleChest(self):
+        self.player.inChest[0] = not self.player.inChest[0]  
+        self.open = not self.open
+
+        if self.player.inChest[0] == False:
+            self.player.inChest[1] = None
+            self.cursorPositon = None
+
+        else:
+            self.player.inChest[1] = self
+
+    def addItemToChest(self, item):
+        try:
+            index = self.inventory.index(0)
+
+            self.inventory[index] = item
+            return True
+        except ValueError:
+            return False
+    
+    def moveThroughItems(self, e):
+        if self.cursorPosition != None:
+            if e.keysym == "Right":
+                delta = -1
+            else:
+                delta = 1
+            
+            if delta < 0:
+                    self.cursorPosition = (self.cursorPosition + 1) % 9
+                    if self.cursorPosition == 0:
+                        self.cursorPosition = 1
+
+                
+            else:
+                self.cursorPosition = self.cursorPosition - 1
+                if self.cursorPosition < 1:
+                    self.cursorPosition = 8
+
 
 
 class Item:

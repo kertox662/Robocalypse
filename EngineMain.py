@@ -170,13 +170,14 @@ def displayFPS():
     fpsText = s.canv.create_text(37, 10, text = text, fill = '#20FF20')
 
 def doGameCalculations():
-    
+    global bindQueue
     while True:
         if Scene.current_scene == "scene_game":
             player.applyFriction()            
             player.updateVelocity()
             player.move()
             player.checkNearTable(renderedTiles)
+            player.checkNearChest()
 
             for i in renderedTiles:
                 for j in i:
@@ -189,7 +190,7 @@ def doGameCalculations():
         sleep(1/60)
 
 def customEventHandler():
-    global resources, CraftWin, tempFurniture
+    global resources, CraftWin, tempFurniture, bindQueue
     while True:
         for e in KH.checkEvents:
                 if e == "Place Furniture":
@@ -208,7 +209,9 @@ def customEventHandler():
                         if tempFurniture.shownSprite == tempFurniture.spriteGreen:
                             tempFurniture.isPlacing = False
                             tempFurniture.doCollision = True
-                            findMap(tempFurniture.tile.nodeMap, tempFurniture.tile.entities)
+
+                            bindQueue.put(["<Right>",tempFurniture.moveThroughItems])
+                            bindQueue.put(["<Left>",tempFurniture.moveThroughItems])
                             
                             tileX = int(tempFurniture.x // Tile.tileWidth)
                             tileY = int(tempFurniture.y // Tile.tileHeight)
@@ -430,16 +433,6 @@ def loadTiles():
     print("Finished Building World!")
 
 
-def testDraw():
-    global s
-    x = s.canv.create_oval(100, 100, 200, 200, fill = 'red')
-    while True:
-        s.canv.delete(x)
-        x = s.canv.create_oval(100, 100, 200, 200, fill = 'red')
-        s.canv.update()
-        sleep(0.05)
-
-
 #===================================================
 #==============Draw Graphics Functions==============
 #===================================================
@@ -517,9 +510,13 @@ def drawItemName():
         else:
             hotbar.itemName = -1
 
-
+def drawOpenChestInv():
+    chest = player.inChest[1]
+    if chest != None:
+        chest.displayInventory()
 
 def drawUIGraphics():
+    drawOpenChestInv()
     drawResources()
     
     if settings["displayFPS"] == True:
@@ -540,6 +537,10 @@ def emptyDelQueue():
         s.canv.delete(objToDelete.screenObj)
         objToDelete.tile.entities.remove(objToDelete)
 
+def emptyBindQueue():
+    while not bindQueue.empty():
+        nextBind = bindQueue.get()
+        KH.addTkinterBind(*nextBind)
 
 def doScroll(event):
     if CraftWin.isMouseInWindow():
@@ -552,21 +553,24 @@ def interact(event):
     x = KH.mouseX + Cam.x - s.width/2
     y = KH.mouseY + Cam.y - s.height/2
 
-    print("Player:", player.x, player.y)
-    print("Clicked:",x,y)
-
     indX = int(x // Tile.tileWidth)
     indY = int(y // Tile.tileHeight)
 
     curTile = tileGrid[indY][indX]
 
-    if dist([x, y], [player.x, player.y]) < 200:
-        for i in curTile.entities:
-            if dist([x,y], [i.x, i.y]) < 30:
-                i.pickUpItem()
-    
-    else:
-        print(dist([x, y], [player.x, player.y]))
+
+    for i in curTile.entities: 
+        if dist([x, y], [player.x, player.y]) < 200:
+            if isinstance(i, GroundItem):            
+                if dist([x,y], [i.x, i.y]) < 30:
+                    i.pickUpItem()
+            elif isinstance(i,Furniture):
+                if i.id == 2:
+                    if dist([x,y], [i.x, i.y]) < 60:
+                        if player.inChest[0] == False or i.open == True:
+                            i.toggleChest()
+                            print(i.open)
+
 
 #==========================================================
 #====================Grouping Functions====================
@@ -624,6 +628,7 @@ def runGame():
        drawGroundGraphics()
        drawUIGraphics()
        emptyDelQueue()
+       emptyBindQueue()
 
     #    print(renderedTiles[0][0].x, renderedTiles[0][0].y)
 
@@ -642,6 +647,7 @@ def setInitialValues():
     global CraftWin, costBox, costIcons, costText, resourceOrder
     global tempFurniture
     global entityData, entityArrangementData, entitySprites, entityHighlights, entityAnimations, groundItemData, percentDone
+    global bindQueue
 
     #=====Primitive Variables=====
     TESTING = False
@@ -659,23 +665,9 @@ def setInitialValues():
     newAlert = {"text":""}
     resourceOrder = ["wood", "stone", "metal", "wires"]
     deleteQueue = Queue()
+    bindQueue = Queue()
 
     settings = loadSettings()
-    #=====Screen and Tkinter windows=====
-    #print("ABout toe meke screen")
-    
-    # if settings["window"]["width"] == None:
-    #     s = makeScreen(1024, 768, settings["window"]["fullscreen"], "Robocalypse", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
-    #     settings["window"]["width"] = s.canv.winfo_screenwidth()
-    #     settings["window"]["height"] = s.canv.winfo_screenheight()
-        
-    # else:
-    #     s = makeScreen(settings["window"]["width"], settings["window"]["height"], settings["window"]["fullscreen"], "Robocalypse Game", __file__.split('EngineMain.py')[0] + "images/Robot16.xpm")
-
-
-
-   
-    
 
     #=====Item Data From files=====
     print("Starting to load data...")
@@ -774,7 +766,8 @@ def setInitialValues():
     CraftWin = CraftingWindow(s, hotbar, KH, player)
 
 
-    KH.addTkinterBind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
+    # KH.addTkinterBind("<space>", lambda e: alerts.put(choice([{"text":"Hello", "delay":1},{"text":"World", "delay":0.5},{"text":"Notification", "delay": 1},{"text":"flrp", "delay":1/4}])))
+    KH.addTkinterBind("<space>", player.itemInChestMovement)
     KH.addTkinterBind("<c>", lambda e: toggleOpenCrafting(CraftWin, e))
     if sys.platform == 'linux':
         KH.addTkinterBind("<4>", doScroll)
@@ -805,14 +798,11 @@ def setInitialValues():
 
     alertThread = Thread(target=doAlert)
     alertThread.daemon = True
-
-    testThread = Thread(target=testDraw)
-    testThread.daemon = True
     
 
     hotbar.addItem(1)
     hotbar.addItem(2)
-    hotbar.addItem(9)
+    hotbar.addItem(10)
     
     frameThread.start()
     calcThread.start()

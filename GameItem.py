@@ -3,35 +3,14 @@ from tkinter import *
 
 
 
-class test:
-    def __init__(self,val):
-        self.val = val
-    
-    def change(self):
-        self.val += 5
 
 
-x = 5
+root = Tk()
+c = Canvas(root, width = 800, height = 800)
+c.pack()
 
-t = test(x)
-t.change()
-
-print(x)
-
-
-
-
-
-# root = Tk()
-# c = Canvas(root, width = 800, height = 800)
-# c.pack()
-
-# def func(e):
-#     print(e.x, e.y)
-#     try:
-#         print(e.keysym)
-#     except:
-#         pass
+def func(e):
+    print(e.keysym)
 
 # x = -1
 
@@ -42,6 +21,9 @@ print(x)
 #     c.tag_bind(x, "e", func)
 #     c.update()
 #     sleep(0.03)
+
+root.bind("<Right>", func)
+root.mainloop()
 
 
 
