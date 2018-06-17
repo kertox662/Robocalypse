@@ -140,6 +140,9 @@ class Hotbar(GameObject):
         self.invScreenObj = [-1]*6
         self.lockCursor = False
 
+        self.itemFrame = 0
+        self.itemName = -1
+
         screen.root.bind("<KeyPress>", self.changeCursorPosition)
     
     def display(self):
@@ -157,9 +160,14 @@ class Hotbar(GameObject):
         if not self.lockCursor:
             if event.keysym in ['1','2','3','4','5','6']:
                 self.cursorPosition = int(event.keysym)
+                self.itemFrame = 0
     
     def addItem(self, id):
         try:
+            index = self.inventory.index(0)
+            if self.cursorPosition - 1 == index:
+                self.itemFrame = 0
+
             self.inventory[self.inventory.index(0)] = Item(id, 100)
             return True
         except ValueError:
@@ -186,3 +194,5 @@ class Hotbar(GameObject):
                 self.cursorPosition = self.cursorPosition - 1
                 if self.cursorPosition < 1:
                     self.cursorPosition = 6
+            
+            self.itemFrame = 0

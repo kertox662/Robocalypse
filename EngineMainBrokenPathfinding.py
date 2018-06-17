@@ -50,6 +50,8 @@ from pygame import mixer
 
 #Miscellaneous
 from keyHandler import KeyHandler
+from AstarPathAlgo import getPath
+from UpdateNodeMap import findMap
 
 
 #Game Scene Stuff
@@ -71,7 +73,21 @@ def dist(p1, p2):
     l = sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2 )
     return l
 
+def nodeMapFromTiles(grid):
+    nMap = []
+    for i in range(len(grid)*20):
+        nMap.append([])
 
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            curTile = grid[i][j]
+            for y in range(len(curTile.nodeMap)):
+                for x in range(len(curTile.nodeMap[0])):
+                    setToNode = Node.fromCopy(curTile.nodeMap[y][x])
+                    nMap[y + i*20].append(setToNode)
+                
+    
+    return nMap
 
 def saveSettingsEvent(Event):
     saveSettings()
@@ -426,6 +442,13 @@ def loadTiles():
                         entityArrangement = entityArrangement[3:]
                     
                     curTile.entities.sort(key = lambda entity: entity.y)
+                
+                curTile.setNodeMap(entityArrangement[0])
+
+                # curTile.setNodeMap([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+
+            else:
+                curTile.setNodeMap([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
 
     print("Finished Building World!")
 
@@ -461,6 +484,8 @@ def drawGroundGraphics():
     gameS.displayStationaryEntities(player, True, renderedTiles)
     player.display(player, True, player.collisionBox, True)
     # player.drawEntityBox(player.collisionBox)
+    for i in enemies:
+        i.display()
     # gameS.displayStationaryBoxes(renderedTiles, "collision")
     gameS.displayStationaryEntities(player, False, renderedTiles)
 
@@ -642,6 +667,7 @@ def setInitialValues():
     global CraftWin, costBox, costIcons, costText, resourceOrder
     global tempFurniture
     global entityData, entityArrangementData, entitySprites, entityHighlights, entityAnimations, groundItemData, percentDone
+    global enemies
 
     #=====Primitive Variables=====
     TESTING = False
@@ -659,6 +685,7 @@ def setInitialValues():
     newAlert = {"text":""}
     resourceOrder = ["wood", "stone", "metal", "wires"]
     deleteQueue = Queue()
+    enemies = []
 
     settings = loadSettings()
     #=====Screen and Tkinter windows=====
@@ -784,6 +811,7 @@ def setInitialValues():
     
     KH.addTkinterBind("e", interact)
     
+    enemies.append(Enemy(startx, starty, "Enemy", 0, None, s, Cam, None, False, None))
     # print(itemData)
     # print("===============================")
     # print(itemSprites)
@@ -806,6 +834,11 @@ def setInitialValues():
     alertThread = Thread(target=doAlert)
     alertThread.daemon = True
 
+    pathFindingThread = Thread(target = doPathFindingCalc)
+    pathFindingThread.daemon = True
+    # gameS.setNodeMap()
+    # gameS.setNodesThread.start()
+
     testThread = Thread(target=testDraw)
     testThread.daemon = True
     
@@ -820,6 +853,8 @@ def setInitialValues():
     graphCalcThread.start()
     craftWinThread.start()
     alertThread.start()
+    pathFindingThread.start()
+    # testThread.start()
 
     sleep(0.1)
 

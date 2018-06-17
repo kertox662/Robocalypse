@@ -40,6 +40,16 @@ def findMap(tileID, variation):
         print(nMap[i])
     return
 
+def findMapFromPrevious(grid, entities):
+    for eY in range(20):
+        for eX in range(20):
+            for ent in entities:
+                x = eX*20
+                y = eY*20
+                # print(x,y)
+                nMap[eY][eX] = int(ent.isPointInBox([x, y], "collision"))
+
+
 tileData = loadSettings("data/tileEntityArrangement.json")
 entityInfo = loadSettings("data/entities.json")
 

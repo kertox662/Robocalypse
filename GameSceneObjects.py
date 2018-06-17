@@ -3,7 +3,8 @@ from getData import *
 from PIL import Image, ImageTk, ImageFilter
 import sys
 from random import *
-from math import sqrt
+from math import *
+from AstarPathAlgo import getPath
 
 def dist(x1, y1, x2, y2):
     dx = (x2 - x1)**2
@@ -535,12 +536,6 @@ class Tile(GameObject):
 
         return False
     
-    def setNodeMap(self, nMap):
-        for i in range(20):
-            for j in range(20):
-                nMap[i][j] = Node(self.x - 200 + j * 20, self.y - 200 + i*20, nMap[i][j])
-        
-        self.nodeMap = nMap
 
 
 class Camera:
@@ -657,6 +652,9 @@ class Furniture(stationaryEntity):
         self.shownActive = None
 
         self.colliding = False
+
+        if self.id == 2:
+            self.inventory = [0]*8
     
     def chooseSprite(self, tileArray):
         self.colliding = False
@@ -717,19 +715,6 @@ class Furniture(stationaryEntity):
         return l
 
 
-class Node:
-    def __init__(self,x,y, nodeType):
-        self.x = x
-        self.y = y
-        self.nodeType = nodeType
-        self.shortPath = None
-    
-    @classmethod
-    def fromCopy(cls, copy):
-        # print(copy.x, copy.y, copy.nodeType)
-        newNode = cls(copy.x, copy.y, copy.nodeType)
-        return newNode
-
 class Item:
     ItemData = loadSettings("data/items.json")
     itemSprites = []
@@ -750,3 +735,7 @@ class Item:
 
         if id in [9,10,11]:
             self.furnitureId = Item.ItemData[str(id)]["furnitureID"]
+
+
+
+    
