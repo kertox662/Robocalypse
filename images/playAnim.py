@@ -3,11 +3,13 @@ from PIL import Image, ImageTk
 from time import sleep
 
 root = Tk()
-c = Canvas(root, width = 400, height = 400)
+w = 1920
+h = 1200
+c = Canvas(root, width = w, height = h)
 c.pack()
 
-animBase = "Entities/TreeAnim/Falling/"
-animFrame = 28
+animBase = "UI/RainAnim/"
+animFrame = 11
 
 #animBase = "Walking/RightUp/"
 #animFrame = 14
@@ -25,7 +27,7 @@ sObj = -1
 while True:
     c.delete(sObj)
     sprite = frames[(frameNum //4) % animFrame]
-    sObj = c.create_image(200, 200, image = sprite)
+    sObj = c.create_image(w/2, h/2, image = sprite)
     c.update()
     sleep(1/60)
     frameNum += 1
