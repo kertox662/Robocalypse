@@ -15,6 +15,15 @@
         "sprite": "images/Entities/RockAnim/Rock1.png",
         "doCollision": true,
         "animations":["images/Entities/RockAnim/", 2]
+    },
+
+    "7":{
+        "name":"Ore",
+        "collision": [[-60, 60, 60, -60], [10, 10, 60, 60]],
+        "hitbox": [[-60, 60, 60, -60], [-15, -15, 60, 60]],
+        "sprite": "images/Entities/OreAnim/Ore.png",
+        "doCollision": true,
+        "animations":["images/Entities/OreAnim/", 2]
     }
 
 

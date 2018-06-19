@@ -18,15 +18,6 @@
 	},
 
 	"3":{
-		"name":"Flashlight",
-		"type":"Tool",
-		"icon":"images/Tools/Flashlight/flashlight.png",
-		"iconHighlight":"images/Tools/Flashlight/flashlightHighlight.png",
-		"cost": [0,2, 15, 10],
-		"tableRequired":true
-	},
-
-	"4":{
 		"name":"Lighter",
 		"type":"Tool",
 		"icon":"images/Tools/Lighter/Lighter.png",
@@ -35,7 +26,7 @@
 		"tableRequired":true
 	},
 
-	"5":{
+	"4":{
 		"name":"Matches",
 		"type":"Tool",
 		"icon":"images/Tools/Matches/Matches.png",
@@ -44,7 +35,7 @@
 		"tableRequired":false
 	},
 
-	"6":{
+	"5":{
 		"name":"Bucket",
 		"type":"Tool",
 		"icon":"images/Tools/Bucket/Bucket.png",
@@ -53,25 +44,17 @@
 		"tableRequired":true
 	},
 
-	"7":{
-		"name":"Water Bottle",
-		"type":"Tool",
-		"icon":"images/Tools/Water Bottle/waterBottle.png",
-		"iconHighlight":"images/Tools/Water Bottle/waterBottleHighlight.png",
-		"cost":[0,0,25,0],
-		"tableRequired":true
-	},
 
-	"8":{
+	"6":{
 		"name":"Battery",
 		"type":"Tool",
 		"icon":"images/Misc/Battery/Battery.png",
 		"iconHighlight":"images/Misc/Battery/BatteryHighlight.png",
-		"cost":[0,0,25,10],
+		"cost":[0,0,15,5],
 		"tableRequired":true
 	},
 
-	"9":{
+	"7":{
 		"name":"Engineering Table",
 		"type":"Furniture",
 		"icon":"images/Furniture/EngineeringTable/EngineeringTable.png",
@@ -82,7 +65,7 @@
 		"furnitureID":1
 	},
 
-	"10":{
+	"8":{
 		"name":"Chest",
 		"type":"Furniture",
 		"icon":"images/Furniture/Chest/Chest.png",
@@ -93,15 +76,68 @@
 		"furnitureID":2
 	},
 
-	"11":{
-		"name":"Welding Station",
+	"9":{
+		"name":"Electric Station",
 		"type":"Furniture",
 		"icon":"images/Furniture/WeldingStation/WeldingStation.png",
 		"iconHighlight":"images/Furniture/WeldingStation/WeldingStationHighlight.png",
-		"cost":[0, 20, 100, 50],
+		"cost":[0, 20, 100, 0],
 		"tableRequired":true,
 
 		"furnitureID":3
-	}
+	},
+
+	"10":{
+		"name":"Generator",
+		"type":"Furniture",
+		"icon":"images/Furniture/Generator/GeneratorIcon.png",
+		"iconHighlight":"images/Furniture/Generator/GeneratorIconHighlight.png",
+		"cost": [0,20, 50, 20],
+		"tableRequired":true,
+
+		"furnitureID":4
+	},
+
+	"11":{
+		"name":"Solar Panel",
+		"type":"Furniture",
+		"icon":"images/Furniture/SolarPanel/SolarIcon.png",
+		"iconHighlight":"images/Furniture/SolarPanel/SolarIconHighlight.png",
+		"cost":[0,0,100,50],
+		"tableRequired":true,
+
+		"furnitureID":5
+	},
+
+	"12":{
+		"name":"Launch Pad",
+		"type":"Furniture",
+		"icon":"images/Furniture/LaunchPad/LaunchPadIcon.png",
+		"iconHighlight":"images/Furniture/LaunchPad/LaunchPadIconHighlight.png",
+		"cost":[0,20,75,20],
+		"tableRequired":true,
+
+		"furnitureID":6
+
+	},
+
+	"13":{
+		"name":"Lamp Post",
+		"type":"Furniture",
+		"icon":"images/Furniture/Light/LampPostIcon.png",
+		"iconHighlight":"images/Furniture/Light/LampPostIconHighlight.png",
+		"cost":[0,0,30,35],
+		"tableRequired":true,
+
+		"furnitureID":7
+
+	},
+
+	"14":{"name":"Wires",
+		"type":"Resource",
+		"icon": "images/Resources/Electrical/wires.png",
+		"iconHighlight": "images/Resources/Electrical/wires.png",
+		"cost": [0,0,2,0],
+		"tableRequired":false}
 
 }

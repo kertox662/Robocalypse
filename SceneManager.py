@@ -32,7 +32,8 @@ class MainScene(Scene):
         self.optionsText = []
         self.title = 0
         self.titleText = GameTitle
-        self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')   
+        self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')
+        self.switch = False   
     
 
     def deleteOptions(self, option):
@@ -52,6 +53,7 @@ class MainScene(Scene):
 
     def changeSceneHandler(self,target):
         self.deleteOptions("All")
+        self.switch = True
         self.change_scene(target)
 
 
@@ -62,31 +64,22 @@ class MainScene(Scene):
         self.deleteOptions('Title')
         self.title = self.screen.canv.create_text(xC, yC *0.5, text = self.titleText, font = ('Helvetica', 24))
         
-        if len(self.optionsText) == 0:
-            for i in range(len(self.options)):
-                text = self.screen.canv.create_text(xC, yC + 50*i, text = self.options[i], activefill = 'yellow',font = ('Helvetica', 16))
-                self.optionsText.append(text)
-                
-                if self.options[i] == "Start Game":
-                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_game'))
-                elif self.options[i] == "Settings":
-                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_settings'))
-                elif self.options[i] == "Quit Game":
-                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.screen.root.destroy())
-
-        else:
+        if len(self.optionsText) > 0:
             for i in range(len(self.optionsText)-1 , -1, -1):
                 self.deleteOptions(self.optionsText[i])
                 self.optionsText.pop(i)
-                text = self.screen.canv.create_text(xC, yC + 50*i, text = self.options[i], activefill = 'yellow',font = ('Helvetica', 16))
-                self.optionsText.insert(i, text)
-                
-                if self.options[i] == "Start Game":
-                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_game'))
-                elif self.options[i] == "Settings":
-                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_settings'))
-                elif self.options[i] == "Quit Game":
-                    self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.screen.destroyScreen())
+        
+        
+        for i in range(len(self.options)):
+            text = self.screen.canv.create_text(xC, yC + 50*i, text = self.options[i], activefill = 'yellow',font = ('Helvetica', 16))
+            self.optionsText.append(text)
+            
+            if self.options[i] == "Start Game":
+                self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_game'))
+            elif self.options[i] == "Settings":
+                self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_settings'))
+            elif self.options[i] == "Quit Game":
+                self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.screen.root.destroy())
 
 
 
@@ -96,10 +89,9 @@ class SettingsScene(Scene):
     screenOptions = [(1920,1200),(1920,1080),(1680,1050),(1600,900),(1440,900),(1360,768),(1280,1024),(1280,800),(1280,720),(1024,768)]
     def __init__(self, screen, KHandler):
         super().__init__("scene_settings", screen, KHandler,connections = ["scene_main", "scene_menu"])
-        self.settings = ["Screen Size", "Fullscreen","Sound", "Show FPS"]
+        self.settings = ["Screen Size", "Fullscreen","Sound", "Show FPS", "Day/Night Cycle"]
         self.settingText = []
         self.title = 0
-        # self.saveFunc = saveFunc
 
         self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')
 
@@ -146,14 +138,13 @@ class SettingsScene(Scene):
         self.screen.canv.delete(self.Background)
     
 
-    def displaySettings(self, x, y, width, height, fullscreen, sound, fps):
+    def displaySettings(self, x, y, width, height, fullscreen, sound, fps, dayNight):
         self.deleteSettings()
         self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')
 
 
-        if TESTING: print(x,y, fullscreen == True)
         self.title = self.screen.canv.create_text(x, y*0.5, text = "Settings", font = ('Helvetica', '24'))
-        options = [fullscreen, sound, fps]
+        options = [fullscreen, sound, fps, dayNight]
         
         for i in self.settings:
             if i == 'Screen Size':
@@ -170,12 +161,13 @@ class SettingsScene(Scene):
 class GameScene(Scene):
 
     def __init__(self, screen, camera, KHandler, tileArray, player):
-        super().__init__("scene_game", screen, KHandler, connections = ["scene_main", "scene_menu"])
+        super().__init__("scene_game", screen, KHandler, connections = ["scene_main", "scene_gameOver", "scene_win"])
         self.camera = camera
         self.screen.root.bind("<Escape>", lambda e: self.change_scene("scene_main"))
         self.tileArray = tileArray
         self.player = player
         self.nodeMap = []
+        self.ingame = False
     
 
     def showTiles(self, tileArray):
@@ -230,35 +222,7 @@ class GameScene(Scene):
             for j in i[minX:maxX + 1]:
                 newRenderArray[-1].append(j)
 
-        # print(len(newRenderArray[0]), len(newRenderArray))
-        # self.setNodeMap()
-
         return newRenderArray
-    
-    def setNodeMap(self):
-        mapRow = [0]*len(self.tileArray[0]) * 20
-        nodeMap = [mapRow] * len(self.tileArray) * 20
-        for i in range(len(nodeMap)):
-            for j in range(len(nodeMap[0])):
-                xCoor = j * 20
-                yCoor = i * 20
-                print("Checking Node at position {},{}".format(xCoor, yCoor))
-                isBlocked = False
-
-                xIndex = xCoor // 400
-                yIndex = yCoor // 400
-
-                for y in range(-1, 2):
-                    for x in range(-1, 2):
-                        tile = self.tileArray[yIndex + y][xIndex + x]
-                        if self.dist(xCoor, tile.x, yCoor, tile.y) < 700:
-                            for ent in tile.entities:
-                                if ent.isPointInBox([xCoor, yCorr], "collision"):
-                                    isBlocked = True
-                                    break
-
-                nodeMap[i][j] = Node(xCoor, yCoor, int(isBlocked))
-        self.nodeMap = nodeMap
 
 
     def dist(self, x1, x2, y1 ,y2):
@@ -280,7 +244,6 @@ class LoadingScene:
         animFrame = 0
         outline, bar, loadingtitle, loadtext, playerFrame = -1,-1,-1,-1, -1
         while self.percentDone[0] < 100:
-            print(animFrame)
             self.screen.canv.delete(outline, bar, loadingtitle, loadtext, playerFrame)
             outline = self.screen.canv.create_rectangle(100, self.screen.height/2 - 50, self.screen.width - 100, self.screen.height/2 + 50, width = 3)
             bar = self.screen.canv.create_rectangle(100, self.screen.height/2 - 50, (self.screen.width - 100)*self.percentDone[0]/100, self.screen.height/2 + 50, fill = 'red')
@@ -293,3 +256,40 @@ class LoadingScene:
             sleep(0.02)
 
         self.screen.canv.delete(outline, bar, loadingtitle, loadtext, playerFrame)
+
+
+class GameOverScene(Scene):
+    def __init__(self, screen, KH, player):
+        super().__init__("scene_gameOver", screen, KH, ["scene_main"])
+    
+        self.player = player
+
+        self.title = -1
+        self.text = -1
+        self.dayText = -1
+
+    def displayGO(self, dayNum):
+        if self.player.wireHP <= 0:
+            text = "You Shutdown!"
+        
+        else:
+            text = "You didn't escape in time!"
+        
+        if dayNum == 1:
+            dayOrDays = "day"
+        else:
+            dayOrDays = "days"
+
+        self.title = self.screen.canv.create_text(self.screen.width / 2, 200, text = "GAME OVER", font = ("Helvetica", 40))
+        self.text = self.screen.canv.create_text(self.screen.width / 2, self.screen.height / 2, text = text)
+        self.dayText = self.screen.canv.create_text(self.screen.width / 2, self.screen.height - 100, text = "You survived for {} {}.".format(dayNum, dayOrDays))
+        
+
+
+class WinScene(Scene):
+    def __init__(self, screen, KH):
+        super().__init__("scene_win", screen, KH, ["scene_main"])
+
+    def displayWin(self, dayNum):
+        self.title = self.screen.canv.create_text(self.screen.width / 2, 200, text = "You Escaped the Planet", font = ("Helvetica", 40))
+        self.text = self.screen.canv.create_text(self.screen.width / 2, self.screen.height / 2, text = "You escaped the planet!")

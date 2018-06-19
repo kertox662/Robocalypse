@@ -5,5 +5,6 @@
         "width": 1024,
         "fullscreen": false
     },
-    "sound": false
+    "sound": false,
+    "doDayNight": false
 }

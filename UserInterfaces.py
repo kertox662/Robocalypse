@@ -40,7 +40,6 @@ class CraftingWindow():
 
     def display(self):
         self.screen.canv.delete(self.screenObjFill, self.screenObjOutline, self.screenObjText)
-        # print(self.screen.width)
         if self.x >= -112:
             self.screenObjFill = self.screen.canv.create_image(self.x, self.screen.height - 253, image = self.fill)
             self.screenObjOutline = self.screen.canv.create_image(self.x, self.screen.height - 253, image = self.outline)
@@ -54,11 +53,18 @@ class CraftingWindow():
         self.screenObjects = []
         
         if self.player.nearTable == True:
-            self.listToUse = self.itemData
+            self.listToUse = self.itemData.copy()
             self.yMax = (len(self.itemSprites) - 10) * -44
         else:
-            self.listToUse = self.noTableItems
+            self.listToUse = self.noTableItems.copy()
             self.yMax = 0
+        
+        if not self.player.nearWires:
+            if type(self.listToUse) == dict:
+                self.listToUse.pop("14", None)
+            
+            else:
+                self.listToUse.remove("14")
 
         for i in self.listToUse:
             if type(self.listToUse) == dict:
@@ -76,9 +82,7 @@ class CraftingWindow():
     def setCostWindow(self, event):
         y = event.y
         y -= (self.screen.height - 440 + self.y)
-        # print(y)
         indexY = y//44 + 1
-        # print(indexY)
         if type(self.listToUse) == dict:
             self.currentCostWindow = self.itemData[str(indexY)]["cost"]
         else:
@@ -88,7 +92,7 @@ class CraftingWindow():
         self.currentCostWindow = None
 
     def initCraftItem(self, event):
-        y = event.y
+        y = event.y - self.y
         y -= (self.screen.height - 428)
         indexY = y//44 + 1
         if type(self.listToUse) == dict:

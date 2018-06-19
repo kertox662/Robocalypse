@@ -8,7 +8,6 @@ from math import *
 def dist(x1, y1, x2, y2):
     dx = (x2 - x1)**2
     dy = (y2 - y1)**2
-    #print(dx, dy)
     l = sqrt(dx + dy)
     
     return l
@@ -89,7 +88,7 @@ class stationaryEntity(Entity):
             self.fallAnim = animations[0]
             self.xOff = -43
         
-        elif self.type == "Rock":
+        elif self.type == "Rock" or self.type == "Ore":
             self.display = self.rockDisplay
             self.damageSprites = animations[0]
 
@@ -105,9 +104,6 @@ class stationaryEntity(Entity):
         else:
             bufferX = 0
             bufferY = 0
-        
-        # print("X:", min(self.collisionBox[0]) + self.x + self.xOff + bufferX, max(self.collisionBox[0]) + self.x + self.xOff + bufferX)
-        # print("Y:", min(self.hitBox[1]) + self.y + self.yOff + bufferY, max(self.hitBox[1]) + self.y + self.yOff + bufferY)
 
         if boxType == "collision":
             if min(self.collisionBox[0]) + self.x + bufferX <= x <= max(self.collisionBox[0]) + self.x + bufferX:
@@ -124,18 +120,13 @@ class stationaryEntity(Entity):
     
     def checkLife(self):
         if not isinstance(self, GroundItem):
-            # print("Life", self.life, self)
             if self.life <= 0 and self.dead == False:
                 if self.type == "Tree":
-                    # self.fallAnim = loadAnimation("images/Entities/TreeAnim/Falling/", 28)
                     self.animFrame = 0
                     self.falling = True
                     self.dead = True
-                    # self.xOff = 
-                    print("I'm a dead tree")
                 
                 else:
-                    print("I'm dead")
                     self.dead = True
                     
                     
@@ -188,7 +179,6 @@ class movingEntity(Entity):
             return collisions
 
         for i in range(len(self.collisionBox[0])):
-            # print("MAX:",min(box[1]) - colObj.y, self.collisionBox[1][i] - self.y,"MIN:", max(box[1]) - colObj.y)
             if min(box[0]) + colObj.x <= self.collisionBox[0][i] + self.x <= max(box[0]) + colObj.x:
                 if min(box[1]) + colObj.y <= self.collisionBox[1][i] + self.y <= max(box[1]) + colObj.y:
                     collisions[i] = True
@@ -206,9 +196,7 @@ class Player(movingEntity):
     playerFriction = 0.9
 
     def __init__(self, x, y, screen, camera, KH, resources):
-        # pImg = Image.open()
-        # img = ImageTk.PhotoImage(image=pImg)
-        super().__init__(x,y,"Player", 0, "images/Robot1.png", screen, camera, ((-25, 0, 25, 25, 25, 0, -25, -25), (20,20,20,35,50,50,50,35)), True, None)#(-25, 0, 25, 25, 25, 0, -25, -25), (20,20,20,35,50,50,50,35)
+        super().__init__(x,y,"Player", 0, "images/Robot1.png", screen, camera, ((-25, 0, 25, 25, 25, 0, -25, -25), (20,20,20,35,50,50,50,35)), True, None)
         self.Velx = 0
         self.Vely = 0
         self.KH = KH
@@ -217,12 +205,17 @@ class Player(movingEntity):
         self.resources = resources
         self.isPlacing = False
         self.nearTable = False
+        self.nearWires = False
         self.inChest = [False, None]
+
+        self.light = False
 
         self.metalHP = 50
         self.metalMaxHP = 50
         self.wireHP = 50
         self.wireMaxHP = 50
+        self.electricity = 100
+        self.electricityMax = 100
 
         self.metalHPBar = -1
         self.metalHPBarOutline = -1
@@ -234,8 +227,14 @@ class Player(movingEntity):
         self.wireHPText = -1
         self.wireHPIcon = -1
 
+        self.electricityBar = -1
+        self.electricityBarOutline = -1
+        self.electricityIcon = -1
+        self.electricityText = -1
+
         self.metalIcon = resources["metal"]["spriteSmall"]
         self.wiresIcon = resources["wires"]["spriteSmall"]
+        self.electricityIconSprite = loadImage("images/Resources/Electrical/LightningBolt.png")
 
         self.animFrame = 0
         self.direction = ["down"]
@@ -244,6 +243,8 @@ class Player(movingEntity):
         self.doingAction = False
         self.actionFrame = 0
 
+        self.lightSprite = loadImage("images/Lights/LightCircle40.png")
+        self.lightObj = -1
 
         self.downIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Down/", 8)
         self.upIdleAnim = loadAnimation("images/PlayerAnimation/Idle/Up/", 8)
@@ -310,8 +311,14 @@ class Player(movingEntity):
         
     def move(self):
         if self.doingAction == False:
-            self.x += self.Velx * Player.playerSpeed
-            self.y += self.Vely * Player.playerSpeed
+            if self.direction in ["up", "down", "left", "right"]:
+                speedFactor = 1
+            
+            else:
+                speedFactor = sqrt(2)
+
+            self.x += self.Velx * Player.playerSpeed# / speedFactor
+            self.y += self.Vely * Player.playerSpeed# / speedFactor
 
         if self.x < 0:
             self.x = 0
@@ -367,28 +374,19 @@ class Player(movingEntity):
     
     def doStationaryCollisions(self, collisions, entity):
         if True in [collisions[0], collisions[2], collisions[4], collisions[6]] and not True in [collisions[1], collisions[3], collisions[5], collisions[7]]:
-            # factors = [1,1]
             xMid = (min(entity.collisionBox[0]) + max(entity.collisionBox[0]) + (entity.x + entity.xOff) * 2) / 2
             yMid = (min(entity.collisionBox[1]) + max(entity.collisionBox[1]) + (entity.y + entity.yOff) * 2) / 2
 
             collidingCorner = collisions.index(True)
 
-            # self.x -= self.Velx * Player.playerSpeed
-            # self.y -= self.Vely * Player.playerSpeed
-
             if not ((self.x + self.collisionBox[0][collidingCorner] + self.xOff > xMid and self.Velx > 0) or (self.x + self.collisionBox[0][collidingCorner] + self.xOff < xMid and self.Velx < 0)):
                 self.x -= self.Velx * Player.playerSpeed
-                # factors[0] = -1
-                # self.Vely = 0
                 self.Vely = self.Vely * -0.8
 
             if not ((self.y + self.collisionBox[1][collidingCorner] + self.yOff > yMid and self.Vely > 0) or (self.y + self.collisionBox[1][collidingCorner] + self.yOff < yMid and self.Vely < 0)):
                 self.y -= self.Vely * Player.playerSpeed
-                # factors[1] = -1
-                # self.Velx = 0
                 self.Velx = self.Velx * -0.8
 
-            # self.moveCam(self.restrictions, -1,-1)
             while True in self.isColliding(entity):
                 self.move()
 
@@ -397,10 +395,7 @@ class Player(movingEntity):
             if abs(self.Vely) < 0.3:
                 self.Vely = 0
 
-            # print("Both")
         elif True in [collisions[1], collisions[5]]:
-            # self.y -= self.Vely * Player.playerSpeed
-            # self.moveCam(self.restrictions, 1, -1)
             self.Vely = self.Vely * -0.8
             while True in self.isColliding(entity):
                 self.move()
@@ -408,39 +403,40 @@ class Player(movingEntity):
             if abs(self.Vely) < 0.3:
                 self.Vely = 0
 
-            # self.Vely = 0
-            # print("Y")
         elif True in [collisions[3], collisions[7]]:
-            # self.x -= self.Velx * Player.playerSpeed
-            # self.moveCam(self.restrictions, -1, 1)
 
-            # self.Velx = 0
             self.Velx = self.Velx * -0.8
             while True in self.isColliding(entity):
                 self.move()
 
             if abs(self.Velx) < 0.3:
                 self.Velx = 0
-            # print("X")
     
     def displayLife(self):
         self.screen.canv.delete(self.wireHPBar, self.wireHPIcon, self.wireHPText, self.wireHPBarOutline)
-        self.screen.canv.delete(self.metalHPBar, self.metalHPIcon, self.metalHPText, self.metalHPBarOutline)
+        # self.screen.canv.delete(self.metalHPBar, self.metalHPIcon, self.metalHPText, self.metalHPBarOutline)
+        self.screen.canv.delete(self.electricityBar, self.electricityBarOutline, self.electricityIcon, self.electricityText)
 
-        self.metalHPBarOutline = self.screen.canv.create_polygon(9, 29, 9 + max(0,self.metalMaxHP), 29, 14 + max(0,self.metalMaxHP), 35, 14, 35, fill = 'white', outline = 'black', width = 1)
-        self.wireHPBarOutline = self.screen.canv.create_polygon(9, 44, 9 + max(0,self.wireMaxHP), 44, 14 + max(0,self.wireMaxHP), 50, 14, 50, fill = 'white', outline = 'black', width = 1)
+        # self.metalHPBarOutline = self.screen.canv.create_polygon(9, 29, 9 + max(0,self.metalMaxHP), 29, 14 + max(0,self.metalMaxHP), 35, 14, 35, fill = 'white', outline = 'black', width = 1)
+        self.wireHPBarOutline = self.screen.canv.create_polygon(9, 29, 9 + max(0,self.wireMaxHP), 29, 14 + max(0,self.wireMaxHP), 35, 14, 35, fill = 'white', outline = 'black', width = 1)
+        self.electricityBarOutline = self.screen.canv.create_polygon(9, 44, 9 + max(0,self.electricityMax), 44, 14 + max(0,self.electricityMax), 50, 14, 50, fill = 'white', outline = 'black', width = 1)
 
-        self.metalHPBar = self.screen.canv.create_polygon(10, 30, 10 + max(0,self.metalHP), 30, 15 + max(0,self.metalHP), 35, 15, 35, fill = 'red', outline = '', width = 1)
-        self.wireHPBar = self.screen.canv.create_polygon(10, 45, 10 + max(0,self.wireHP), 45, 15 + max(0,self.wireHP), 50, 15, 50, fill = 'red', outline = '', width = 1)
+
+        # self.metalHPBar = self.screen.canv.create_polygon(10, 30, 10 + max(0,self.metalHP), 30, 15 + max(0,self.metalHP), 35, 15, 35, fill = 'red', outline = '', width = 1)
+        self.wireHPBar = self.screen.canv.create_polygon(10, 30, 10 + max(0,self.wireHP), 30, 15 + max(0,self.wireHP), 35, 15, 35, fill = 'red', outline = '', width = 1)
+        self.electricityBar = self.screen.canv.create_polygon(10, 45, 10 + max(0,self.electricity), 45, 15 + max(0,self.electricity), 50, 15, 50, fill = 'red', outline = '', width = 1)
         
-        self.metalHPIcon = self.screen.canv.create_image(30 + max(0,self.metalMaxHP), 32, image = self.metalIcon)
-        self.wireHPIcon = self.screen.canv.create_image(30 + max(0,self.metalMaxHP), 48, image = self.wiresIcon)
+        # self.metalHPIcon = self.screen.canv.create_image(30 + max(0,self.metalMaxHP), 32, image = self.metalIcon)
+        self.wireHPIcon = self.screen.canv.create_image(30 + max(0,self.wireMaxHP), 32, image = self.wiresIcon)
+        self.electricityIcon = self.screen.canv.create_image(30 + max(0,self.electricity), 48, image = self.electricityIconSprite)
 
-        self.metalHPText = self.screen.canv.create_text(65 + max(0,self.metalMaxHP), 32, text = "{}/{}".format(max(0,int(self.metalHP)), self.metalMaxHP))
-        self.wireHPText = self.screen.canv.create_text(65 + max(0,self.wireMaxHP), 48, text = "{}/{}".format(max(0,int(self.wireHP)), self.wireMaxHP))
+        # self.metalHPText = self.screen.canv.create_text(65 + max(0,self.metalMaxHP), 32, text = "{}/{}".format(max(0,int(self.metalHP)), self.metalMaxHP))
+        self.wireHPText = self.screen.canv.create_text(65 + max(0,self.wireMaxHP), 32, text = "{}/{}".format(max(0,int(self.wireHP)), self.wireMaxHP))
+        self.electricityText = self.screen.canv.create_text(65 + max(0,self.electricityMax), 48, text = "{}/{}".format(max(0,int(self.electricity)), self.electricityMax))
 
     def checkNearTable(self, tileArray):
         self.nearTable = False
+        self.nearWires = False
         for i in tileArray:
             for j in i:
                 for k in j.entities:
@@ -449,6 +445,11 @@ class Player(movingEntity):
                             if k.isPlacing == False:
                                 if k.dist(self.x, self.y) < 200:
                                     self.nearTable = True
+
+                        if k.id == 3:
+                            if k.isPlacing == False:
+                                if k.dist(self.x, self.y) < 200:
+                                    self.nearWires = True
     
     def checkNearChest(self):
         if self.inChest[0] == True:
@@ -535,8 +536,8 @@ class Player(movingEntity):
 
 
 
-tileGridWidth = 10
-tileGridHeight = 10
+tileGridWidth = 50
+tileGridHeight = 50
 
 class Tile(GameObject):
     tileWidth = 400
@@ -595,7 +596,6 @@ class Camera:
         self.x += self.Velx * speed
         self.y += self.Vely * speed
 
-        # print(self.screen.width, self.screen.height)
 
         if self.x < self.screen.width/2:
             self.x = self.screen.width/2
@@ -658,13 +658,18 @@ class Furniture(stationaryEntity):
     furnitureSpritesGreen = []
     chestUI = [loadImage("images/UI/Hotbar8.png"), loadImage("images/UI/cursor.png")]
 
+    arrowSprites = [[loadImage("images/Arrows/GreenRight.png"), loadImage("images/Arrows/GreenLeft.png"), loadImage("images/Arrows/GreenUp.png"), loadImage("images/Arrows/GreenDown.png")],
+                    [loadImage("images/Arrows/RedRight.png"), loadImage("images/Arrows/RedLeft.png"), loadImage("images/Arrows/RedUp.png"), loadImage("images/Arrows/RedDown.png")]]
+    
+    rocketSprite = loadImage("images/Furniture/LaunchPad/WithRocket.png")
+
     for i in range(len(furnitureData)):
         furnitureSprites.append(loadImage(furnitureData[str(i+1)]["furnitureSprite"]))
         furnitureHighlights.append(loadImage(furnitureData[str(i+1)]["furnitureHighlight"]))
         furnitureSpritesRed.append(loadImage(furnitureData[str(i+1)]["furnitureRed"]))
         furnitureSpritesGreen.append(loadImage(furnitureData[str(i+1)]["furnitureGreen"]))
 
-    def __init__(self, x, y, id, screen, camera, player, tile, delQueue):
+    def __init__(self, x, y, id, screen, camera, player, tile, delQueue, resources = None):
         sprite = Furniture.furnitureSprites[int(id) - 1]
         self.highlight = Furniture.furnitureHighlights[int(id) - 1]
         self.spriteRed = Furniture.furnitureSpritesRed[int(id) - 1]
@@ -693,6 +698,77 @@ class Furniture(stationaryEntity):
             self.cursorScreenObj = -1
             self.cursorPosition = None
         
+        elif self.id == 4:
+            self.resource = 0
+            self.resourceType = "wood"
+            self.water = 0
+            self.open = False
+            self.playerResources = resources
+
+            self.increaseArrow1 = -1
+            self.decreaseArrow1 = -1
+            self.increaseArrow10 = -1
+            self.decreaseArrow10 = -1
+
+            self.text1x = -1
+            self.text10x = -1
+
+            self.increaseSprite = Furniture.arrowSprites[1][0]
+            self.increaseHighlight = Furniture.arrowSprites[0][0]
+
+            self.decreaseSprite = Furniture.arrowSprites[1][1]
+            self.decreaseHighlight = Furniture.arrowSprites[0][1]
+
+            self.resourceWindow = -1
+            self.resourceText = -1
+            self.resourceIcon = -1
+
+            self.charge = 0
+
+        
+        elif self.id == 6:
+            self.resource = 0
+            self.resourceType = "metal"
+            self.open = False
+            self.playerResources = resources
+
+            self.increaseArrow1 = -1
+            self.decreaseArrow1 = -1
+            self.increaseArrow10 = -1
+            self.decreaseArrow10 = -1
+
+            self.text1x = -1
+            self.text10x = -1
+
+            self.text1x2 = -1
+            self.text10x2 = -1
+            
+            self.increaseSprite = Furniture.arrowSprites[1][0]
+            self.increaseHighlight = Furniture.arrowSprites[0][0]
+
+            self.decreaseSprite = Furniture.arrowSprites[1][1]
+            self.decreaseHighlight = Furniture.arrowSprites[0][1]
+
+            self.resourceWindow = -1
+            self.resourceText = -1
+            self.resourceIcon = -1
+
+            self.charge = 0
+
+
+
+            self.wires = 0
+            self.resourceType2 = "wires"
+
+            self.increaseArrow12 = -1
+            self.decreaseArrow12 = -1
+            self.increaseArrow102 = -1
+            self.decreaseArrow102 = -1
+
+            self.resourceText2 = -1
+            self.resourceIcon2 = -1
+
+            self.altSprite = Furniture.rocketSprite
             
 
     
@@ -711,15 +787,10 @@ class Furniture(stationaryEntity):
                                     self.colliding = True
         
         if self.dist(self.player.x, self.player.y) < 400:
-            # print(dist(self.x, self.player.x, self.y, self.player.y))
             for p in range(len(self.player.collisionBox[0])):
                             point = [self.player.x + self.player.collisionBox[0][p], self.player.y + self.player.collisionBox[1][p]]
-                            # print(point)
-                            # print(min(self.collisionBox[0]) + self.x + self.xOff, max(self.collisionBox[0]) + self.x + self.xOff)
                             if self.isPointInBox(point, "collision"):
                                 self.colliding = True
-                            # if self.player.isColliding(self):
-                            #     self.colliding = True
         
         if self.colliding == False:
             self.shownSprite = self.spriteGreen
@@ -744,7 +815,6 @@ class Furniture(stationaryEntity):
                 if (self.y + self.yOff + collisionMid <= player.y + player.yOff + playerColDist) == lessOrGreater:
                     self.screenObj = self.screen.canv.create_image(self.x - self.camera.x + self.xOff + self.screen.width/2, self.y - self.camera.y + self.yOff + self.screen.height/2, image = self.sprite, activeimage = self.highlight)
             else:
-                # print(self.player.KH.mouseX - self.camera.x + self.xOff + self.screen.width/2, self.player.KH.mouseY - self.camera.y + self.yOff + self.screen.height/2)
                 self.screenObj = self.screen.canv.create_image(self.player.KH.mouseX , self.player.KH.mouseY, image = self.shownSprite)
 
     
@@ -805,8 +875,123 @@ class Furniture(stationaryEntity):
                 self.cursorPosition = self.cursorPosition - 1
                 if self.cursorPosition < 1:
                     self.cursorPosition = 8
+    
+    def toggleResourceScreen(): 
+        self.open = not self.open
+
+    def displayResourceScreen(self):
+        if self.id == 4:
+            text = str(self.resource)
+        
+        elif self.id == 6:
+            text = "{} / 1000".format(self.resource)
+
+        camBufferX = self.screen.width / 2 - self.camera.x
+        camBufferY = self.screen.height / 2 - self.camera.y
+        
+        self.screen.canv.delete(self.increaseArrow1, self.decreaseArrow1, self.increaseArrow10, self.decreaseArrow10 ,self.resourceText, self.resourceIcon, self.resourceWindow, self.text1x, self.text10x)
 
 
+        if self.id != 6:
+            self.resourceWindow = self.screen.canv.create_rectangle(self.x + camBufferX - 55, self.y + camBufferY - 80, self.x + camBufferX + 55, self.y + camBufferY - 30, fill = 'white')
+       
+        else:
+            self.screen.canv.delete(self.text1x2, self.text10x2, self.increaseArrow12, self.increaseArrow102, self.decreaseArrow12, self.decreaseArrow102, self.resourceIcon2, self.resourceText2)
+            self.resourceWindow = self.screen.canv.create_rectangle(self.x + camBufferX - 80, self.y + camBufferY - 120, self.x + camBufferX + 80, self.y + camBufferY - 30, fill = 'white')
+            self.text1x2 = self.screen.canv.create_text(self.x + camBufferX + 70, self.y + camBufferY - 110, text = "x1")
+            self.text10x2 = self.screen.canv.create_text(self.x + camBufferX + 70, self.y + camBufferY - 90, text = "x10")
+
+            self.increaseArrow12 = self.screen.canv.create_image(self.x + camBufferX + 40, self.y + camBufferY - 110, image = self.increaseSprite, activeimage = self.increaseHighlight)
+            self.decreaseArrow12 = self.screen.canv.create_image(self.x + camBufferX - 60, self.y + camBufferY - 110, image = self.decreaseSprite, activeimage = self.decreaseHighlight)
+
+            self.increaseArrow102 = self.screen.canv.create_image(self.x + camBufferX + 40, self.y + camBufferY - 90, image = self.increaseSprite, activeimage = self.increaseHighlight)
+            self.decreaseArrow102 = self.screen.canv.create_image(self.x + camBufferX - 60, self.y + camBufferY - 90, image = self.decreaseSprite, activeimage = self.decreaseHighlight)
+
+            self.resourceIcon2 = self.screen.canv.create_image(self.x+camBufferX, self.y + camBufferY - 110, image = self.playerResources[self.resourceType2]["spriteSmall"])
+            self.resourceText2 = self.screen.canv.create_text(self.x + camBufferX, self.y + camBufferY - 90, text = "{} / 500".format(self.wires))
+
+            self.screen.canv.tag_bind(self.increaseArrow12, "<Button-1>", self.placeWires1)
+            self.screen.canv.tag_bind(self.increaseArrow102, "<Button-1>", self.placeWires10)
+            self.screen.canv.tag_bind(self.decreaseArrow12, "<Button-1>", self.takeOutWires1)
+            self.screen.canv.tag_bind(self.decreaseArrow102, "<Button-1>", self.takeOutWires10)
+
+
+        if self.id == 6:
+            self.resourceText = self.screen.canv.create_text(self.x + camBufferX, self.y + camBufferY - 40, text = text)
+        else:
+            self.resourceText = self.screen.canv.create_text(self.x + camBufferX - 10, self.y + camBufferY - 40, text = text)
+        
+
+        self.resourceIcon = self.screen.canv.create_image(self.x+camBufferX, self.y + camBufferY - 60, image = self.playerResources[self.resourceType]["spriteSmall"])
+
+        self.increaseArrow1 = self.screen.canv.create_image(self.x + camBufferX + 40, self.y + camBufferY - 60, image = self.increaseSprite, activeimage = self.increaseHighlight)
+        self.increaseArrow10 = self.screen.canv.create_image(self.x + camBufferX + 40, self.y + camBufferY - 40, image = self.increaseSprite, activeimage = self.increaseHighlight)
+
+        if self.id != 6:
+            self.decreaseArrow1 = self.screen.canv.create_image(self.x + camBufferX - 40, self.y + camBufferY - 60, image = self.decreaseSprite, activeimage = self.decreaseHighlight)
+            self.decreaseArrow10 = self.screen.canv.create_image(self.x + camBufferX - 40, self.y + camBufferY - 40, image = self.decreaseSprite, activeimage = self.decreaseHighlight)
+
+        else:
+            self.decreaseArrow1 = self.screen.canv.create_image(self.x + camBufferX - 60, self.y + camBufferY - 60, image = self.decreaseSprite, activeimage = self.decreaseHighlight)
+            self.decreaseArrow10 = self.screen.canv.create_image(self.x + camBufferX - 60, self.y + camBufferY - 40, image = self.decreaseSprite, activeimage = self.decreaseHighlight)
+        
+        if self.id != 6:
+            self.text1x = self.screen.canv.create_text(self.x + camBufferX + 17, self.y + camBufferY - 60, text = "x1")
+            self.text10x = self.screen.canv.create_text(self.x + camBufferX + 17, self.y + camBufferY - 40, text = "x10")
+        
+        else:
+            self.text1x = self.screen.canv.create_text(self.x + camBufferX + 70, self.y + camBufferY - 60, text = "x1")
+            self.text10x = self.screen.canv.create_text(self.x + camBufferX + 70, self.y + camBufferY - 40, text = "x10")
+        
+
+        self.screen.canv.tag_bind(self.increaseArrow1, "<Button-1>", self.placeResources1)
+        self.screen.canv.tag_bind(self.increaseArrow10, "<Button-1>", self.placeResources10)
+        self.screen.canv.tag_bind(self.decreaseArrow1, "<Button-1>", self.takeOutResources1)
+        self.screen.canv.tag_bind(self.decreaseArrow10, "<Button-1>", self.takeOutResources10)
+
+    def placeResources1(self, e):
+        if self.playerResources[self.resourceType]["amount"] >= 1:
+            if self.id != 6 and self.resource < 99 or self.id == 6 and self.resource < 1000:
+                self.resource += 1
+                self.playerResources[self.resourceType]["amount"] -= 1
+    
+    def placeResources10(self, e):
+        if self.playerResources[self.resourceType]["amount"] >= 10:
+            if self.id != 6 and self.resource < 90 or self.id == 6 and self.resource < 990:
+                self.resource += 10
+                self.playerResources[self.resourceType]["amount"] -= 10
+    
+    def takeOutResources1(self, e):
+        if self.resource >= 1:
+            self.resource -= 1
+            self.playerResources[self.resourceType]["amount"] += 1
+    
+    def takeOutResources10(self, e):
+        if self.resource >= 10:
+            self.resource -= 10
+            self.playerResources[self.resourceType]["amount"] += 10
+
+    def placeWires1(self, e):
+        if self.playerResources[self.resourceType2]["amount"] >= 1:
+            if self.wires < 500:
+                self.wires += 1
+                self.playerResources[self.resourceType2]["amount"] -= 1
+    
+    def placeWires10(self, e):
+        if self.playerResources[self.resourceType2]["amount"] >= 10:
+            if self.wires < 490:
+                self.wires += 10
+                self.playerResources[self.resourceType2]["amount"] -= 10
+    
+    def takeOutWires1(self, e):
+        if self.wires >= 1:
+            self.wires -= 1
+            self.playerResources[self.resourceType2]["amount"] += 1
+
+    def takeOutWires10(self, e):
+        if self.wires >= 10:
+            self.wires -= 10
+            self.playerResources[self.resourceType2]["amount"] += 10
 
 class Item:
     ItemData = loadSettings("data/items.json")
@@ -826,7 +1011,7 @@ class Item:
         self.durability = durability
         self.screenObj = -1
 
-        if id in [9,10,11]:
+        if id in [7, 8, 9, 10, 11, 12, 13]:
             self.furnitureId = Item.ItemData[str(id)]["furnitureID"]
 
 

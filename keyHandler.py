@@ -78,17 +78,18 @@ class KeyHandler:
             elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id == 2:
                 self.checkEvents.append("Mine Rock")
             
-            elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id in [9,10,11]:
+            elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id in [7,8,9,10,11,12,13]:
                 self.checkEvents.append("Place Furniture")
             
+            elif self.hotbar.inventory[self.hotbar.cursorPosition - 1].id == 6:
+                self.checkEvents.append("Use Battery")
+            
             else:
-                print("No action checked")
                 return
             
             self.mouseClickx = event.x
             self.mouseClicky = event.y
 
-        # print(self.checkEvents)
     def cancelAction(self, event):
         self.checkEvents.append("Cancel")
 

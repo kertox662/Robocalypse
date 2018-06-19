@@ -17,11 +17,47 @@
     },
 
 "3":
-    {   "name":"Welding Station",
+    {   "name":"Electric Station",
         "furnitureSprite":"images/Furniture/WeldingStation/WeldingStationLarge.png",
         "furnitureHighlight":"images/Furniture/WeldingStation/WeldingStationLargeHighlight.png",
         "furnitureGreen":"images/Furniture/WeldingStation/WeldingStationLargeGreen.png",
         "furnitureRed":"images/Furniture/WeldingStation/WeldingStationLargeRed.png",
         "collision":[[-70, 70, 70, -70], [16, 16, 68, 68]]
+    },
+
+"4":{
+    "name":"Generator",
+    "furnitureSprite": "images/Furniture/Generator/Generator.png",
+    "furnitureHighlight":"images/Furniture/Generator/GeneratorHighlight.png",
+    "furnitureGreen":"images/Furniture/Generator/GeneratorGreen.png",
+    "furnitureRed":"images/Furniture/Generator/GeneratorRed.png",
+    "collision":[[-40, 40, 40, -40], [0, 0, 23, 23]]
+    },
+
+"5":{
+    "name":"Solar Panel",
+    "furnitureSprite": "images/Furniture/SolarPanel/SolarPanel.png",
+    "furnitureHighlight":"images/Furniture/SolarPanel/SolarPanelHighlight.png",
+    "furnitureGreen":"images/Furniture/SolarPanel/SolarPanelGreen.png",
+    "furnitureRed":"images/Furniture/SolarPanel/SolarPanelRed.png",
+    "collision":[[-40, 40, 40, -40], [8, 8, 28, 28]]
+    },
+
+"6":{
+    "name":"Launch Pad",
+    "furnitureSprite": "images/Furniture/LaunchPad/LaunchPad.png",
+    "furnitureHighlight":"images/Furniture/LaunchPad/LaunchPadHighlight.png",
+    "furnitureGreen":"images/Furniture/LaunchPad/LaunchPadGreen.png",
+    "furnitureRed":"images/Furniture/LaunchPad/LaunchPadRed.png",
+    "collision":[[-16, 16, 16, -16], [0, 0, 23, 23]]
+    },
+
+"7":{
+    "name":"Lamp Post",
+    "furnitureSprite": "images/Furniture/Light/LampPost.png",
+    "furnitureHighlight":"images/Furniture/Light/LampPostHighlight.png",
+    "furnitureGreen":"images/Furniture/Light/LampPostGreen.png",
+    "furnitureRed":"images/Furniture/Light/LampPostRed.png",
+    "collision":[[-16, 16, 16, -16], [0, 0, 23, 23]]
     }
 }
