@@ -17,6 +17,7 @@ class Scene:
         self.screen = screen
         self.KH = KHandler
 
+    #Sees if the change is possible and changes it if it is
     def change_scene(self, targetscene = None):
         if targetscene in self.connections:
             Scene.current_scene = targetscene
@@ -36,7 +37,7 @@ class MainScene(Scene):
         self.switch = False   
     
 
-    def deleteOptions(self, option):
+    def deleteOptions(self, option): #Deletes menu options. 
         if option == 'Title':
             if self.title != 0:
                 self.screen.canv.delete(self.title)
@@ -51,30 +52,30 @@ class MainScene(Scene):
             self.screen.canv.delete(option)
 
 
-    def changeSceneHandler(self,target):
+    def changeSceneHandler(self,target): #deletes options and switches scene
         self.deleteOptions("All")
         self.switch = True
         self.change_scene(target)
 
 
-    def displayOptions(self,xC, yC):
-        self.screen.canv.delete(self.Background)
+    def displayOptions(self,xC, yC): #Draws the options on screen and bind clicking them to functions
+        self.screen.canv.delete(self.Background) #White background
         self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')
 
-        self.deleteOptions('Title')
+        self.deleteOptions('Title') #Title of game
         self.title = self.screen.canv.create_text(xC, yC *0.5, text = self.titleText, font = ('Helvetica', 24))
         
-        if len(self.optionsText) > 0:
+        if len(self.optionsText) > 0: #deletes options
             for i in range(len(self.optionsText)-1 , -1, -1):
                 self.deleteOptions(self.optionsText[i])
                 self.optionsText.pop(i)
         
         
-        for i in range(len(self.options)):
+        for i in range(len(self.options)): #draws options
             text = self.screen.canv.create_text(xC, yC + 50*i, text = self.options[i], activefill = 'yellow',font = ('Helvetica', 16))
             self.optionsText.append(text)
             
-            if self.options[i] == "Start Game":
+            if self.options[i] == "Start Game": #Binds based on which option it is
                 self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_game'))
             elif self.options[i] == "Settings":
                 self.screen.canv.tag_bind(text, "<Button-1>", lambda e: self.changeSceneHandler('scene_settings'))
@@ -83,10 +84,8 @@ class MainScene(Scene):
 
 
 
-TESTING = False
-
-class SettingsScene(Scene):
-    screenOptions = [(1920,1200),(1920,1080),(1680,1050),(1600,900),(1440,900),(1360,768),(1280,1024),(1280,800),(1280,720),(1024,768)]
+class SettingsScene(Scene): 
+    screenOptions = [(1920,1200),(1920,1080),(1680,1050),(1600,900),(1440,900),(1360,768),(1280,1024),(1280,800),(1280,720),(1024,768)] #Starts off with many different screen options
     def __init__(self, screen, KHandler):
         super().__init__("scene_settings", screen, KHandler,connections = ["scene_main", "scene_menu"])
         self.settings = ["Screen Size", "Fullscreen","Sound", "Show FPS", "Day/Night Cycle"]
@@ -95,27 +94,27 @@ class SettingsScene(Scene):
 
         self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')
 
-        maxWidth = screen.canv.winfo_screenwidth()
+        maxWidth = screen.canv.winfo_screenwidth() #The size of the screen
         maxHeight = screen.canv.winfo_screenheight()
 
-        for i in range(len(SettingsScene.screenOptions)-1, -1, -1):
+        for i in range(len(SettingsScene.screenOptions)-1, -1, -1): #removes screen options that are too big
             if SettingsScene.screenOptions[i][0] > maxWidth or SettingsScene.screenOptions[i][1] > maxHeight:
                 SettingsScene.screenOptions.pop(i)
     
 
-    def changeSetting(self, Event):
+    def changeSetting(self, Event): #finds the item that was clicked and changes its value
         item = self.screen.canv.find_closest(Event.x, Event.y)
         text = self.screen.canv.itemcget(item, 'text')
         
         selOption = text.split()[0]
-        if selOption == 'Screen':
+        if selOption == 'Screen': #If it's screen size, cycles to next possible resolution
             textSplit = text.split()
             width = int(textSplit[3])
             height = int(textSplit[5])
             index = (screenOptions.index((width, height)) + 1) % len(screenOptions)
             self.screen.canv.itemconfig(item , text = "Screen Size - {} x {}".format(screenOptions[index][0], screenOptions[index][1]))
             
-        elif selOption in ['Sound', 'Fullscreen', 'Show']:
+        elif selOption in ['Sound', 'Fullscreen', 'Show', "Day/Night"]:  
             newVal = not eval(text.split()[-1])
             self.screen.canv.itemconfig(item , text = "{} - {}".format(selOption,newVal))
         
@@ -128,7 +127,7 @@ class SettingsScene(Scene):
         self.screen.canv.update()
 
     
-    def deleteSettings(self):
+    def deleteSettings(self): #Deletes the title and option canvas objects
         self.screen.canv.delete(self.title)
         self.title = 0
         for i in range(len(self.settingText)):
@@ -138,7 +137,7 @@ class SettingsScene(Scene):
         self.screen.canv.delete(self.Background)
     
 
-    def displaySettings(self, x, y, width, height, fullscreen, sound, fps, dayNight):
+    def displaySettings(self, x, y, width, height, fullscreen, sound, fps, dayNight): #Displays the options with given options
         self.deleteSettings()
         self.Background = self.screen.canv.create_rectangle(-200, -200, self.screen.width + 200, self.screen.height + 200, fill = 'white')
 
@@ -146,7 +145,7 @@ class SettingsScene(Scene):
         self.title = self.screen.canv.create_text(x, y*0.5, text = "Settings", font = ('Helvetica', '24'))
         options = [fullscreen, sound, fps, dayNight]
         
-        for i in self.settings:
+        for i in self.settings: #Since screen resolution is 2 words essentially, this is done seperately
             if i == 'Screen Size':
                 self.settingText.append(self.screen.canv.create_text(x, y + 50*self.settings.index(i), text = "Screen Size - {} x {}".format(width, height), font = ('Helvetica', '16'), fill = 'black',activefill = 'yellow'))
                 self.screen.canv.tag_bind(self.settingText[-1],"<Button-1>", self.changeSetting)
@@ -170,22 +169,22 @@ class GameScene(Scene):
         self.ingame = False
     
 
-    def showTiles(self, tileArray):
+    def showTiles(self, tileArray): #draws the tiles (the tileArray parameter will almost always be renderedTiles)
         camX = self.camera.x
         camY = self.camera.y
         for i in tileArray:
             for j in i:
-                j.display(camX, camY)
+                j.display(camX, camY) #tiles are displayed relative to the camera
     
 
-    def displayStationaryEntities(self, player, lOrG, tileArray):
+    def displayStationaryEntities(self, player, lOrG, tileArray): #Displays the entities from each tile.
         for i in tileArray:
             for j in i:
                 for k in j.entities:
                     k.display(player, lOrG, k.collisionBox)
     
 
-    def displayStationaryBoxes(self, tileArray, boxType):
+    def displayStationaryBoxes(self, tileArray, boxType): #Displays the collision boxes for each entity for each tile
         for i in tileArray:
             for j in i:
                 for k in j.entities:
@@ -195,7 +194,7 @@ class GameScene(Scene):
                         k.drawEntityBox(k.collisionBox)
                         
     
-    def checkRendered(self, tileArray):
+    def checkRendered(self, tileArray): #Sees if there are any tiles currently in renderedGrid that are now offscreen
         for i in tileArray:
             for j in i:
                 if not j.isOnScreen():
@@ -204,12 +203,14 @@ class GameScene(Scene):
         return True
     
     def setRenderGrid(self):
+        #Sets the boundaries for renderedTiles
         minX = floor((self.camera.x - self.screen.width/2 - 100) / Tile.tileWidth)
         maxX = ceil((self.camera.x + self.screen.width/2 + 100) / Tile.tileWidth)
         
         minY = floor((self.camera.y - self.screen.height/2 - 100) / Tile.tileHeight)
         maxY = ceil((self.camera.y + self.screen.height/2 + 100) / Tile.tileHeight)
 
+        #Caps the boundaries to the edge most tiles
         minX = max(minX, 0)
         maxX = min(maxX, tileGridWidth)
 
@@ -217,14 +218,14 @@ class GameScene(Scene):
         maxY = min(maxY, tileGridHeight)
 
         newRenderArray = []
-        for i in self.tileArray[minY:maxY+1]:
+        for i in self.tileArray[minY:maxY+1]: #From a blank array, adds a list and then adds each tiles to the interior list to make a 2d array
             newRenderArray.append([])
             for j in i[minX:maxX + 1]:
                 newRenderArray[-1].append(j)
 
         return newRenderArray
 
-
+    #distance formula
     def dist(self, x1, x2, y1 ,y2):
         dx = (x1 - x2) ** 2
         dy = (y1 - y2) ** 2
@@ -234,13 +235,14 @@ class GameScene(Scene):
     def doNotification(self):
         pass
 
+#Screen for display while loading data
 class LoadingScene:
     def __init__(self, screen, percentDone):
         self.screen = screen
         self.playerAnim = loadAnimation("images/PlayerAnimation/Walking/Right/", 14)
         self.percentDone = percentDone
 
-    def updateLoading(self):
+    def updateLoading(self): #Displays bar, percentage, and character animation
         animFrame = 0
         outline, bar, loadingtitle, loadtext, playerFrame = -1,-1,-1,-1, -1
         while self.percentDone[0] < 100:
@@ -257,7 +259,7 @@ class LoadingScene:
 
         self.screen.canv.delete(outline, bar, loadingtitle, loadtext, playerFrame)
 
-
+#Scene to go to when fails
 class GameOverScene(Scene):
     def __init__(self, screen, KH, player):
         super().__init__("scene_gameOver", screen, KH, ["scene_main"])
@@ -268,7 +270,7 @@ class GameOverScene(Scene):
         self.text = -1
         self.dayText = -1
 
-    def displayGO(self, dayNum):
+    def displayGO(self, dayNum): #Displays text on screen. Title of GAME OVER, the reason for failure, and how long you survived
         if self.player.wireHP <= 0:
             text = "You Shutdown!"
         
@@ -286,10 +288,10 @@ class GameOverScene(Scene):
         
 
 
-class WinScene(Scene):
+class WinScene(Scene): #Scene to go to when you win
     def __init__(self, screen, KH):
         super().__init__("scene_win", screen, KH, ["scene_main"])
 
-    def displayWin(self, dayNum):
+    def displayWin(self, dayNum): #Displays a congratulatory message
         self.title = self.screen.canv.create_text(self.screen.width / 2, 200, text = "You Escaped the Planet", font = ("Helvetica", 40))
         self.text = self.screen.canv.create_text(self.screen.width / 2, self.screen.height / 2, text = "You escaped the planet!")

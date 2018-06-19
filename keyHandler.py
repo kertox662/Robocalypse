@@ -13,28 +13,28 @@ class KeyHandler:
         self.scene = "scene_main"
         self.hotbar = hotbar
 
-        self.wToggle = False
+        self.wToggle = False #WASD is toggled on or off by pressing the keys
         self.aToggle = False
         self.sToggle = False
         self.dToggle = False
 
-        self.checkEvents = []
-        self.screen.canv.bind("<Button-1>", self.doAction)
-        self.screen.root.bind("<Motion>", self.updateMousePostion)
+        self.checkEvents = [] #The array that gets checked for events
+        self.screen.canv.bind("<Button-1>", self.doAction) #Left mouse is for do action
+        self.screen.root.bind("<Motion>", self.updateMousePostion) #Constantly tracks mouse postion on screen
         self.mouseClickx = -1000
         self.mouseClicky = -1000
         self.mouseX = -1000
         self.mouseY = -1000
 
-        t = Thread(target=keyboardThread, args=(self,))
+        t = Thread(target=keyboardThread, args=(self,)) #this is the keyboard listener
         t.daemon = True
         t.start()
 
-        self.SceneClass = SceneClass
+        self.SceneClass = SceneClass #Needs variables from Scene
         
     
             
-    def onPress(self, key):
+    def onPress(self, key): #whenever a button is pressed, it sets that button's variable to true
         try:
             ch = key.char
 
@@ -51,7 +51,7 @@ class KeyHandler:
             self.dToggle = True
     
     
-    def onRelease(self, key):
+    def onRelease(self, key): #opposite of onPress, sets it to false when button is released 
         try:
             ch = key.char
             if ch == 'w':
@@ -67,7 +67,7 @@ class KeyHandler:
         except AttributeError:
             pass
     
-    def doAction(self, event):
+    def doAction(self, event): #does an action based on the current item in the inventory
         if self.SceneClass.current_scene == "scene_game":
             if self.hotbar.inventory[self.hotbar.cursorPosition - 1] == 0:
                 return
@@ -89,6 +89,7 @@ class KeyHandler:
             
             self.mouseClickx = event.x
             self.mouseClicky = event.y
+            #Updates the clicked mouse location
 
     def cancelAction(self, event):
         self.checkEvents.append("Cancel")
@@ -97,7 +98,7 @@ class KeyHandler:
         self.mouseX = event.x 
         self.mouseY = event.y
     
-    def addTkinterBind(self, bind, function):
+    def addTkinterBind(self, bind, function): #So other objects can use this object to bind to screen
         self.screen.root.bind(bind, function)
         
 

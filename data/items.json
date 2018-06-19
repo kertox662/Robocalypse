@@ -50,7 +50,7 @@
 		"type":"Tool",
 		"icon":"images/Misc/Battery/Battery.png",
 		"iconHighlight":"images/Misc/Battery/BatteryHighlight.png",
-		"cost":[0,0,15,5],
+		"cost":[0,10,15,5],
 		"tableRequired":true
 	},
 
@@ -137,7 +137,7 @@
 		"type":"Resource",
 		"icon": "images/Resources/Electrical/wires.png",
 		"iconHighlight": "images/Resources/Electrical/wires.png",
-		"cost": [0,0,2,0],
+		"cost": [1,0,2,0],
 		"tableRequired":false}
 
 }

@@ -153,7 +153,7 @@ def saveSettings():
 #=============Thread Functions=============
 #==========================================
 
-#Ticks up Frame Rate
+#Calculates the FPS
 def countFrameRate():
     global frame
     global fps
@@ -165,7 +165,7 @@ def countFrameRate():
         frame = 0
         startTime = time()
 
-#Calculates the FPS
+#displays the FPS
 def displayFPS():
     global fpsText
     text = "{} fps".format(fps)
@@ -184,7 +184,7 @@ def doDayCycle():
 
 #The calculation thread
 def doGameCalculations():
-    global bindQueue, timeOfDay
+    global bindQueue, timeOfDay, renderedTiles, CraftWin, dayFrame
     while True:
         if Scene.current_scene == "scene_game" and mainS.switch == False:
             #Player Movement
@@ -216,7 +216,7 @@ def doGameCalculations():
                 timeOfDay = "Night"
             
             #Every certain amount of frames, electricity decreases
-            if dayFrame % 200 == 0:
+            if dayFrame % 400 == 0:
                 player.electricity -= 1
                 player.electricity = max(0,player.electricity)
             
@@ -231,7 +231,7 @@ def doGameCalculations():
             #Checks for win
             for i in furnitureArray:
                 if i.id == 6:
-                    if i.resource >= 1000 and i.wires >= 500:
+                    if i.resource >= 600 and i.wires >= 300:
                         i.sprite = i.altSprite
             
             #Checks for game loss from days
@@ -239,8 +239,21 @@ def doGameCalculations():
                 gameS.change_scene("scene_gameOver")
 
 
+            if CraftWin.openWindow: #Moves the crafting window depending on if it is open or not
+                if CraftWin.x < 112:
+                    CraftWin.x += 8
             
+            else:
+                if CraftWin.x > -112:
+                    CraftWin.x -= 8
+            
+            if gameS.checkRendered(renderedTiles) == False: #If a tile in rendered tiles goes offscreen, sets a new rendered tiles array
+                renderedTiles = gameS.setRenderGrid()
+            
+            player.chooseAnimFrame()
 
+            dayFrame += 2
+            
         sleep(1/60)
 
 #Events from crafting and action button
@@ -370,7 +383,7 @@ def customEventHandler():
         #Ids are taken from tiles.json
         if int(tileToCheck.id) in [2, 19, 20, 21, 22]:
             if tileToCheck.isPointInBox([player.x, player.y + 35]):
-                player.wireHP -= 0.1
+                # player.wireHP -= 0.1
                 Player.playerSpeed = 5
             
             else:
@@ -378,7 +391,7 @@ def customEventHandler():
 
         elif int(tileToCheck.id) in [4,5,6,7,8,9,10,11]:
             if not tileToCheck.isPointInBox([player.x, player.y + 35]):
-                player.wireHP -= 0.1
+                # player.wireHP -= 0.1
                 Player.playerSpeed = 5
             
             else:
@@ -409,7 +422,8 @@ def customEventHandler():
             
             if craftAvailable == True:
                 if CraftWin.toDoCrafting == 14: #Wires from crafting get added to the resource pool
-                        resources["metal"]["amount"] -= 3
+                        resources["metal"]["amount"] -= 2
+                        resources["wood"]["amount"] -= 1
                         resources["wires"]["amount"] += 1
 
                 elif hotbar.addItem(CraftWin.toDoCrafting): #Game checks if it is possible to place the item in the hotbar
@@ -430,10 +444,8 @@ def doGraphicCalcs():
     global renderedTiles
     while True:
         if Scene.current_scene == "scene_game": #If in game
-            if gameS.checkRendered(renderedTiles) == False: #If a tile in rendered tiles goes offscreen, sets a new rendered tiles array
-                renderedTiles = gameS.setRenderGrid()
-            
-            player.chooseAnimFrame() #Selects player animation frame
+             #Selects player animation frame
+             pass
 
         sleep(1/60)
 
@@ -1082,7 +1094,7 @@ def setInitialValues():
     
 
     
-
+    #Gets the map data to know where to put each tile
     with open('data/TileData.txt') as mapD:
         tileMap = mapD.read().split('\n')
     
@@ -1090,7 +1102,7 @@ def setInitialValues():
         tileMap[i] = tileMap[i].split(',')
 
     percentDone = [0]
-
+    #Starts a thread to make the tileGrid
     loadingThread = Thread(target = loadTiles)
     loadingThread.daemon = True
     loadingThread.start()
@@ -1098,24 +1110,27 @@ def setInitialValues():
     loadScene = LoadingScene(s, percentDone)
     loadScene.updateLoading()
     
-
+    #Makes the Scenes for the game
     mainS = MainScene("Robocalypse", s, KH)
     settingsS = SettingsScene(s,KH)
     gameS = GameScene(s,Cam, KH, tileGrid, player)
     gameoverS = GameOverScene(s, KH, player)
     winS = WinScene(s, KH)
 
+    #Sets which tiles to render on screen
     renderedTiles = gameS.setRenderGrid()
-        
+    
+    #For settings scene
     firstTime = True
 
-    
+    #sorted the entities in order of y value
     for i in tileGrid:
         for j in i:
             j.entities = sorted(j.entities, key = lambda entity: entity.y)
     
     CraftWin = CraftingWindow(s, hotbar, KH, player)
 
+    #Makes initial binds
     KH.addTkinterBind("<space>", player.itemInChestMovement)
     KH.addTkinterBind("<c>", lambda e: toggleOpenCrafting(CraftWin, e))
     if sys.platform == 'linux':
@@ -1126,6 +1141,7 @@ def setInitialValues():
     
     KH.addTkinterBind("e", interact)
 
+    #Creates threads
     frameThread = Thread(target=countFrameRate)
     frameThread.daemon = True
 
@@ -1148,17 +1164,18 @@ def setInitialValues():
     dayCycleThread.daemon = True
       
 
-    
+    #Starts threads 
     frameThread.start()
     calcThread.start()
     eventThread.start()
-    graphCalcThread.start()
-    craftWinThread.start()
+    # graphCalcThread.start()
+    # craftWinThread.start()
     alertThread.start()
-    dayCycleThread.start()
+    # dayCycleThread.start()
 
     sleep(0.1)
 
+    #Does run game
     s.root.after(200, runGame)
         
 
